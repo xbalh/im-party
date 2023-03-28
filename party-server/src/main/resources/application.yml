@@ -6,3 +6,8 @@ spring:
     url: jdbc:mysql://localhost:3306/study?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&useSSL=true
     username: root
     password: 123456
+  cache:
+    type: ehcache
+    ehcache:
+      config: classpath:/ehcache.xml
+
