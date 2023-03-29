@@ -1,4 +1,4 @@
-package com.im.imparty.config.security;
+package com.im.imparty.config.security.filter;
 
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDeniedException;

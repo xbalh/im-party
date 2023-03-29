@@ -1,12 +1,11 @@
 package com.im.imparty.config;
 
-import com.im.imparty.config.security.JwtVerifyFilter;
-import com.im.imparty.config.security.MyAuthenticationFilter;
+import com.im.imparty.config.security.filter.JwtVerifyFilter;
+import com.im.imparty.config.security.filter.LoginVerifyAuthenticationFilter;
 import com.im.imparty.config.security.provider.JwtAuthenticationProvider;
 import com.im.imparty.config.security.provider.MyAuthenticationProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -81,16 +80,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf()
                 .disable()
                 .addFilterBefore(getFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(getFilter2(), MyAuthenticationFilter.class);
+                .addFilterBefore(getFilter2(), LoginVerifyAuthenticationFilter.class);
         System.out.println("");
 
     }
 
     protected Filter getFilter() throws Exception {
-        MyAuthenticationFilter myAuthenticationFilter = new MyAuthenticationFilter(super.authenticationManagerBean());
-        myAuthenticationFilter.setAuthenticationSuccessHandler(loginSuccessHandler);
-        myAuthenticationFilter.setAuthenticationFailureHandler(loginFailureHandler);
-        return myAuthenticationFilter;
+        LoginVerifyAuthenticationFilter loginVerifyAuthenticationFilter = new LoginVerifyAuthenticationFilter(super.authenticationManagerBean());
+        loginVerifyAuthenticationFilter.setAuthenticationSuccessHandler(loginSuccessHandler);
+        loginVerifyAuthenticationFilter.setAuthenticationFailureHandler(loginFailureHandler);
+        return loginVerifyAuthenticationFilter;
     }
     protected Filter getFilter2() throws Exception {
         JwtVerifyFilter myAuthenticationFilter = new JwtVerifyFilter(super.authenticationManagerBean());

@@ -1,4 +1,4 @@
-package com.im.imparty.config.security;
+package com.im.imparty.config.security.filter;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
