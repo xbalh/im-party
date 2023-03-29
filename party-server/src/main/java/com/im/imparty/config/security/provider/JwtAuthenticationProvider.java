@@ -1,5 +1,6 @@
 package com.im.imparty.config.security.provider;
 
+import com.im.imparty.config.security.authentication.LoginJwtToken;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
@@ -12,20 +13,19 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 
 @Component
-public class MyAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
+public class JwtAuthenticationProvider implements AuthenticationProvider {
 
-    public MyAuthenticationProvider() {
-        System.out.println("MyAuthenticationProvider");
+    public JwtAuthenticationProvider() {
+        System.out.println("JwtAuthenticationProvider");
     }
 
     @Override
-    protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
-        System.out.println(userDetails);
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        return authentication;
     }
 
     @Override
-    protected UserDetails retrieveUser(String username, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
-        return new User("小明", "123456", new ArrayList<>());
+    public boolean supports(Class<?> authentication) {
+        return LoginJwtToken.class.isAssignableFrom(authentication);
     }
-
 }

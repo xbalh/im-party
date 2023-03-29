@@ -42,7 +42,7 @@ public class LoginFailureHandler extends SimpleUrlAuthenticationFailureHandler {
         }
         logger.info("登录失败原因：" + errorInfo);
         //ajax请求认证方式
-        response.getWriter().write(BaseResult.ok(errorInfo).data(exception).toJSONString());
+        response.getWriter().write(BaseResult.fail(errorInfo).toJSONString());
     }
 
 }
