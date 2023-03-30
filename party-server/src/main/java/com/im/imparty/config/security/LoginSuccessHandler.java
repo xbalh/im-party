@@ -7,6 +7,7 @@ import org.springframework.security.web.authentication.SavedRequestAwareAuthenti
 import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -30,7 +31,9 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
         logger.info("登录认证成功");
         //这里写你登录成功后的逻辑，可加验证码验证等
 
+        response.setHeader("Token", "123tttt");
+        response.addCookie(new Cookie("Token", "123tttt"));
         //ajax请求认证方式
-        response.getWriter().write(BaseResult.ok("登陆成功").data(authentication).toJSONString());
+        response.getWriter().write(BaseResult.ok(authentication.getName() + "登陆成功").data(authentication).toJSONString());
     }
 }
