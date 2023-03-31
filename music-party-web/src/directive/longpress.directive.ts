@@ -12,7 +12,7 @@ const longpress = {
       throw 'callback must be a function'
     }
     // 定义变量
-    let pressTimer: number
+    let pressTimer: NodeJS.Timeout
     // 运行函数
     el.handler = () => {
       binding.value()
@@ -32,7 +32,7 @@ const longpress = {
     const cancel = () => {
       if (pressTimer !== null) {
         clearTimeout(pressTimer)
-        pressTimer = null as unknown as number
+        pressTimer = null as unknown as NodeJS.Timeout
       }
     }
     // 添加事件监听器

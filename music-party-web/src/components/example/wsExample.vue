@@ -17,7 +17,7 @@ import Ws from "@/utils/ws";
 export default class WsExample extends Vue {
   WS: Ws;
   handleChat: (data: object) => any;
-  timeId: number;
+  timeId: NodeJS.Timeout;
 
   constructor() {
     super();

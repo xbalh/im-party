@@ -15,6 +15,17 @@ export default function gloablHook(router: VueRouter) {
         return next('/')
       }
 
+      //如果没有token，去别的页面要自动跳转到登录页面
+      if (to.path !== '/login' && !token) {
+        return router.replace({
+          name: 'Login',
+          query: {
+            redirectUrl: fullPath
+          }
+        })
+      }
+
+      //如果没有token才需要登录
       if (isLogin && !token) {
         return router.replace({
           name: 'Login',

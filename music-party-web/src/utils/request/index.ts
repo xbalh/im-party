@@ -20,7 +20,7 @@ class RequestProxy implements RequestProxyType {
   private requestCount: number = 0;
   // Loading 控制
   loadingConfig: {
-    timeId?: number
+    timeId?: NodeJS.Timeout
     service?: any
   } = {}
 

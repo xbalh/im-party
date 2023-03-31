@@ -13,7 +13,7 @@ class Ws {
   // 是否在重连中
   isReconnectionLoading = false
   // 延时重连的 id
-  timeId: number | undefined
+  timeId: NodeJS.Timeout | undefined
   // 是否是用户手动关闭连接
   isCustomClose = false
   // 错误消息队列

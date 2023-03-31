@@ -33,6 +33,8 @@ import WsExample from "@/components/example/wsExample.vue";
 import LangExample from "@/components/example/langExample.vue";
 import VuexExample from "@/components/example/vuexExample.vue";
 import WorkerExample from "@/components/example/workerExample.vue";
+import defaultPageApi from "@/api/default-page"
+import Request from "@/utils/requestInstance";
 
 @Component({
   components: {
@@ -47,9 +49,33 @@ import WorkerExample from "@/components/example/workerExample.vue";
 export default class Home extends Vue {
   lazySrc = "https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=2754522765,4239052193&fm=26&gp=0.jpg"
 
+  created() {
+    this.init("test");
+  }
+
+  async init(params: | string ) {
+    console.log(params, "init");
+    try {
+      const res = await Request.get(
+        defaultPageApi.home.init,
+        {
+          params,
+        },
+        { isNeedToken: true }
+      );
+
+    } catch (error) {
+      console.error(error, "init");
+    }
+  }
+
   longpress() {
     console.log("触发长按事件")
   }
+
+
+
+
 }
 </script>
 

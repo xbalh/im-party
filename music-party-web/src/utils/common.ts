@@ -6,7 +6,7 @@
  * @param time 延迟时间
  */
 export const imageStabilization = (cb: Function, delay = 300) => {
-  let timeId: number
+  let timeId: NodeJS.Timeout
 
   return () => {
     if (timeId) clearTimeout(timeId)
@@ -63,3 +63,22 @@ export function outputUrl(query: { [index: string]: string | number }) {
 
   return url.slice(1)
 }
+
+import JSEncrypt from "jsencrypt";
+import * as fs from "fs";
+
+
+const defaultPublickKey = fs.readFileSync('../../publicKey.pem', 'utf8');
+
+export function encodeRSA(word: string, keyStr: string) {
+  //这个是公钥,有入参时用入参，没有入参用默认公钥
+  keyStr = keyStr ? keyStr : defaultPublickKey;
+  //创建对象
+  const jsRsa = new JSEncrypt();
+  //设置公钥
+  jsRsa.setPublicKey(keyStr);
+  //返回加密后结果
+  return jsRsa.encrypt(word);
+}
+
+

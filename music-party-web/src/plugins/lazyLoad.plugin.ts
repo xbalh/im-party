@@ -60,7 +60,7 @@ const LazyLoad = {
   },
   // 节流
   throttle(fn: Function, delay: number) {
-    let timer: number
+    let timer: NodeJS.Timeout
     let prevTime: number
     return function (...args: any[]) {
       const currTime = Date.now()
@@ -78,7 +78,7 @@ const LazyLoad = {
 
       timer = setTimeout(() => {
         prevTime = Date.now()
-        timer = null as unknown as number
+        timer = null as unknown as NodeJS.Timeout
         // eslint-disable-next-line prefer-spread
         fn.apply(null, args)
       }, delay)

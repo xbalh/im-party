@@ -25,11 +25,8 @@ for (const key in routerConfig) {
 const routes: Array<RouteConfig> = [
   {
     path: "",
-    name: "BaseLayout",
-    component: BaseLayout,
-    children: [
-      ...routerConfig.default.routes
-    ]
+    name: "Home",
+    component: () => import(/* webpackChunkName: "login" */ "@/views/main-page/main-module/home/index.vue"),
   },
   {
     path: "/other",

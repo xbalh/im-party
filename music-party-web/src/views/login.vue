@@ -34,9 +34,9 @@ import Request from '@/utils/requestInstance'
 import { namespace } from "vuex-class"
 import type { FormInstance } from "element-plus"
 import { AxiosResponse } from "axios"
-import { LoginData, LoginForm } from "@/types/login";
+import { LoginData, LoginForm } from "@/types/login"
 import { Form } from "element-ui"
-import JSEncrypt from 'jsencrypt';
+import { encodeRSA } from '@/utils/common'
 
 const permissionsStore = namespace('permissionsStore')
 const userStore = namespace('userStore')
@@ -80,16 +80,10 @@ export default class Login extends Vue {
   }
 
   async handleLogin() {
-    const encryptor = new JSEncrypt();
-    const pubKey = ''
-    encryptor.setPublicKey(pubKey);
-    if(!encryptor.encrypt(this.ruleForm.password)){
-      console.error("加密出错了");
-      return
-    }
-    const enPassword = encryptor.encrypt(this.ruleForm.password)
+
+    const enPassword = encodeRSA(this.ruleForm.password, '')
     const formData = new FormData();
-    formData.append("username", this.loginData.ruleForm.username)
+    formData.append("username", this.ruleForm.username)
     formData.append("password", enPassword as string)
     // this.$message.error('账号或密码错误！');
     try {

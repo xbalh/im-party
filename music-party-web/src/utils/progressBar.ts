@@ -1,5 +1,5 @@
 class ProgressBar {
-  timeId = 0;
+  timeId!: NodeJS.Timeout;
   progress = 0;
   backgroundColor: string;
   height: number;
