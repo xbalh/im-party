@@ -8,10 +8,24 @@ module.exports = {
   runtimeCompiler: true,
 
   devServer: {
+    port: 3000,
     overlay: {
-      warnings: true,
+      warnings: false,
       errors: true
     },
+
+    proxy: { // string | Object
+      '/api': {
+        /* 目标代理服务器地址 */
+        target: 'http://localhost:8080/',
+        /* 允许跨域 */
+        changeOrigin: true,
+        pathRewrite: {
+          '^/api': '/' //规定请求地址以什么作为开头
+        }
+      },
+    },
+    host: '0.0.0.0',
     before: require("./src/mock")
   },
 
@@ -42,7 +56,7 @@ module.exports = {
       postcss: {
         plugins: [
           autoprefixer(),
-          
+
           // px -> rem
           // pxtorem({
           //   rootValue: 75,
@@ -66,7 +80,7 @@ module.exports = {
           // })
         ]
       },
-      
+
       // 默认情况下 `sass` 选项会同时对 `sass` 和 `scss` 语法同时生效
       // 因为 `scss` 语法在内部也是由 sass-loader 处理的
       // 但是在配置 `prependData` 选项的时候
@@ -87,5 +101,3 @@ module.exports = {
   //     });
   // }
 }
-
-

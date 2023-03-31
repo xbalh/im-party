@@ -2,5 +2,5 @@
 
 // 分各个小模块
 export const home = {
-  
+  init: '/init-base'
 }

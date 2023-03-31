@@ -15,7 +15,9 @@
     "animate.css": "^4.1.1",
     "axios": "^0.21.0",
     "core-js": "^3.6.5",
+    "element-plus": "2.3.1",
     "element-ui": "^2.14.1",
+    "jsencrypt": "^3.3.2",
     "mockjs": "^1.1.0",
     "postcss-pxtorem": "^5.1.1",
     "vue": "^2.6.11",
@@ -68,5 +70,13 @@
     "hooks": {
       "commit-msg": "commitlint -e $GIT_PARAMS"
     }
+  },
+  "rules": {
+    "generator-star-spacing": "off",
+    "no-debugger": "off",
+    "no-tabs": "off",
+    "no-unused-vars": "off",
+    "no-console": "off",
+    "no-irregular-whitespace": "off"
   }
 }

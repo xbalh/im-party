@@ -31,8 +31,32 @@
 
 <script lang="ts">
 import { Vue } from "vue-property-decorator";
+import Request from "@/utils/requestInstance";
+import defaultPageApi from "@/api/default-page"
 
-export default class BaseLayout extends Vue {}
+export default class BaseLayout extends Vue {
+
+  created() {
+    this.init("test");
+  }
+
+  async init(params: | string ) {
+    console.log(params, "init");
+    try {
+      const res = await Request.get(
+        defaultPageApi.home.init,
+        {
+          params,
+        },
+        { isNeedToken: true }
+      );
+
+    } catch (error) {
+      console.error(error, "init");
+    }
+  }
+
+}
 </script>
 
 <style lang="scss" scoped>

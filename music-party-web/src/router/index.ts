@@ -45,6 +45,11 @@ const routes: Array<RouteConfig> = [
     component: () => import(/* webpackChunkName: "login" */ "@/views/login.vue")
   },
   {
+    path: '/register',
+    name: "Register",
+    component: () => import(/* webpackChunkName: "login" */ "@/views/register.vue")
+  },
+  {
     path: '*',
     name: "404",
     component: () => import(/* webpackChunkName: "404" */ "@/views/404.vue")

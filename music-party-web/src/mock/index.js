@@ -30,7 +30,8 @@ module.exports = function(app) {
 
   const overdue = (req, res, cb) => {
     const { token } = req.headers
-    if ((new Date().getTime() - +token) > 1000 * 60 * 60 * 24 * 7) {
+    //1000 * 60 * 60 * 24 * 7
+    if ((new Date().getTime() - +token) > 1000 ) {
       return res.json({
         code: 401,
         message: 'token 已失效，请登录！'
@@ -67,6 +68,25 @@ module.exports = function(app) {
         res.statusCode = 500;
         res.json(Mock.mock({ code: -1, msg: "请求错误" }));
       }, 3000);
+    })
+
+    .get("/init-base", (req, res) => {
+      console.log(req.url);
+      setTimeout(() => {
+        res.json(
+          Mock.mock({
+            code: 200,
+            // 属性 list 的值是一个数组，其中含有 1 到 10 个元素
+            "list|1-10": [
+              {
+                // 属性 id 是一个自增数，起始值为 1，每次增 1
+                "id|+1": 1,
+                img: Random.image("200x100", "#4A7BF7", "Hello"),
+              },
+            ],
+          })
+        );
+      }, 500);
     })
 
     .get("/list", (req, res) => {
@@ -121,15 +141,15 @@ module.exports = function(app) {
       })
     })
 
-    .post('/login', (req, res) => {
-      res.json({
-        code: 0,
-        data: {
-          token: new Date().getTime()
-        },
-        message: '登录成功'
-      })
-    })
+    // .post('/login', (req, res) => {
+    //   res.json({
+    //     code: 0,
+    //     data: {
+    //       token: new Date().getTime()
+    //     },
+    //     message: '登录成功'
+    //   })
+    // })
 
     .post('/refresh-token', (req, res) => {
       res.json({
