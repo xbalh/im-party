@@ -1,6 +1,6 @@
 package com.im.imparty.config;
 
-import com.im.imparty.config.security.filter.JwtVerifyFilter;
+import com.im.imparty.config.security.filter.JwtVerifyAuthenticationFilter;
 import com.im.imparty.config.security.filter.LoginVerifyAuthenticationFilter;
 import com.im.imparty.config.security.provider.JwtAuthenticationProvider;
 import com.im.imparty.config.security.provider.MyAuthenticationProvider;
@@ -44,10 +44,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(
                         //"/doc.html",
-                        //"/swagger-ui/**",
-                        "/swagger/**",
-                        //"/swagger-resources/**",
-                        //"/**/v3/api-docs",
+                        "/swagger-ui/**",
+                        "/swagger-resources/**",
+                        "/**/v2/api-docs",
                         "/**/*.js",
                         "/**/*.css",
                         "/**/*.png",
@@ -55,17 +54,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         //"/webjars/springfox-swagger-ui/**",
                         //"/actuator/**",
                         //"/druid/**",
-                        "/user/login",
-                        "/user/register",
-                        "/user/info",
-                        "/user/logout"
+                        "/login",
+                        "/register",
+                        "/info",
+                        "/logout"
                 ).permitAll()
                 .anyRequest() //任何其它请求
                 .authenticated() //都需要身份认证
-                .and()
-                .formLogin()
-                .successHandler(loginSuccessHandler)
-                .failureHandler(loginFailureHandler)
+//                .and()
+//                .formLogin()
+//                .successHandler(loginSuccessHandler)
+//                .failureHandler(loginFailureHandler)
                 .and()
                 .authenticationProvider(jwtAuthenticationProvider)
                 .authenticationProvider(myAuthenticationProvider)
@@ -81,7 +80,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .disable()
                 .addFilterBefore(getFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(getFilter2(), LoginVerifyAuthenticationFilter.class);
-        System.out.println("");
 
     }
 
@@ -92,7 +90,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return loginVerifyAuthenticationFilter;
     }
     protected Filter getFilter2() throws Exception {
-        JwtVerifyFilter myAuthenticationFilter = new JwtVerifyFilter(super.authenticationManagerBean());
+        JwtVerifyAuthenticationFilter myAuthenticationFilter = new JwtVerifyAuthenticationFilter(super.authenticationManagerBean());
         return myAuthenticationFilter;
     }
 

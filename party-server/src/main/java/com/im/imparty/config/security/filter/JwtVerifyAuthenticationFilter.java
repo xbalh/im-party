@@ -5,7 +5,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import javax.servlet.FilterChain;
@@ -16,8 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
 
-public class JwtVerifyFilter extends BasicAuthenticationFilter {
-    public JwtVerifyFilter(AuthenticationManager authenticationManager) {
+public class JwtVerifyAuthenticationFilter extends BasicAuthenticationFilter {
+    public JwtVerifyAuthenticationFilter(AuthenticationManager authenticationManager) {
         super(authenticationManager);
     }
 
@@ -34,10 +33,13 @@ public class JwtVerifyFilter extends BasicAuthenticationFilter {
                     ("admin", null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         } else {
-            // 游客登录
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken
-                    ("游客", null, Collections.emptyList());
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            cookie = Arrays.stream(cookies).filter(item -> "useVisitor".equals(item.getName())).findAny().orElse(null);
+            // 判断游客登录
+            if (cookie != null) {
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken
+                        ("游客", null, Collections.emptyList());
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            }
         }
         chain.doFilter(request, response);
     }

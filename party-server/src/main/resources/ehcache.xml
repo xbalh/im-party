@@ -41,7 +41,7 @@
      diskExpiryThreadIntervalSeconds， 磁盘缓存的清理线程运行间隔,默认是120秒
      memoryStoreEvictionPolicy， 内存存储与释放策略,即达到maxElementsInMemory限制时,Ehcache会根据指定策略清理内存 共有三种策略,分别为LRU(最近最少使用)、LFU(最常用的)、FIFO(先进先出)
     -->
-    <cache name="user"
+    <cache name="userInfo"
            maxElementsInMemory="10000"
            eternal="false"
            timeToIdleSeconds="6000"

@@ -1,4 +1,4 @@
-package com.im.imparty.web.vo.util;
+package com.im.imparty.spring.util;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
