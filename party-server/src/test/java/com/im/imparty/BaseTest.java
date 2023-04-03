@@ -1,8 +1,10 @@
 package com.im.imparty;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.im.imparty.user.entity.User;
+import com.im.imparty.user.dto.UserInfoDetail;
+import com.im.imparty.user.entity.UserDomain;
 import com.im.imparty.user.mapper.UserMapper;
+import com.im.imparty.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,11 +17,12 @@ import java.util.List;
 public class BaseTest {
 
     @Resource
-    private UserMapper userMapper;
+    private UserService userService;
 
     @Test
     public void test() {
-        List<User> users = userMapper.selectList(new QueryWrapper<>());
+        UserInfoDetail users = userService.getUserDetail("root");
+        users = userService.getUserDetail("root");
         log.info("{}", users);
     }
 }

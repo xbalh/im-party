@@ -24,6 +24,10 @@ public class BaseResult<T> {
     public static <T> BaseResult<T> ok(String msg) {
         return new BaseResult(200, msg);
     }
+
+    public static <T> BaseResult<T> ok(String msg, T data) {
+        return new BaseResult(200, msg).data(data);
+    }
     public static <T> BaseResult<T> fail(String msg) {
         return new BaseResult(500, msg);
     }

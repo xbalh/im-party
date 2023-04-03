@@ -1,13 +1,22 @@
 server:
   port: 8080
 spring:
+  profiles:
+    active: dev
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/study?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&useSSL=true
-    username: root
-    password: 123456
+    url: jdbc:mysql://117.50.183.42:3306/imparty?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&useSSL=true
+    username: partyuser
+    password: Xbalh@123456
   cache:
     type: ehcache
     ehcache:
       config: classpath:/ehcache.xml
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+mybatis-plus:
+  global-config:
+    db-config:
+      id-type: ASSIGN_ID # mybatisPlus id生成策略雪花算法
 
