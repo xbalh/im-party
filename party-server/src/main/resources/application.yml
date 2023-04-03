@@ -6,8 +6,8 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://117.50.183.42:3306/imparty?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&useSSL=true
-    username: root
-    password: Wsm@19980824
+    username: partyuser
+    password: Xbalh@123456
   cache:
     type: ehcache
     ehcache:
