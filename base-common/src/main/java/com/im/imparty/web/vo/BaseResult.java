@@ -32,6 +32,10 @@ public class BaseResult<T> {
         return new BaseResult(500, msg);
     }
 
+    public static <T> BaseResult<T> build(int code, String msg) {
+        return new BaseResult(code, msg);
+    }
+
     public BaseResult<T> data(T data) {
         this.data = data;
         return this;

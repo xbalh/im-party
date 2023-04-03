@@ -1,5 +1,7 @@
 package com.im.imparty.config;
 
+import com.im.imparty.config.security.MyAccessDeniedHandler;
+import com.im.imparty.config.security.MyAuthenticationEntryPoint;
 import com.im.imparty.config.security.filter.JwtVerifyAuthenticationFilter;
 import com.im.imparty.config.security.filter.LoginVerifyAuthenticationFilter;
 import com.im.imparty.config.security.provider.JwtAuthenticationProvider;
@@ -61,10 +63,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 ).permitAll()
                 .anyRequest() //任何其它请求
                 .authenticated() //都需要身份认证
-//                .and()
-//                .formLogin()
-//                .successHandler(loginSuccessHandler)
-//                .failureHandler(loginFailureHandler)
+                .and()
+                .formLogin()
+                .successHandler(loginSuccessHandler)
+                .failureHandler(loginFailureHandler)
                 .and()
                 .authenticationProvider(jwtAuthenticationProvider)
                 .authenticationProvider(myAuthenticationProvider)
@@ -79,7 +81,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf()
                 .disable()
                 .addFilterBefore(getFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(getFilter2(), LoginVerifyAuthenticationFilter.class);
+                .addFilterBefore(getFilter2(), LoginVerifyAuthenticationFilter.class)
+                .exceptionHandling()
+                .authenticationEntryPoint(new MyAuthenticationEntryPoint())
+                .accessDeniedHandler(new MyAccessDeniedHandler());
 
     }
 

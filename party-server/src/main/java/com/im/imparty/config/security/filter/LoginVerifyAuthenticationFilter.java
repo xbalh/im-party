@@ -12,6 +12,7 @@ import com.im.imparty.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -45,7 +46,7 @@ public class LoginVerifyAuthenticationFilter extends UsernamePasswordAuthenticat
         if (!request.getMethod().equals("POST")) {
             throw new AuthenticationServiceException("Authentication method not supported: " + request.getMethod());
         }
-
+        String errorMsg = "";
         try (BufferedReader reader = request.getReader()){
             StringBuilder sb = new StringBuilder();
             String buffer = null;
@@ -57,23 +58,20 @@ public class LoginVerifyAuthenticationFilter extends UsernamePasswordAuthenticat
             }
             if (JSONValidator.from(sb.toString()).validate()) {
                 LoginInVO loginIn = JSONObject.parseObject(sb.toString(), LoginInVO.class);
-                UserService bean = SpringFactoryUtils.getBean(UserService.class);
-                UserInfoDetail login = bean.getUserDetail(loginIn.getUsername());
+                //UserService bean = SpringFactoryUtils.getBean(UserService.class);
+                //UserInfoDetail login = bean.getUserDetail(loginIn.getUsername());
                 UsernamePasswordAuthenticationToken authenticationToken =
-                        new UsernamePasswordAuthenticationToken(login.getUserName()
-                                , login.getPassword()
-                                , login.getRoleList().stream().map(i ->
-                                (GrantedAuthority) () -> i.getRoleCode()
-                        ).collect(Collectors.toList()));
-                authenticationToken.setDetails(login);
+                        new UsernamePasswordAuthenticationToken(loginIn.getUsername()
+                                , loginIn.getPassword());
+                setDetails(request, authenticationToken);
                 return this.getAuthenticationManager().authenticate(authenticationToken);
             }
         } catch (IOException e) {
             log.error("LoginVerifyAuthenticationFilter验证io异常");
-            return null;
-        } catch (Exception e) {
+            throw new InternalAuthenticationServiceException(e.getMessage());
+        } catch (AuthenticationException e) {
             log.error("LoginVerifyAuthenticationFilter异常");
-            return null;
+            throw e;
         }
         return null;
     }

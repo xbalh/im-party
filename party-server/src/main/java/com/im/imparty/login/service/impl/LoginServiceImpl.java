@@ -31,11 +31,11 @@ public class LoginServiceImpl implements LoginService {
 
         JSONObject info = new JSONObject();
         info.put("nickName", userDetail.getNickName());
-        info.put("userName", userDetail.getUserName());
+        info.put("userName", userDetail.getUsername());
         info.put("saltExpiresTime", DateTimeUtils.dateTimeToString(userDetail.getSaltExpiresTime()));
         info.put("roleList", StringUtils.join(Optional.ofNullable(userDetail.getRoleList()).orElse(Collections.emptyList())));
-        String tokenJwt = JwtTokenUtils.encryptTokenJwt(info, userDetail.getUserName(), userDetail.getSalt());
-        LoginInfoVO loginInfoVO = new LoginInfoVO(tokenJwt, JwtTokenUtils.encryptRefreshTokenJwt(tokenJwt, userDetail.getSalt()));
+        String tokenJwt = JwtTokenUtils.encryptTokenJwt(info, userDetail.getUsername());
+        LoginInfoVO loginInfoVO = new LoginInfoVO(tokenJwt, JwtTokenUtils.encryptRefreshTokenJwt(tokenJwt));
         return loginInfoVO;
 
     }
