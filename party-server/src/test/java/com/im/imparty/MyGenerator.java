@@ -21,8 +21,15 @@ public class MyGenerator {
     /** 数据源配置*/
     private static final String jdbc = "jdbc:mysql://117.50.183.42:3306/imparty?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&useSSL=true";
     private static final String driverName = "com.mysql.cj.jdbc.Driver";
-    private static final String username = "root";
-    private static final String password = "Wsm@19980824";
+    private static String username = "";
+    private static String password = "";
+
+    static {
+        // -DdatabaseUser=xxx  -DdatabasePassword=xxx
+        username = System.getProperty("DdatabaseUser");
+        password = System.getProperty("DdatabasePassword");
+    }
+
     /** 包名*/
     private static final String moduleName = "user";
     /** 表名前缀*/
