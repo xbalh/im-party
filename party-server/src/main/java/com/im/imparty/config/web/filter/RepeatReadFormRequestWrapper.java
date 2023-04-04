@@ -11,11 +11,11 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class FormRequestWrapper extends HttpServletRequestWrapper {
+public class RepeatReadFormRequestWrapper extends HttpServletRequestWrapper {
 
     private final byte[] requestBody;
 
-    public FormRequestWrapper(HttpServletRequest request) throws IOException {
+    public RepeatReadFormRequestWrapper(HttpServletRequest request) throws IOException {
         super(request);
         requestBody =  StreamUtils.copyToByteArray(request.getInputStream());
     }
