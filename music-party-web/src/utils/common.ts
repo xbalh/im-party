@@ -65,12 +65,20 @@ export function outputUrl(query: { [index: string]: string | number }) {
 }
 
 import JSEncrypt from "jsencrypt";
-import * as fs from "fs";
 
-
-const defaultPublickKey = fs.readFileSync('../../publicKey.pem', 'utf8');
+const defaultPublickKey = `-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAov7q9c1SjnOS4TB3RRB+
+b/laKcLzYNSuvupXeZj4VguqKFGLoUFvCHWuKStqdscaDq9JwWh1q1eS+HqbV1G7
+S1IUccj3IcFUwQZFaHufCgGg1fT8j/nl6iniefNbDtIbcJk0KTlk5tlCT72xGRrr
+08tbnTj6y0uivGMVtrDQTWaduqSlogFs6Rj4Dg0sJ2kTmRr9LFMno/wLlcV475+5
+H4uo3UIYckE8RoP8iY+4ZO/8ZxCiKn0e/xmgFhIDqD9Y+yVIEwBV50RY1P+nuNMC
+wgEkUG3oNo+XHrzrXJHJL/Z/GIYGrbYwm24uWcJhbeZbdiguc/GjyzfAgzzI3liD
+5QIDAQAB
+-----END PUBLIC KEY-----
+`
 
 export function encodeRSA(word: string, keyStr: string) {
+
   //这个是公钥,有入参时用入参，没有入参用默认公钥
   keyStr = keyStr ? keyStr : defaultPublickKey;
   //创建对象

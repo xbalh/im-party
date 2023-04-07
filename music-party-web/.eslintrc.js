@@ -21,7 +21,14 @@ module.exports = {
     "@typescript-eslint/ban-ts-ignore": ["off"],
     "@typescript-eslint/no-var-requires": ["off"],
     "@typescript-eslint/no-non-null-assertion": ["off"],
-    "prettier/prettier": "off"
+    "prettier/prettier": "off",
+    "@typescript-eslint/no-this-alias": [
+      "off",
+      {
+        "allowDestructuring": true, // Disallow `const { props, state } = this`; true by default
+        "allowedNames": ["vm"] // Allow `const self = this`; `[]` by default
+      }
+    ]
   },
   overrides: [
     {

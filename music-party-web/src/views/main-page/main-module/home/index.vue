@@ -1,28 +1,6 @@
 <template>
   <div class="home">
-    <h1 class="title animate__animated animate__infinite animate__shakeX">test request</h1>
-    <request-example />
-
-    <h1 class="title" v-animate="'animate__infinite animate__shakeX'">test WebSocket</h1>
-    <ws-example />
-
-    <h1 class="title animate__animated animate__infinite animate__fadeIn">Lang</h1>
-    <lang-example />
-
-    <h1 class="title">Vuex</h1>
-    <vuex-example />
-
-    <h1 class="title">Directive</h1>
-    <p v-copy>点我复制 <span>😯</span></p>
-
-    <h1 class="title">Longpress</h1>
-    <p v-longpress="longpress">长按 <span>😯</span></p>
-
-    <worker-example />
-
-    <img
-      v-lazyLoad="lazySrc"
-    />
+    <MusicPlayer></MusicPlayer>
   </div>
 </template>
 
@@ -33,6 +11,7 @@ import WsExample from "@/components/example/wsExample.vue";
 import LangExample from "@/components/example/langExample.vue";
 import VuexExample from "@/components/example/vuexExample.vue";
 import WorkerExample from "@/components/example/workerExample.vue";
+import MusicPlayer from "@/components/music-player/index.vue";
 import defaultPageApi from "@/api/default-page"
 import Request from "@/utils/requestInstance";
 
@@ -42,7 +21,8 @@ import Request from "@/utils/requestInstance";
     WsExample,
     LangExample,
     VuexExample,
-    WorkerExample
+    WorkerExample,
+    MusicPlayer
   }
 })
 

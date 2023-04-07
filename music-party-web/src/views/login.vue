@@ -52,11 +52,11 @@ export default class Login extends Vue {
   rules = {
     username: [
       { required: true, message: '请输入账号', trigger: 'blur' },
-      { min: 5, max: 16, message: '账号的长度在5-16之间', trigger: 'blur' },
+      { min: 1, max: 16, message: '账号的长度在1-16之间', trigger: 'blur' },
     ],
     password: [
       { required: true, message: '请输入密码', trigger: 'blur' },
-      { min: 6, max: 20, message: '密码的长度在6-20之间', trigger: 'blur' },
+      { min: 1, max: 20, message: '密码的长度在1-20之间', trigger: 'blur' },
     ],
   }
 
@@ -90,15 +90,18 @@ export default class Login extends Vue {
       const res: AxiosResponse = await Request.post(
         '/login',
         {
-          data: formData
+          data: {
+            username: this.ruleForm.username,
+            password: enPassword
+          }
         }
       )
-      if (res.status !== 200) {
-        this.$message.error('账号或密码错误！');
-        return
-      }
+      // if (res.status !== 200 || !res.headers.token || res.headers.token == '') {
+      //   this.$message.error('账号或密码错误！');
+      //   return
+      // }
 
-      this.setToken(res.headers.token)
+      this.setToken(res.data.token)
 
     } catch (error) {
       console.log(error, "login error")
@@ -109,21 +112,21 @@ export default class Login extends Vue {
 
     this.$router.replace({ path })
 
-    try {
-      const res = await Request.get('/promise')
-      this.setPermissions(res.data)
-    } catch (error) {
-      console.error(error, '获取权限出错了')
-    }
+    // try {
+    //   const res = await Request.get('/promise')
+    //   this.setPermissions(res.data)
+    // } catch (error) {
+    //   console.error(error, '获取权限出错了')
+    // }
   }
 }
 </script>
 
 <style>
 body {
-  background: url('../assets/images/登录界面背景图.jpg');
+  /* background: url('../assets/images/登录界面背景图.jpg'); */
   /* background-repeat: repeat-x; */
-  background-attachment: fixed;
+  /* background-attachment: fixed; */
 }
 
 form {

@@ -141,15 +141,15 @@ module.exports = function(app) {
       })
     })
 
-    // .post('/login', (req, res) => {
-    //   res.json({
-    //     code: 0,
-    //     data: {
-    //       token: new Date().getTime()
-    //     },
-    //     message: '登录成功'
-    //   })
-    // })
+    .post('/api/login', (req, res) => {
+      res.json({
+        code: 200,
+        data: {
+          token: new Date().getTime()
+        },
+        message: '登录成功'
+      })
+    })
 
     .post('/refresh-token', (req, res) => {
       res.json({
