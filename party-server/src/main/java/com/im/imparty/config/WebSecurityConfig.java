@@ -5,7 +5,7 @@ import com.im.imparty.config.security.MyAuthenticationEntryPoint;
 import com.im.imparty.config.security.filter.JwtVerifyAuthenticationFilter;
 import com.im.imparty.config.security.filter.LoginVerifyAuthenticationFilter;
 import com.im.imparty.config.security.provider.JwtAuthenticationProvider;
-import com.im.imparty.config.security.provider.MyAuthenticationProvider;
+import com.im.imparty.config.security.provider.PasswordLoginAuthenticationProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -34,7 +34,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private AuthenticationFailureHandler loginFailureHandler; //认证失败结果处理器
 
     @Resource
-    private MyAuthenticationProvider myAuthenticationProvider;
+    private PasswordLoginAuthenticationProvider passwordLoginAuthenticationProvider;
 
     @Resource
     private JwtAuthenticationProvider jwtAuthenticationProvider;
@@ -69,7 +69,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .failureHandler(loginFailureHandler)
                 .and()
                 .authenticationProvider(jwtAuthenticationProvider)
-                .authenticationProvider(myAuthenticationProvider)
+                .authenticationProvider(passwordLoginAuthenticationProvider)
                 //2、登录配置表单认证方式
                 //4、session管理
                 .sessionManagement()

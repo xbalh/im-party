@@ -67,8 +67,8 @@
 
         <dependency>
             <groupId>cn.hutool</groupId>
-            <artifactId>hutool-core</artifactId>
-            <version>5.8.9</version>
+            <artifactId>hutool-all</artifactId>
+            <version>5.7.16</version>
         </dependency>
 
     </dependencies>

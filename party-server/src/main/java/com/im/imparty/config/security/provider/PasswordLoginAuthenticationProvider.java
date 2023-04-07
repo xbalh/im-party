@@ -1,7 +1,9 @@
 package com.im.imparty.config.security.provider;
 
+import cn.hutool.crypto.SecureUtil;
 import com.im.imparty.user.dto.UserInfoDetail;
 import com.im.imparty.user.service.UserService;
+import org.apache.catalina.security.SecurityUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachePut;
@@ -17,13 +19,15 @@ import org.springframework.security.core.userdetails.UserCache;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
+import java.security.interfaces.RSAKey;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 @Component
-public class MyAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider implements UserCache {
+public class PasswordLoginAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider implements UserCache {
 
     @Resource
     private CacheManager cacheManager;
@@ -31,7 +35,7 @@ public class MyAuthenticationProvider extends AbstractUserDetailsAuthenticationP
     @Resource
     private UserService userService;
 
-    public MyAuthenticationProvider() {
+    public PasswordLoginAuthenticationProvider() {
         setUserCache(this);
         System.out.println("MyAuthenticationProvider");
     }
