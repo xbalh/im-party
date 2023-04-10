@@ -1,6 +1,13 @@
 <template>
   <div class="home">
-    <MusicPlayer></MusicPlayer>
+    <div>
+      <MusicPlayer @currentTime="currentTime"></MusicPlayer>
+    </div>>
+<div>
+  <el-button @click="setCurrentTime">
+    控制当前播放进度
+  </el-button>
+</div>
   </div>
 </template>
 
@@ -29,6 +36,8 @@ import Request from "@/utils/requestInstance";
 export default class Home extends Vue {
   lazySrc = "https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=2754522765,4239052193&fm=26&gp=0.jpg"
 
+  currentTime: string = "00:00";
+
   created() {
     this.init("test");
   }
@@ -47,6 +56,10 @@ export default class Home extends Vue {
     } catch (error) {
       console.error(error, "init");
     }
+  }
+
+  setCurrentTime() {
+    this.currentTime = "01:01"
   }
 
   longpress() {
