@@ -52,6 +52,11 @@
                 <version>${im-version}</version>
             </dependency>
             <dependency>
+                <groupId>com.im</groupId>
+                <artifactId>websocket</artifactId>
+                <version>${im-version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-test</artifactId>
             </dependency>

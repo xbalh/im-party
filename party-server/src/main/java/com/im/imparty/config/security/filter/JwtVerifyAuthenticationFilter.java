@@ -3,12 +3,11 @@ package com.im.imparty.config.security.filter;
 import com.alibaba.fastjson.JSONObject;
 import com.auth0.jwt.interfaces.Claim;
 import com.im.imparty.common.util.JwtTokenUtils;
-import com.im.imparty.config.security.authentication.LoginJwtToken;
+import com.im.imparty.spring.authentication.LoginJwtToken;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
@@ -21,7 +20,6 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class JwtVerifyAuthenticationFilter extends BasicAuthenticationFilter {
     public JwtVerifyAuthenticationFilter(AuthenticationManager authenticationManager) {
