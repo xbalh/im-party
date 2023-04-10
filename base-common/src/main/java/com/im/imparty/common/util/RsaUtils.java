@@ -87,12 +87,17 @@ public class RsaUtils {
         InputStream inputStream = private_key.getInputStream();
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         IoUtil.copy(inputStream, byteArrayOutputStream);
-        //String key = new String(byteArrayOutputStream.toByteArray()).replaceAll("\n", "");
-        RSAPrivateKey rsaPrivateKey = RSAPrivateCrtKeyImpl.newKey(byteArrayOutputStream.toByteArray());
-        return decryptByPrivateKey(data, rsaPrivateKey);
+        RSA rsa = new RSA(new String(byteArrayOutputStream.toByteArray()), null);
+        return new String(rsa.decrypt(data, KeyType.PrivateKey));
     }
 
     public static void main(String[] args) throws Exception {
+                     //HK3GD6YhjUkgDAazhd7NhV7qDSm30Z1DLARn2W3gOZ+WHMWIJUJOesKHwWcXeK02hJfOFPr7PRpe01f7kVIIVQ==
+        String data = "HK3GD6YhjUkgDAazhd7NhV7qDSm30Z1DLARn2W3g0Z+WHMWlJUJOesKHwWcXeKO2hJfOFPr7PRpeOlf7kVIlVQ==";
+        String decrypt = decrypt(data);
+    }
+
+    public static void main2(String[] args) throws Exception {
 
         String str = "1234";
         RSA rsa = new RSA();

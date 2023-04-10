@@ -1,6 +1,7 @@
 package com.im.imparty.config.security.provider;
 
 import cn.hutool.crypto.SecureUtil;
+import com.im.imparty.common.util.RsaUtils;
 import com.im.imparty.user.dto.UserInfoDetail;
 import com.im.imparty.user.service.UserService;
 import org.apache.catalina.security.SecurityUtil;
@@ -42,7 +43,13 @@ public class PasswordLoginAuthenticationProvider extends AbstractUserDetailsAuth
 
     @Override
     protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
-        if (!StringUtils.equals(userDetails.getPassword(), authentication.getCredentials().toString())) {
+        String password = "";
+        try {
+            password = RsaUtils.decrypt(authentication.getCredentials().toString());
+        } catch (Exception e) {
+            throw new BadCredentialsException("密码错误");
+        }
+        if (!StringUtils.equals(userDetails.getPassword(), password)) {
             throw new BadCredentialsException("密码错误");
         }
         System.out.println(userDetails);
