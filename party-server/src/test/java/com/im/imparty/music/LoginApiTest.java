@@ -1,9 +1,12 @@
 package com.im.imparty.music;
 
 import com.im.imparty.BaseTest;
+import com.im.imparty.music.api.LoginApi;
+import com.im.imparty.music.api.MusicApi;
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 
 public class LoginApiTest extends BaseTest {
 
@@ -15,7 +18,7 @@ public class LoginApiTest extends BaseTest {
 
     @Test
     public void test() {
-        String s = loginApi.qrKey();
+        String s = musicApi.getSong(Arrays.asList("210049"), "exhigh");
         System.out.println(s);
     }
 }

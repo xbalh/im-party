@@ -13,8 +13,11 @@ spring:
     ehcache:
       config: classpath:/ehcache.xml
   mvc:
-    pathmatch:
-      matching-strategy: ant_path_matcher
+    view:
+      suffix: .html
+      static-path-pattern: /**
+      resources:
+        static-locations: classpath:/templates/,classpath:/static/
 mybatis-plus:
   global-config:
     db-config:
