@@ -20,3 +20,6 @@ mybatis-plus:
     db-config:
       id-type: ASSIGN_ID # mybatisPlus id生成策略雪花算法
 
+NeteaseCloudMusicApi:
+  url: http://117.50.183.42:3000
+
