@@ -50,6 +50,10 @@
             <artifactId>spring-boot-starter-freemarker</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.im</groupId>
+            <artifactId>websocket</artifactId>
+        </dependency>
         <!-- mybatis-plus-generator依赖-->
         <dependency>
             <groupId>com.baomidou</groupId>

@@ -1,4 +1,4 @@
-package com.im.imparty.config.security.authentication;
+package com.im.imparty.spring.authentication;
 
 import lombok.Data;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
