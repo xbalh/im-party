@@ -2,13 +2,7 @@ package com.im.imparty.config.security.filter;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONValidator;
-import com.im.imparty.config.security.authentication.LoginJwtToken;
-import com.im.imparty.login.service.LoginService;
 import com.im.imparty.login.vo.LoginInVO;
-import com.im.imparty.login.vo.LoginInfoVO;
-import com.im.imparty.spring.util.SpringFactoryUtils;
-import com.im.imparty.user.dto.UserInfoDetail;
-import com.im.imparty.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -16,17 +10,13 @@ import org.springframework.security.authentication.InternalAuthenticationService
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.stream.Collectors;
 
 
 @Slf4j

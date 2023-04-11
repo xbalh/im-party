@@ -34,4 +34,6 @@ public class UserController {
 //        };
     }
 
+    // public BaseResult<String> getWebsocket
+
 }
