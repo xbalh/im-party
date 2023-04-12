@@ -11,9 +11,12 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class WpDic {
-    private Integer str;
-    private Integer wit;
-    private Integer agi;
-    private Integer spd;
-    private Integer hlt;
+    private String id;
+    private Integer wpStr;
+    private Integer wpWit;
+    private Integer wpAgi;
+    private Integer wpHlt;
+    private String wpType;
+    private String wpRarity;
+    private String wpSize;
 }

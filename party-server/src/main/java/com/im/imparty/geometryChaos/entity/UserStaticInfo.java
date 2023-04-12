@@ -10,7 +10,7 @@ import lombok.experimental.Accessors;
  **/
 @Data
 @Accessors(chain = true)
-public class PersonInfo {
+public class UserStaticInfo {
     private String userName;
     private Integer str;
     private Integer wit;

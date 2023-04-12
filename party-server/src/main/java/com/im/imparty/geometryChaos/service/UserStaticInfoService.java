@@ -1,8 +1,7 @@
 package com.im.imparty.geometryChaos.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.im.imparty.geometryChaos.entity.EverydayInfo;
-import com.im.imparty.geometryChaos.entity.PersonInfo;
+import com.im.imparty.geometryChaos.entity.UserStaticInfo;
 
 /**
  * <p>
@@ -12,5 +11,5 @@ import com.im.imparty.geometryChaos.entity.PersonInfo;
  * @author liang yanbo
  * @since 2022-08-18
  */
-public interface PersonInfoService extends IService<PersonInfo> {
+public interface UserStaticInfoService extends IService<UserStaticInfo> {
 }

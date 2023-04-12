@@ -20,7 +20,7 @@ public class PersonFightInfo {
     private Integer wit;
     private Integer agi;
     private Integer spd;
-    private Integer hlt;
+    private Integer htl;
     private Integer cri;
     private Integer criPer;
     private Integer blk;
@@ -30,6 +30,5 @@ public class PersonFightInfo {
     private BigDecimal finalDef;
     private List<String> usedWeapon;
     private List<BuffInfo> buff;
-    private List<BuffInfo> debuff;
     private WpInfo wpInfo;
 }

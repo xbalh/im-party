@@ -2,12 +2,8 @@ package com.im.imparty.geometryChaos.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.im.imparty.geometryChaos.entity.BattleInfo;
-import com.im.imparty.geometryChaos.entity.PersonInfo;
 import com.im.imparty.geometryChaos.mapper.BattleInfoMapper;
-import com.im.imparty.geometryChaos.mapper.PersonInfoMapper;
 import com.im.imparty.geometryChaos.service.BattleInfoService;
-import com.im.imparty.geometryChaos.service.PersonInfoService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
