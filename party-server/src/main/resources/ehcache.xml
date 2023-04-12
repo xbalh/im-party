@@ -59,4 +59,13 @@
            overflowToDisk="true"
            memoryStoreEvictionPolicy="LRU" />
 
+    <cache name="MusicLogin"
+           maxElementsInMemory="10000"
+           eternal="false"
+           timeToIdleSeconds="6000"
+           timeToLiveSeconds="6000"
+           maxElementsOnDisk="10000000"
+           overflowToDisk="true"
+           memoryStoreEvictionPolicy="LRU" />
+
 </ehcache>
