@@ -43,6 +43,14 @@ public class MusicLoginServiceImpl implements MusicLoginService {
         return null;
     }
 
+
+    @Cacheable(cacheNames = "MusicLogin", key = "'cookie'", unless = "#result != null")
+    @Override
+    public String getCookie() {
+
+        return null;
+    }
+
     @Override
     @Caching(
             evict = {
@@ -50,7 +58,9 @@ public class MusicLoginServiceImpl implements MusicLoginService {
                     @CacheEvict(cacheNames = "MusicLogin", key = "'qrimg'")
             }
     )
-    public void clearQrKey() {
+    public void clearQrKey() {}
 
+    private String getCookie2() {
+        return null;
     }
 }

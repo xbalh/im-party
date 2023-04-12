@@ -12,6 +12,8 @@ public interface MusicLoginService {
     @Cacheable(cacheNames = "MusicLogin", key = "key", unless = "#result != null")
     String getQrKeyInCache();
 
+    String getCookie();
+
     @CacheEvict(cacheNames = "MusicLogin", key = "key")
     void clearQrKey();
 }
