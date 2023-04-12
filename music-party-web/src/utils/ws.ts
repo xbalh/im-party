@@ -85,7 +85,7 @@ class Ws {
     this.ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data)
-        this.eventCenter.emit(data.type, data.data)
+        this.eventCenter.emit(data.method, data.data)
       } catch (error) {
         console.log(error, 'error')
       }

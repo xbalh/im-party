@@ -45,6 +45,7 @@ const userStore = namespace('userStore')
 export default class Login extends Vue {
   @permissionsStore.Mutation('setPermissions') setPermissions!: Function
   @userStore.Mutation('setToken') setToken!: Function
+  @userStore.Mutation('setRefreshToken') setRefreshToken!: Function
 
   loginData: LoginData = reactive(new LoginData())
   ruleForm: LoginForm = this.loginData.ruleForm
@@ -96,12 +97,13 @@ export default class Login extends Vue {
           }
         }
       )
-      // if (res.status !== 200 || !res.headers.token || res.headers.token == '') {
-      //   this.$message.error('账号或密码错误！');
-      //   return
-      // }
+      if (res.status !== 200 || !res.data.accessToken || res.data.accessToken == '') {
+        this.$message.error('账号或密码错误！');
+        return
+      }
 
-      this.setToken(res.data.token)
+      this.setToken(res.data.accessToken)
+      this.setRefreshToken(res.data.refreshToken)
 
     } catch (error) {
       console.log(error, "login error")
