@@ -20,8 +20,8 @@ public class GeometryChaosMainController {
 
     @ApiOperation(value = "创建角色")
     @PostMapping("/geometryChaosMain/createCharacter")
-    public PersonInfo createCharacter(@RequestBody String userName) {
-        PersonInfo geometryChaosMainServiceCharacter = geometryChaosMainService.createCharacter(userName);
+    public UserStaticInfo createCharacter(@RequestBody String userName) {
+        UserStaticInfo geometryChaosMainServiceCharacter = geometryChaosMainService.createCharacter(userName);
         return geometryChaosMainServiceCharacter;
     }
 
@@ -44,8 +44,8 @@ public class GeometryChaosMainController {
 
     @ApiOperation(value = "开始单个回合")
     @PostMapping("/geometryChaosMain/startOneTurn")
-    public String startOneTurn(@RequestBody TurnInfo turnInfo) {
-        String result = geometryChaosMainService.startOneTurn(turnInfo);
+    public BattleInfo startOneTurn(@RequestBody TurnInfo turnInfo) {
+        BattleInfo result = geometryChaosMainService.startOneTurn(turnInfo);
         return result;
     }
 }

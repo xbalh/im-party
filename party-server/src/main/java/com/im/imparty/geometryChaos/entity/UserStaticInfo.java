@@ -1,5 +1,6 @@
 package com.im.imparty.geometryChaos.entity;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -10,7 +11,8 @@ import lombok.experimental.Accessors;
  **/
 @Data
 @Accessors(chain = true)
-public class PersonInfo {
+public class UserStaticInfo {
+    @TableId
     private String userName;
     private Integer str;
     private Integer wit;

@@ -37,6 +37,7 @@ public class JwtVerifyAuthenticationFilter extends BasicAuthenticationFilter {
             LoginJwtToken loginJwtToken = new LoginJwtToken(Collections.emptyList(), jwtStr);
             // TODO refreshToken
             SecurityContextHolder.getContext().setAuthentication(loginJwtToken);
+            response.setHeader("Sec-WebSocket-Protocol", jwtStr);
         } else {
             Cookie[] cookies = Optional.ofNullable(request.getCookies()).orElse(new Cookie[0]);
             Cookie cookie = Arrays.stream(cookies).filter(item -> "Authentication".equals(item.getName())).findAny().orElse(null);

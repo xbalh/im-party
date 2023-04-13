@@ -30,8 +30,8 @@ public class EverydayInfoController {
 
     @ApiOperation(value = "获取每日第一次信息")
     @PostMapping("/everyday/getFirstEveryday")
-    public String getFirstEveryday(@RequestBody EverydayInfo everydayInfo) {
-        String firstEveryday = everydayInfoService.getFirstEveryday(everydayInfo);
+    public String getFirstEveryday(@RequestBody String userName) {
+        String firstEveryday = everydayInfoService.getFirstEveryday(userName);
         return firstEveryday;
     }
 

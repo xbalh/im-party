@@ -2,10 +2,10 @@ package com.im.imparty.geometryChaos.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.im.imparty.geometryChaos.entity.PersonInfo;
+import com.im.imparty.geometryChaos.entity.UserStaticInfo;
 import com.im.imparty.geometryChaos.mapper.EverydayInfoMapper;
 import com.im.imparty.geometryChaos.entity.EverydayInfo;
-import com.im.imparty.geometryChaos.mapper.PersonInfoMapper;
+import com.im.imparty.geometryChaos.mapper.UserStaticInfoMapper;
 import com.im.imparty.geometryChaos.service.EverydayInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,18 +26,16 @@ import java.util.UUID;
 public class EverydayInfoServiceImpl extends ServiceImpl<EverydayInfoMapper, EverydayInfo> implements EverydayInfoService {
 
     @Autowired
-    PersonInfoMapper personInfoMapper;
+    UserStaticInfoMapper userStaticInfoMapper;
 
     @Autowired
     EverydayInfoMapper everydayInfoMapper;
 
     @Override
-    public String getFirstEveryday(EverydayInfo requestPage) {
-        String userId = requestPage.getUserId();
-
+    public String getFirstEveryday(String userName) {
         // 计算天数，记录历史数据
         QueryWrapper<EverydayInfo> everydayInfoQueryWrapper = new QueryWrapper<>();
-        everydayInfoQueryWrapper.eq("user_id", requestPage.getUserId());
+        everydayInfoQueryWrapper.eq("user_name", userName);
         everydayInfoQueryWrapper.orderByDesc("create_time");
         everydayInfoQueryWrapper.last(" limit 1");
         Integer nowDays;
@@ -45,7 +43,7 @@ public class EverydayInfoServiceImpl extends ServiceImpl<EverydayInfoMapper, Eve
         // 如果没有就新建
         if (everydayInfo == null) {
             everydayInfo = new EverydayInfo();
-            everydayInfo.setUserId(userId)
+            everydayInfo.setUserName(userName)
                     .setDaysCount("100")
                     .setEverydayNum("0")
                     .setCreateTime(new Date())
@@ -58,11 +56,11 @@ public class EverydayInfoServiceImpl extends ServiceImpl<EverydayInfoMapper, Eve
                 .setCreateTime(new Date())
                 .setId(UUID.randomUUID().toString());
 
-        QueryWrapper<PersonInfo> wrapper = new QueryWrapper<>();
-        wrapper.eq("user_id", requestPage.getUserId());
-        PersonInfo userImportantInfo = personInfoMapper.selectOne(wrapper);
+        QueryWrapper<UserStaticInfo> wrapper = new QueryWrapper<>();
+        wrapper.eq("user_name", userName);
+        UserStaticInfo userImportantInfo = userStaticInfoMapper.selectOne(wrapper);
 
-        Integer finalCoin = 100;
+        Integer finalCoin = 20;
         if (nowDays > 500) {
             nowDays = 500;
         }
@@ -84,7 +82,7 @@ public class EverydayInfoServiceImpl extends ServiceImpl<EverydayInfoMapper, Eve
         }
 
         userImportantInfo.setYb(userImportantInfo.getYb() + finalCoin);
-        personInfoMapper.updateById(userImportantInfo);
+        userStaticInfoMapper.updateById(userImportantInfo);
 
         everydayInfo.setDaysCount(String.valueOf(finalCoin));
         everydayInfoMapper.insert(everydayInfo);

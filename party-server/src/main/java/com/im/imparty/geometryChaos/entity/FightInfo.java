@@ -3,6 +3,8 @@ package com.im.imparty.geometryChaos.entity;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.util.List;
+
 /**
  * @Description
  * @Author Liang Yanbo
@@ -11,9 +13,13 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class FightInfo {
+    private Integer round;
     private Integer ifVictory;
     private Integer ifHeal;
-    private Integer ifDebuff;
+    private List<BuffUpInfo> ifBuff;
     private Integer finalNum;
     private String instructions;
+    private String message;
+    private String offensiveName;
+    private String defenseName;
 }

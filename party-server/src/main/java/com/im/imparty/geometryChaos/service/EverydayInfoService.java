@@ -15,8 +15,8 @@ public interface EverydayInfoService extends IService<EverydayInfo> {
 
     /***
      *每日第一次访问获取数据
-     * @param requestPage
+     * @param userName
      * @return
      */
-    String getFirstEveryday(EverydayInfo requestPage);
+    String getFirstEveryday(String userName);
 }
