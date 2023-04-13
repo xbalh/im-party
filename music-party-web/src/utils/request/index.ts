@@ -117,7 +117,9 @@ class RequestProxy implements RequestProxyType {
   private addToken(config: AxiosRequestConfig, customConfig: CustomConfigType) {
     if (customConfig.isNeedToken) {
       config.headers = {
-        token: store.getters['userStore/getToken'] || ''
+        Authentication: store.getters['userStore/getToken'] || '',
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        refresh_token: store.getters['userStore/getRefreshToken'] || ''
       };
     } else {
       config.headers = {};

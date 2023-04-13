@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.auth0.jwt.interfaces.Claim;
 import com.im.imparty.common.util.JwtTokenUtils;
 import com.im.imparty.spring.authentication.LoginJwtToken;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,18 +29,9 @@ public class JwtVerifyAuthenticationFilter extends BasicAuthenticationFilter {
 
     @Override
     protected void doFilterInternal(@NotNull HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-        Cookie[] cookies = Optional.ofNullable(request.getCookies()).orElse(new Cookie[0]);
-        Cookie cookie = Arrays.stream(cookies).filter(item -> "Authentication".equals(item.getName())).findAny().orElse(null);
-
-        if (cookie != null || request.getHeader("Authentication") != null) {
-            System.out.println("request.getHeader(\"Token\")" + request.getHeader("Authentication"));
-            System.out.println("cookie" + cookie.getValue());
-
-            String jwtStr = cookie == null || cookie.getValue() == null ? request.getHeader("Authentication") : cookie.getValue();
-
-            Cookie refreshTokenCookie = Arrays.stream(cookies).filter(item -> "refresh_token".equals(item.getName())).findAny().orElse(null);
-            String refreshToken = refreshTokenCookie == null || refreshTokenCookie.getValue() == null ? request.getHeader("refresh_token") : refreshTokenCookie.getValue();
-
+        //Sec-WebSocket-Protocol不为空说明是ws请求
+        if (StringUtils.isNotBlank(request.getHeader("Sec-WebSocket-Protocol"))) {
+            String jwtStr = request.getHeader("Sec-WebSocket-Protocol");
             // 验证jwt
             Map<String, Claim> jsonObject = JwtTokenUtils.decryptJwt(jwtStr);
             if (jsonObject.get("userName") == null) {
@@ -58,20 +50,58 @@ public class JwtVerifyAuthenticationFilter extends BasicAuthenticationFilter {
             JSONObject userInfo = JSONObject.parseObject(jsonObject.get("userInfo").asString());
             String[] roleList = Optional.ofNullable(userInfo.getString("roleList")).orElse("").split(",");
             List<GrantedAuthority> authorityList = Arrays.stream(roleList).map(item -> (GrantedAuthority) () -> item).collect(Collectors.toList());
-            LoginJwtToken loginJwtToken = new LoginJwtToken(authorityList, userName, cookie.getValue());
+            LoginJwtToken loginJwtToken = new LoginJwtToken(authorityList, userName, jwtStr);
             loginJwtToken.setNickName(Optional.ofNullable(userInfo.getString("nickName")).orElse(userName));
             loginJwtToken.setExpireTime(exp);
-            loginJwtToken.setRefreshToken(refreshToken);
             SecurityContextHolder.getContext().setAuthentication(loginJwtToken);
         } else {
-            cookie = Arrays.stream(cookies).filter(item -> "useVisitor".equals(item.getName())).findAny().orElse(null);
-            // 判断游客登录
-            if (cookie != null) {
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken
-                        (" ", null, Collections.emptyList());
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            Cookie[] cookies = Optional.ofNullable(request.getCookies()).orElse(new Cookie[0]);
+            Cookie cookie = Arrays.stream(cookies).filter(item -> "Authentication".equals(item.getName())).findAny().orElse(null);
+
+            if (cookie != null || request.getHeader("Authentication") != null) {
+                System.out.println("request.getHeader(\"Token\")" + request.getHeader("Authentication"));
+                System.out.println("cookie" + cookie.getValue());
+
+                String jwtStr = cookie == null || cookie.getValue() == null ? request.getHeader("Authentication") : cookie.getValue();
+
+                Cookie refreshTokenCookie = Arrays.stream(cookies).filter(item -> "refresh_token".equals(item.getName())).findAny().orElse(null);
+                String refreshToken = refreshTokenCookie == null || refreshTokenCookie.getValue() == null ? request.getHeader("refresh_token") : refreshTokenCookie.getValue();
+
+                // 验证jwt
+                Map<String, Claim> jsonObject = JwtTokenUtils.decryptJwt(jwtStr);
+                if (jsonObject.get("userName") == null) {
+                    return;
+                }
+                String userName = jsonObject.get("userName").asString();
+
+                if (jsonObject.get("exp") == null) {
+                    return;
+                }
+                Instant exp = jsonObject.get("exp").asInstant();
+
+                if (jsonObject.get("userInfo") == null) {
+                    return;
+                }
+                JSONObject userInfo = JSONObject.parseObject(jsonObject.get("userInfo").asString());
+                String[] roleList = Optional.ofNullable(userInfo.getString("roleList")).orElse("").split(",");
+                List<GrantedAuthority> authorityList = Arrays.stream(roleList).map(item -> (GrantedAuthority) () -> item).collect(Collectors.toList());
+                LoginJwtToken loginJwtToken = new LoginJwtToken(authorityList, userName, cookie.getValue());
+                loginJwtToken.setNickName(Optional.ofNullable(userInfo.getString("nickName")).orElse(userName));
+                loginJwtToken.setExpireTime(exp);
+                loginJwtToken.setRefreshToken(refreshToken);
+                SecurityContextHolder.getContext().setAuthentication(loginJwtToken);
+            } else {
+                cookie = Arrays.stream(cookies).filter(item -> "useVisitor".equals(item.getName())).findAny().orElse(null);
+                // 判断游客登录
+                if (cookie != null) {
+                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken
+                            (" ", null, Collections.emptyList());
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                }
             }
         }
+
+
         chain.doFilter(request, response);
     }
 }
