@@ -54,6 +54,7 @@ public class JwtVerifyAuthenticationFilter extends BasicAuthenticationFilter {
             loginJwtToken.setNickName(Optional.ofNullable(userInfo.getString("nickName")).orElse(userName));
             loginJwtToken.setExpireTime(exp);
             SecurityContextHolder.getContext().setAuthentication(loginJwtToken);
+            response.setHeader("Sec-WebSocket-Protocol", jwtStr);
         } else {
             Cookie[] cookies = Optional.ofNullable(request.getCookies()).orElse(new Cookie[0]);
             Cookie cookie = Arrays.stream(cookies).filter(item -> "Authentication".equals(item.getName())).findAny().orElse(null);

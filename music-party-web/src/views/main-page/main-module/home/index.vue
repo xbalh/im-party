@@ -66,7 +66,7 @@ export default class Home extends Vue {
     this.timeId = setInterval(() => {
       ++count;
       this.WS.send(`count: ${count}`);
-    }, 1000);
+    }, 10000);
 
   }
 
@@ -94,10 +94,6 @@ export default class Home extends Vue {
 
   setCurrentTime() {
     this.currentTime = "01:01"
-  }
-
-  longpress() {
-    console.log("触发长按事件")
   }
 
   handleClose() {
