@@ -43,15 +43,15 @@ public class PasswordLoginAuthenticationProvider extends AbstractUserDetailsAuth
 
     @Override
     protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
-        /*String password = "";
-        try {
-            password = RsaUtils.decrypt(authentication.getCredentials().toString());
-        } catch (Exception e) {
-            throw new BadCredentialsException("密码错误");
-        }
-        if (!StringUtils.equals(userDetails.getPassword(), password)) {
-            throw new BadCredentialsException("密码错误");
-        }*/
+        String password = "";
+//        try {
+//            password = RsaUtils.decrypt(authentication.getCredentials().toString());
+//        } catch (Exception e) {
+//            throw new BadCredentialsException("密码错误");
+//        }
+//        if (!StringUtils.equals(userDetails.getPassword(), password)) {
+//            throw new BadCredentialsException("密码错误");
+//        }
         System.out.println(userDetails);
     }
 

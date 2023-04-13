@@ -8,6 +8,7 @@ interface UserInfoType {
 interface UserStateType {
   userInfo: UserInfoType;
   token: string;
+  refreshToken: string;
 }
 
 const userStore: Module<UserStateType, any> = {
@@ -20,17 +21,23 @@ const userStore: Module<UserStateType, any> = {
       sex: 1,
     },
     token: "",
+    refreshToken: ""
   },
 
   getters: {
     userInfo: (state) => state.userInfo,
     getToken: (state) => state.token,
+    getRefreshToken: (state) => state.refreshToken
   },
 
   mutations: {
     setToken(state, token) {
       state.token = token;
       localStorage.setItem("token", token);
+    },
+    setRefreshToken(state, refreshToken) {
+      state.refreshToken = refreshToken;
+      localStorage.setItem("refreshToken", refreshToken);
     },
   },
 };
