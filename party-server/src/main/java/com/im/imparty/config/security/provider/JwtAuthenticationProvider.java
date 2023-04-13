@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.auth0.jwt.interfaces.Claim;
 import com.im.imparty.common.exception.JwtExpiredException;
 import com.im.imparty.common.exception.JwtValidException;
+import com.im.imparty.common.util.CookieUtils;
 import com.im.imparty.common.util.JwtTokenUtils;
 import com.im.imparty.spring.authentication.LoginJwtToken;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -46,28 +49,37 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         } catch (Exception e) {
             return null;
         }
-        if (verify.getExpireTime().isBefore(Instant.now())) {
+        if (verify.getExpireTime().isBefore(LocalDateTime.now().toInstant(ZoneOffset.UTC))) {
+            ServletRequestAttributes requestAttributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
+            HttpServletResponse response = requestAttributes.getResponse();
             // 过期了 在需要验证refresh token
             LoginJwtToken jwtToken = (LoginJwtToken) authentication;
             String refreshToken = jwtToken.getRefreshToken();
-            Map<String, Claim> refreshMap = JwtTokenUtils.decryptJwt(refreshToken);
-            if (refreshMap.get("expiredTime").asInstant().isBefore(Instant.now())) {
-                //throw new JwtExpiredException("cookie已经过期");
-                return null;
+            Map<String, Claim> refreshMap = null;
+            try {
+                refreshMap = JwtTokenUtils.decryptJwt(refreshToken);
+            } catch (Exception e) {
+                log.error("refreshToken错误！");
+                CookieUtils.remove(response, "Authentication");
+                CookieUtils.remove(response, "refreshToken");
+                throw new JwtExpiredException("cookie已经过期");
             }
-            String randomStr = refreshMap.get("randomStr").asString();
-            if (StringUtils.equals(verify.getUserName(), randomStr)) {
+            if (refreshMap.get("expiredTime").asInstant().isBefore(LocalDateTime.now().toInstant(ZoneOffset.UTC))) {
+                throw new JwtExpiredException("cookie已经过期");
+            }
+            String randomStr = refreshMap.get("validStr").asString();
+            if (StringUtils.equals(verify.getValidStr(), randomStr)) {
                 // 刷新token
-                ServletRequestAttributes requestAttributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
-                HttpServletResponse response = requestAttributes.getResponse();
-                JSONObject userInfo = refreshMap.get("userInfo").as(JSONObject.class);
+                JSONObject userInfo = JSONObject.parseObject(refreshMap.get("userInfo").asString());
                 String userName = refreshMap.get("userName").asString();
                 String newJwt = JwtTokenUtils.encryptTokenJwt(userInfo, userName, randomStr);
                 response.setHeader("Authentication", String.format("Bearer %s", newJwt));
                 response.addCookie(new Cookie("Authentication", newJwt));
             } else {
-                //throw new JwtValidException("cookie有问题！");
-                return null;
+                // 清除cookie
+                CookieUtils.remove(response, "Authentication");
+                CookieUtils.remove(response, "refreshToken");
+                throw new JwtValidException("cookie有问题！");
             }
         }
         return verify;
@@ -89,7 +101,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         }
         String userName = jsonObject.get("userName").asString();
 
-        if (jsonObject.get("exp") == null) {
+        if (jsonObject.get("expiredTime") == null) {
             throw  new JwtValidException("cookie信息错误");
         }
         Instant exp = jsonObject.get("expiredTime").asInstant();
@@ -104,6 +116,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         loginJwtToken.setRefreshToken(jwtToken.getRefreshToken());
         loginJwtToken.setNickName(Optional.ofNullable(userInfo.getString("nickName")).orElse(userName));
         loginJwtToken.setExpireTime(exp);
+        loginJwtToken.setValidStr(jsonObject.get("validStr").asString());
         return loginJwtToken;
     }
 }

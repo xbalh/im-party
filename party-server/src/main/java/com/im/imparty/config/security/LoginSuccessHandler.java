@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component("loginSuccessHandler")
@@ -47,7 +48,7 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
         info.put("nickName", userDetail.getNickName());
         info.put("userName", authentication.getName());
         // info.put("saltExpiresTime", DateTimeUtils.dateTimeToString(userDetail.getSaltExpiresTime()));
-        info.put("roleList", StringUtils.join(Optional.ofNullable(userDetail.getRoleList()).orElse(Collections.emptyList()).stream().map(RoleInfo::getRoleCode)));
+        info.put("roleList", StringUtils.join(Optional.ofNullable(userDetail.getRoleList()).orElse(Collections.emptyList()).stream().map(RoleInfo::getRoleCode).collect(Collectors.toList()), ","));
         String randomStr = UUID.randomUUID().toString();
         String tokenJwt = JwtTokenUtils.encryptTokenJwt(info, userDetail.getUsername(), randomStr);
         LoginInfoVO loginInfoVO = new LoginInfoVO(tokenJwt, JwtTokenUtils.encryptRefreshTokenJwt(info, userDetail.getUsername(), randomStr));

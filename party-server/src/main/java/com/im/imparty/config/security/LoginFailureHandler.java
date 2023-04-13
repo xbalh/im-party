@@ -1,6 +1,7 @@
 package com.im.imparty.config.security;
 
 import com.alibaba.fastjson.JSONObject;
+import com.im.imparty.common.exception.JwtAuthenticationAbstractException;
 import com.im.imparty.web.vo.BaseResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -43,7 +44,10 @@ public class LoginFailureHandler extends SimpleUrlAuthenticationFailureHandler {
         } else if (exception instanceof DisabledException) {
             errorInfo = "账户被禁用，请联系管理员!";
             code = 200;
-        } else {
+        } else if (exception instanceof JwtAuthenticationAbstractException) {
+            ((JwtAuthenticationAbstractException) exception).handler(request, response);
+            return;
+        } else{
             errorInfo = "登录失败!";
             code = 500;
         }

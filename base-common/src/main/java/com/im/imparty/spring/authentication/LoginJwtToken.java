@@ -23,6 +23,8 @@ public class LoginJwtToken extends AbstractAuthenticationToken {
 
     private Instant expireTime;
 
+    private String validStr;
+
     private Object principal = null;
 
     private Object credentials;
