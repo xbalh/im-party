@@ -2,10 +2,10 @@ package com.im.imparty.geometryChaos.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.im.imparty.geometryChaos.entity.PersonInfo;
+import com.im.imparty.geometryChaos.entity.UserStaticInfo;
 import com.im.imparty.geometryChaos.mapper.EverydayInfoMapper;
 import com.im.imparty.geometryChaos.entity.EverydayInfo;
-import com.im.imparty.geometryChaos.mapper.PersonInfoMapper;
+import com.im.imparty.geometryChaos.mapper.UserStaticInfoMapper;
 import com.im.imparty.geometryChaos.service.EverydayInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,7 +26,7 @@ import java.util.UUID;
 public class EverydayInfoServiceImpl extends ServiceImpl<EverydayInfoMapper, EverydayInfo> implements EverydayInfoService {
 
     @Autowired
-    PersonInfoMapper personInfoMapper;
+    UserStaticInfoMapper userStaticInfoMapper;
 
     @Autowired
     EverydayInfoMapper everydayInfoMapper;
@@ -58,9 +58,9 @@ public class EverydayInfoServiceImpl extends ServiceImpl<EverydayInfoMapper, Eve
                 .setCreateTime(new Date())
                 .setId(UUID.randomUUID().toString());
 
-        QueryWrapper<PersonInfo> wrapper = new QueryWrapper<>();
+        QueryWrapper<UserStaticInfo> wrapper = new QueryWrapper<>();
         wrapper.eq("user_id", requestPage.getUserId());
-        PersonInfo userImportantInfo = personInfoMapper.selectOne(wrapper);
+        UserStaticInfo userImportantInfo = userStaticInfoMapper.selectOne(wrapper);
 
         Integer finalCoin = 100;
         if (nowDays > 500) {
@@ -84,7 +84,7 @@ public class EverydayInfoServiceImpl extends ServiceImpl<EverydayInfoMapper, Eve
         }
 
         userImportantInfo.setYb(userImportantInfo.getYb() + finalCoin);
-        personInfoMapper.updateById(userImportantInfo);
+        userStaticInfoMapper.updateById(userImportantInfo);
 
         everydayInfo.setDaysCount(String.valueOf(finalCoin));
         everydayInfoMapper.insert(everydayInfo);

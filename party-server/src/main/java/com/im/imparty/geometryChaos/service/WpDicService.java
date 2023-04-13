@@ -1,7 +1,8 @@
 package com.im.imparty.geometryChaos.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.im.imparty.geometryChaos.entity.BattleInfo;
+import com.im.imparty.geometryChaos.entity.WpDic;
+import com.im.imparty.geometryChaos.entity.WpInfo;
 
 /**
  * <p>
@@ -11,5 +12,5 @@ import com.im.imparty.geometryChaos.entity.BattleInfo;
  * @author liang yanbo
  * @since 2022-08-18
  */
-public interface BattleInfoService extends IService<BattleInfo> {
+public interface WpDicService extends IService<WpDic> {
 }

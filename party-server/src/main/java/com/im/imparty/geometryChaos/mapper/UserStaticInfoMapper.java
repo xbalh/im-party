@@ -1,7 +1,7 @@
 package com.im.imparty.geometryChaos.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.im.imparty.geometryChaos.entity.BattleInfo;
+import com.im.imparty.geometryChaos.entity.UserStaticInfo;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -13,6 +13,6 @@ import org.apache.ibatis.annotations.Mapper;
  * @since 2022-08-18
  */
 @Mapper
-public interface BattleInfoMapper extends BaseMapper<BattleInfo> {
+public interface UserStaticInfoMapper extends BaseMapper<UserStaticInfo> {
 
 }

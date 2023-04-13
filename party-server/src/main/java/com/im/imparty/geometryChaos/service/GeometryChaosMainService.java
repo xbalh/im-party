@@ -1,9 +1,6 @@
 package com.im.imparty.geometryChaos.service;
 
-import com.im.imparty.geometryChaos.entity.FightInfo;
-import com.im.imparty.geometryChaos.entity.PersonInfo;
-import com.im.imparty.geometryChaos.entity.PersonFightInfo;
-import com.im.imparty.geometryChaos.entity.TurnInfo;
+import com.im.imparty.geometryChaos.entity.*;
 
 public interface GeometryChaosMainService {
     /**
@@ -11,7 +8,7 @@ public interface GeometryChaosMainService {
      *
      * @param userName
      **/
-    PersonInfo createCharacter(String userName);
+    UserStaticInfo createCharacter(String userName);
 
     /**
      * 获取战斗前基础属性
@@ -34,5 +31,5 @@ public interface GeometryChaosMainService {
      *
      * @param turnInfo
      **/
-    String startOneTurn(TurnInfo turnInfo);
+    BattleInfo startOneTurn(TurnInfo turnInfo);
 }
