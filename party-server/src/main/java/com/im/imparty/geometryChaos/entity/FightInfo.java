@@ -19,4 +19,7 @@ public class FightInfo {
     private List<BuffUpInfo> ifBuff;
     private Integer finalNum;
     private String instructions;
+    private String message;
+    private String offensiveName;
+    private String defenseName;
 }

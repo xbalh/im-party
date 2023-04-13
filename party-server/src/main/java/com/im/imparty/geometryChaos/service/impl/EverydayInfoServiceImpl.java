@@ -32,12 +32,10 @@ public class EverydayInfoServiceImpl extends ServiceImpl<EverydayInfoMapper, Eve
     EverydayInfoMapper everydayInfoMapper;
 
     @Override
-    public String getFirstEveryday(EverydayInfo requestPage) {
-        String userId = requestPage.getUserId();
-
+    public String getFirstEveryday(String userName) {
         // 计算天数，记录历史数据
         QueryWrapper<EverydayInfo> everydayInfoQueryWrapper = new QueryWrapper<>();
-        everydayInfoQueryWrapper.eq("user_id", requestPage.getUserId());
+        everydayInfoQueryWrapper.eq("user_name", userName);
         everydayInfoQueryWrapper.orderByDesc("create_time");
         everydayInfoQueryWrapper.last(" limit 1");
         Integer nowDays;
@@ -45,7 +43,7 @@ public class EverydayInfoServiceImpl extends ServiceImpl<EverydayInfoMapper, Eve
         // 如果没有就新建
         if (everydayInfo == null) {
             everydayInfo = new EverydayInfo();
-            everydayInfo.setUserId(userId)
+            everydayInfo.setUserName(userName)
                     .setDaysCount("100")
                     .setEverydayNum("0")
                     .setCreateTime(new Date())
@@ -59,10 +57,10 @@ public class EverydayInfoServiceImpl extends ServiceImpl<EverydayInfoMapper, Eve
                 .setId(UUID.randomUUID().toString());
 
         QueryWrapper<UserStaticInfo> wrapper = new QueryWrapper<>();
-        wrapper.eq("user_id", requestPage.getUserId());
+        wrapper.eq("user_name", userName);
         UserStaticInfo userImportantInfo = userStaticInfoMapper.selectOne(wrapper);
 
-        Integer finalCoin = 100;
+        Integer finalCoin = 20;
         if (nowDays > 500) {
             nowDays = 500;
         }
