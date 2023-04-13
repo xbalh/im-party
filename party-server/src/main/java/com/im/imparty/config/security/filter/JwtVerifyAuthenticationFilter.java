@@ -30,65 +30,27 @@ public class JwtVerifyAuthenticationFilter extends BasicAuthenticationFilter {
     @Override
     protected void doFilterInternal(@NotNull HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         //Sec-WebSocket-Protocol不为空说明是ws请求
+        String jwtStr = null;
+        String refreshJwtStr = null;
         if (StringUtils.isNotBlank(request.getHeader("Sec-WebSocket-Protocol"))) {
-            String jwtStr = request.getHeader("Sec-WebSocket-Protocol");
-            // 验证jwt
-            Map<String, Claim> jsonObject = JwtTokenUtils.decryptJwt(jwtStr);
-            if (jsonObject.get("userName") == null) {
-                return;
-            }
-            String userName = jsonObject.get("userName").asString();
-
-            if (jsonObject.get("exp") == null) {
-                return;
-            }
-            Instant exp = jsonObject.get("exp").asInstant();
-
-            if (jsonObject.get("userInfo") == null) {
-                return;
-            }
-            JSONObject userInfo = JSONObject.parseObject(jsonObject.get("userInfo").asString());
-            String[] roleList = Optional.ofNullable(userInfo.getString("roleList")).orElse("").split(",");
-            List<GrantedAuthority> authorityList = Arrays.stream(roleList).map(item -> (GrantedAuthority) () -> item).collect(Collectors.toList());
-            LoginJwtToken loginJwtToken = new LoginJwtToken(authorityList, userName, jwtStr);
-            loginJwtToken.setNickName(Optional.ofNullable(userInfo.getString("nickName")).orElse(userName));
-            loginJwtToken.setExpireTime(exp);
+            jwtStr = request.getHeader("Sec-WebSocket-Protocol");
+            LoginJwtToken loginJwtToken = new LoginJwtToken(Collections.emptyList(), jwtStr);
             SecurityContextHolder.getContext().setAuthentication(loginJwtToken);
         } else {
             Cookie[] cookies = Optional.ofNullable(request.getCookies()).orElse(new Cookie[0]);
             Cookie cookie = Arrays.stream(cookies).filter(item -> "Authentication".equals(item.getName())).findAny().orElse(null);
+            Cookie refreshToken = Arrays.stream(cookies).filter(item -> "refreshToken".equals(item.getName())).findAny().orElse(null);
 
-            if (cookie != null || request.getHeader("Authentication") != null) {
-                System.out.println("request.getHeader(\"Token\")" + request.getHeader("Authentication"));
+            String authentication = request.getHeader("Authentication");
+            String refreshTokenHead = request.getHeader("refreshToken");
+            if (cookie != null || authentication != null) {
+                System.out.println("request.getHeader(\"Token\")" + authentication);
                 System.out.println("cookie" + cookie.getValue());
+                jwtStr = cookie == null || cookie.getValue() == null ? authentication.replace("Bearer  ", "") : cookie.getValue();
+                refreshJwtStr = refreshToken == null || refreshToken.getValue() == null ? refreshTokenHead: refreshToken.getValue();
 
-                String jwtStr = cookie == null || cookie.getValue() == null ? request.getHeader("Authentication") : cookie.getValue();
-
-                Cookie refreshTokenCookie = Arrays.stream(cookies).filter(item -> "refresh_token".equals(item.getName())).findAny().orElse(null);
-                String refreshToken = refreshTokenCookie == null || refreshTokenCookie.getValue() == null ? request.getHeader("refresh_token") : refreshTokenCookie.getValue();
-
-                // 验证jwt
-                Map<String, Claim> jsonObject = JwtTokenUtils.decryptJwt(jwtStr);
-                if (jsonObject.get("userName") == null) {
-                    return;
-                }
-                String userName = jsonObject.get("userName").asString();
-
-                if (jsonObject.get("exp") == null) {
-                    return;
-                }
-                Instant exp = jsonObject.get("exp").asInstant();
-
-                if (jsonObject.get("userInfo") == null) {
-                    return;
-                }
-                JSONObject userInfo = JSONObject.parseObject(jsonObject.get("userInfo").asString());
-                String[] roleList = Optional.ofNullable(userInfo.getString("roleList")).orElse("").split(",");
-                List<GrantedAuthority> authorityList = Arrays.stream(roleList).map(item -> (GrantedAuthority) () -> item).collect(Collectors.toList());
-                LoginJwtToken loginJwtToken = new LoginJwtToken(authorityList, userName, cookie.getValue());
-                loginJwtToken.setNickName(Optional.ofNullable(userInfo.getString("nickName")).orElse(userName));
-                loginJwtToken.setExpireTime(exp);
-                loginJwtToken.setRefreshToken(refreshToken);
+                LoginJwtToken loginJwtToken = new LoginJwtToken(Collections.emptyList(), jwtStr);
+                loginJwtToken.setRefreshToken(refreshJwtStr);
                 SecurityContextHolder.getContext().setAuthentication(loginJwtToken);
             } else {
                 cookie = Arrays.stream(cookies).filter(item -> "useVisitor".equals(item.getName())).findAny().orElse(null);

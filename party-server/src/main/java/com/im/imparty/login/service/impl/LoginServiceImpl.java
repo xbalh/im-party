@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class LoginServiceImpl implements LoginService {
@@ -34,8 +35,9 @@ public class LoginServiceImpl implements LoginService {
         info.put("userName", userDetail.getUsername());
         info.put("saltExpiresTime", DateTimeUtils.dateTimeToString(userDetail.getSaltExpiresTime()));
         info.put("roleList", StringUtils.join(Optional.ofNullable(userDetail.getRoleList()).orElse(Collections.emptyList())));
-        String tokenJwt = JwtTokenUtils.encryptTokenJwt(info, userDetail.getUsername());
-        LoginInfoVO loginInfoVO = new LoginInfoVO(tokenJwt, JwtTokenUtils.encryptRefreshTokenJwt(tokenJwt));
+        String randomStr = UUID.randomUUID().toString();
+        String tokenJwt = JwtTokenUtils.encryptTokenJwt(info, userDetail.getUsername(), randomStr);
+        LoginInfoVO loginInfoVO = new LoginInfoVO(tokenJwt, JwtTokenUtils.encryptRefreshTokenJwt(info, userDetail.getUsername(), randomStr));
         return loginInfoVO;
 
     }

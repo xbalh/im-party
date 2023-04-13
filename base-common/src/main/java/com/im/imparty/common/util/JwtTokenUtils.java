@@ -1,11 +1,15 @@
 package com.im.imparty.common.util;
 
+import cn.hutool.crypto.digest.DigestUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.im.imparty.common.exception.JwtExpiredException;
+import com.im.imparty.common.exception.JwtValidException;
 import org.springframework.util.DigestUtils;
 
 import java.nio.charset.StandardCharsets;
@@ -40,25 +44,35 @@ public class JwtTokenUtils {
         return "root";
     }
 
-    public static String encryptTokenJwt(JSONObject info, String userName) {
+    public static String encryptTokenJwt(JSONObject info, String userName, String randomStr) {
         return JWT.create()
                 .withClaim("userName", userName)
+                .withClaim("validStr", randomStr)
                 .withClaim("userInfo", info.toJSONString())
-                .withExpiresAt(LocalDateTime.now().plusMinutes(30).toInstant(ZoneOffset.UTC))
+                .withClaim("expiredTime", LocalDateTime.now().plusMinutes(30).toInstant(ZoneOffset.UTC))
                 .sign(JWT_SIGN);
     }
 
 
 
-    public static String encryptRefreshTokenJwt(String token) {
+    public static String encryptRefreshTokenJwt(JSONObject info, String userName, String randomStr) {
         return JWT.create()
-                .withClaim("token", token)
-                .withExpiresAt(LocalDateTime.now().plusDays(7).toInstant(ZoneOffset.UTC))
+                .withClaim("validStr", randomStr)
+                .withClaim("userName", userName)
+                .withClaim("userInfo", info.toJSONString())
+                .withClaim("expiredTime", LocalDateTime.now().plusDays(7).toInstant(ZoneOffset.UTC))
                 .sign(JWT_SIGN);
     }
 
     public static Map<String, Claim> decryptJwt(String token) {
-        DecodedJWT verify = getJwtVerifier().verify(token);
+        DecodedJWT verify = null;
+        try {
+            verify = getJwtVerifier().verify(token);
+        } catch (TokenExpiredException e) {
+            throw new JwtExpiredException("cookie已经过期", e);
+        } catch (Exception e) {
+            throw new JwtValidException("cookie有问题！", e);
+        }
         return verify.getClaims();
     }
 

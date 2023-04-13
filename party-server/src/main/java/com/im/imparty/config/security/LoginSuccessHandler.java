@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Component("loginSuccessHandler")
@@ -47,12 +48,13 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
         info.put("userName", authentication.getName());
         // info.put("saltExpiresTime", DateTimeUtils.dateTimeToString(userDetail.getSaltExpiresTime()));
         info.put("roleList", StringUtils.join(Optional.ofNullable(userDetail.getRoleList()).orElse(Collections.emptyList()).stream().map(RoleInfo::getRoleCode)));
-        String tokenJwt = JwtTokenUtils.encryptTokenJwt(info, userDetail.getUsername());
-        LoginInfoVO loginInfoVO = new LoginInfoVO(tokenJwt, JwtTokenUtils.encryptRefreshTokenJwt(tokenJwt));
+        String randomStr = UUID.randomUUID().toString();
+        String tokenJwt = JwtTokenUtils.encryptTokenJwt(info, userDetail.getUsername(), randomStr);
+        LoginInfoVO loginInfoVO = new LoginInfoVO(tokenJwt, JwtTokenUtils.encryptRefreshTokenJwt(info, userDetail.getUsername(), randomStr));
         response.setHeader("Authentication", String.format("Bearer %s", tokenJwt));
-        response.setHeader("refresh_token", loginInfoVO.getRefreshToken());
+        response.setHeader("refreshToken", loginInfoVO.getRefreshToken());
         response.addCookie(new Cookie("Authentication", tokenJwt));
-        response.addCookie(new Cookie("refresh_token", loginInfoVO.getRefreshToken()));
+        response.addCookie(new Cookie("refreshToken", loginInfoVO.getRefreshToken()));
         response.getWriter().write(BaseResult.ok(authentication.getName() + "登陆成功").data(loginInfoVO).toJSONString());
     }
 }

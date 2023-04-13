@@ -1,6 +1,8 @@
 package com.im.imparty.spring.authentication;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -9,7 +11,11 @@ import java.time.Instant;
 import java.util.Collection;
 
 
+@Setter
+@Getter
 public class LoginJwtToken extends AbstractAuthenticationToken {
+
+    private String jwtString;
 
     private String nickName;
 
@@ -17,7 +23,7 @@ public class LoginJwtToken extends AbstractAuthenticationToken {
 
     private Instant expireTime;
 
-    private final Object principal;
+    private Object principal = null;
 
     private Object credentials;
 
@@ -29,49 +35,8 @@ public class LoginJwtToken extends AbstractAuthenticationToken {
         this.credentials = credentials;
     }
 
-    @Override
-    public Object getCredentials() {
-        return credentials;
-    }
-
-    @Override
-    public Object getPrincipal() {
-        return principal;
-    }
-
-    public String getNickName() {
-        return nickName;
-    }
-
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public Instant getExpireTime() {
-        return expireTime;
-    }
-
-    public void setExpireTime(Instant expireTime) {
-        this.expireTime = expireTime;
-    }
-
-    public void setCredentials(Object credentials) {
-        this.credentials = credentials;
-    }
-
-    public String getRefreshToken() {
-        return refreshToken;
-    }
-
-    public void setRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
+    public LoginJwtToken(Collection<? extends GrantedAuthority> authorities, String jwtString) {
+        super(authorities);
+        this.jwtString = jwtString;
     }
 }

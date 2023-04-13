@@ -1,5 +1,6 @@
 package com.im.imparty.config.security;
 
+import com.im.imparty.common.exception.JwtExpiredException;
 import com.im.imparty.web.vo.BaseResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.*;
@@ -31,7 +32,10 @@ public class MyAuthenticationEntryPoint implements AuthenticationEntryPoint {
             errorInfo = "账户过期，请联系管理员!";
         } else if (exception instanceof DisabledException) {
             errorInfo = "账户被禁用，请联系管理员!";
-        } else {
+        } else if (exception instanceof JwtExpiredException) {
+            errorInfo = "登陆已过期，请重新登陆";
+        }
+        else {
             errorInfo = "登录失败!";
         }
         log.info("登录失败原因：" + errorInfo);
