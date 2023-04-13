@@ -30,7 +30,7 @@ public class EverydayInfo implements Serializable {
       @TableId(value = "id", type = IdType.ASSIGN_UUID)
     private String id;
 
-    private String userId;
+    private String userName;
 
     @ApiModelProperty(value = "数量")
     private String everydayNum;
@@ -39,6 +39,4 @@ public class EverydayInfo implements Serializable {
     private String daysCount;
 
     private Date createTime;
-
-
 }

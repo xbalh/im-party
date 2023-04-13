@@ -12,7 +12,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class BuffUpInfo {
     private String buff;
-    private Integer target; // 自己0 对方1
+    private String target;
     private Integer turns;
     private Integer per;
 }
