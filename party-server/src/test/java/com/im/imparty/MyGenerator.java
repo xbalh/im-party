@@ -26,16 +26,16 @@ public class MyGenerator {
 
     static {
         // -DdatabaseUser=xxx  -DdatabasePassword=xxx
-        username = System.getProperty("DdatabaseUser");
-        password = System.getProperty("DdatabasePassword");
+        username = System.getProperty("databaseUser");
+        password = System.getProperty("databasePassword");
     }
 
     /** 包名*/
-    private static final String moduleName = "user";
+    private static final String moduleName = "room";
     /** 表名前缀*/
     private static final String beginName = "";
     /** 需要生成代码的表*/
-    private static final String [] tables = new String[]{"user"};
+    private static final String [] tables = new String[]{"room", "room_user"};
 
 
 
@@ -53,7 +53,7 @@ public class MyGenerator {
         GlobalConfig gc = new GlobalConfig();
         // 当前项目路径
         // String projectPath = System.getProperty("user.dir");
-        String projectPath = "E:/code/java/im-party/user-manager";
+        String projectPath = "/Users/zhangjinyu/Desktop/project/java/im-party/user-manager";
         // 当前项目的下的路径
         gc.setOutputDir(projectPath + "/src/main/java");
         // 作者
@@ -85,7 +85,7 @@ public class MyGenerator {
         // 用于包名、表名前缀
         //pc.setModuleName(moduleName);
         // 生成到那些包下 如 com.modules主包下的 controller.sys.TestController
-        pc.setParent("com.im.imparty.test");
+        pc.setParent("com.im.imparty");
         pc.setController(moduleName + ".controller");
         pc.setService(moduleName + ".service");
         pc.setServiceImpl(moduleName + ".service"+".impl");

@@ -8,24 +8,38 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
+import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @Slf4j
-@ServerEndpoint("/musicParty/ws")
+@ServerEndpoint("/musicParty/ws/{roomId}")
 public class WebSocketServer {
 
-    private static WebsocketSessionManager sessionManager = new WebsocketSessionManager();
+    // private static WebsocketSessionManager sessionManager = new WebsocketSessionManager();
 
+    private static Map<Integer, WebsocketSessionManager> roomMap = new ConcurrentHashMap<>();
+
+    private Integer roomId;
     /**
      * 连接建立成功调用的方法
      */
     @OnOpen
-    public void onOpen(Session session) {
-        sessionManager.addUser(session);     //加入set中
+    public void onOpen(Session session, @PathParam("roomId") Integer roomId) {
+        this.roomId = roomId;
+        if (roomMap.containsKey(roomId)) {
+            roomMap.get(roomId).addUser(session);
+        } else {
+            WebsocketSessionManager websocketSessionManager = new WebsocketSessionManager();
+            websocketSessionManager.addUser(session);
+            roomMap.put(roomId, websocketSessionManager);
+        }//加入set中
 
         try {
+            WebsocketSessionManager sessionManager = roomMap.get(roomId);
             WebsocketSessionImpl sessionBySession = sessionManager.getSessionBySession(session);
             sessionBySession.sendMessage("conn_success");
             log.info("有新窗口开始监听:" + sessionBySession.getUserName() + ",当前在线人数为:" + sessionManager.count());
@@ -40,6 +54,7 @@ public class WebSocketServer {
     @OnClose
     public void onClose(Session session) {
         String userName = SessionUtils.getUserName(session);
+        WebsocketSessionManager sessionManager = roomMap.get(roomId);
         sessionManager.close(session);
         //断开连接情况下，更新主板占用情况为释放
         log.info("释放的userName为："+userName);
@@ -58,6 +73,7 @@ public class WebSocketServer {
         log.info("收到来自窗口" + userName + "的信息:" + message);
         //群发消息
         try {
+            WebsocketSessionManager sessionManager = roomMap.get(roomId);
             sessionManager.getSessionByUserName(userName).sendMessage(message);
         } catch (IOException e) {
             log.error("发送消息失败！", e);
