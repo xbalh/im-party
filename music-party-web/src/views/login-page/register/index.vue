@@ -55,7 +55,7 @@ export default class Login extends Vue {
 
 <style>
 		body {
-			background: url('../assets/images/背景.jpg');
+			background: url('../../../assets/images/背景.jpg');
 			background-repeat: repeat-x;
 			background-attachment: fixed;
 		}

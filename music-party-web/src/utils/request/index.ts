@@ -5,7 +5,7 @@ import {
 } from "./index.type";
 import Request from "./request";
 import { AxiosRequestConfig, AxiosResponse } from "axios";
-// import router from "@/router";
+import router from "@/router";
 import store from "@/store";
 import { Loading } from 'element-ui'
 
@@ -13,10 +13,10 @@ class RequestProxy implements RequestProxyType {
   private axios: RequestType;
   private defaultCustomConfig: CustomConfigType = {
     isNeedLoading: true,
-    isNeedToken: false,
+    isNeedToken: true,
     isNeedShowError: true
-	};
-	// 记录并行的请求次数
+  };
+  // 记录并行的请求次数
   private requestCount: number = 0;
   // Loading 控制
   loadingConfig: {
@@ -43,7 +43,7 @@ class RequestProxy implements RequestProxyType {
     this.transformUrl(config.url);
     this.handleLoading(customConfig, true);
     this.addToken(config, customConfig);
-		customConfig.isNeedLoading && this.requestCount++
+    customConfig.isNeedLoading && this.requestCount++
 
     try {
       const result = await this.axios.request(config);
@@ -55,20 +55,20 @@ class RequestProxy implements RequestProxyType {
         // 解决 token 失效的
 
         // 方案一 跳转至登录页
-        // store.commit('userStore/setToken', '')
-        // store.commit('permissionsStore/setPermissions', {})
-        // router.replace({ path: '/login', query: {
-        //   redirectUrl: router.currentRoute.fullPath
-        // } })
+        store.commit('userStore/setToken', '')
+        store.commit('permissionsStore/setPermissions', {})
+        router.replace({ path: '/login', query: {
+          redirectUrl: router.currentRoute.fullPath
+        } })
 
         // 方式二 自动刷新 token 并重新发起失败的请求
-        const res = await this.transfromRquest({
-          method: 'post',
-          url: '/refresh-token'
-        })
-        console.log(res, '/refresh-token')
-        store.commit('userStore/setToken', res.data.token)
-        return this.transfromRquest(config)
+        // const res = await this.transfromRquest({
+        //   method: 'post',
+        //   url: '/refresh-token'
+        // })
+        // console.log(res, '/refresh-token')
+        // store.commit('userStore/setToken', res.data.token)
+        // return this.transfromRquest(config)
 
         // 方式三 在请求拦截里面先校验 token 是否过期 再发起请求
       }
@@ -76,9 +76,9 @@ class RequestProxy implements RequestProxyType {
       this.handleError(customConfig, error);
       return Promise.reject(error);
     } finally {
-			customConfig.isNeedLoading && this.requestCount--
+      customConfig.isNeedLoading && this.requestCount--
       this.handleLoading(customConfig, false);
-		}
+    }
   }
 
   /**
@@ -87,13 +87,13 @@ class RequestProxy implements RequestProxyType {
    * @param isOpen 是否开启
    */
   private handleLoading(customConfig: CustomConfigType, isOpen: boolean) {
-		if (!customConfig.isNeedLoading) return;
-		// 不重复开启 Loading
-		if (this.requestCount !== 0) return;
+    if (!customConfig.isNeedLoading) return;
+    // 不重复开启 Loading
+    if (this.requestCount !== 0) return;
 
-		if (isOpen) {
+    if (isOpen) {
       console.log("开启 Loading");
-      
+
       this.loadingConfig.timeId = setTimeout(() => {
         this.loadingConfig.service = Loading.service({
           text: '拼命加载中...',
@@ -101,9 +101,9 @@ class RequestProxy implements RequestProxyType {
           background: 'rgba(0, 0, 0, 0.8)'
         })
       }, 300)
-			return
-		}
-    
+      return
+    }
+
     console.log("关闭 Loading");
     clearInterval(this.loadingConfig.timeId)
     this.loadingConfig.service && this.loadingConfig.service.close()
@@ -116,10 +116,13 @@ class RequestProxy implements RequestProxyType {
    */
   private addToken(config: AxiosRequestConfig, customConfig: CustomConfigType) {
     if (customConfig.isNeedToken) {
+
       config.headers = {
-        Authentication: store.getters['userStore/getToken'] || '',
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        refresh_token: store.getters['userStore/getRefreshToken'] || ''
+        cookies: {
+          Authentication: store.getters['userStore/getToken'] || '',
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          refreshToken: store.getters['userStore/getRefreshToken'] || ''
+        }
       };
     } else {
       config.headers = {};

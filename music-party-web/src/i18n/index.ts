@@ -10,8 +10,7 @@ import ElementLocale from "element-ui/lib/locale";
 import en from "./lang/en";
 import zh from "./lang/zh";
 
-Vue.use(VueI18n);
-
+Vue.use(VueI18n)
 const messages = {
   en: {
     ...en,
@@ -19,16 +18,47 @@ const messages = {
   },
   zh: {
     ...zh,
-    ...zhLocale
-  }
-};
-
-// 设置默认语言
+    ...zhLocale,
+  },
+ 
+}
+ 
 const i18n = new VueI18n({
-  locale: "zh", 
-  messages
-});
-
-ElementLocale.i18n((key: string, value: string) => i18n.t(key, value));
-
-export default i18n;
+  locale: localStorage.getItem('language') || 'zh', // 设置语种
+  messages, // 设置全局当地语言包,
+  fallbackLocale: 'zh',
+  numberFormats:{ //设置 数字本地化
+    'en': {
+      currency: { //添加 $
+        style: 'currency', currency: 'USD'
+      }
+    },
+    'zh': {
+      currency: { //添加 ￥
+        style: 'currency', currency: 'JPY', currencyDisplay: 'symbol'
+      }
+    }
+  },
+    dateTimeFormats:{//设置 日期时间本地化
+    'en': {
+      short: { 
+        year: 'numeric', month: 'short', day: 'numeric'
+      },
+      long: {
+        year: 'numeric', month: 'short', day: 'numeric',
+        weekday: 'short', hour: 'numeric', minute: 'numeric'
+      }
+    },
+    'zh': {
+      short: {
+        year: 'numeric', month: 'short', day: 'numeric'
+      },
+      long: {
+            year: 'numeric', month: 'short', day: 'numeric',
+            weekday: 'short', hour: 'numeric', minute: 'numeric'  
+      }
+    }
+  }
+})
+ 
+export default i18n

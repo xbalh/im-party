@@ -50,6 +50,7 @@ export default class Home extends Vue {
   handleChat: (data: object) => any;
   timeId: NodeJS.Timeout;
   @userStore.Getter('getToken') getToken!: string
+  currentUserInfo: any = null;
 
   currentTime: string = "00:00";
 
@@ -57,7 +58,7 @@ export default class Home extends Vue {
     super();
     const token = localStorage.getItem("token");
     if(!token) console.error("token为空");
-    this.WS = new Ws("ws://localhost:8080/musicParty/ws", [token!], false);
+    this.WS = new Ws("ws://localhost:8080/musicParty/ws/1", [token!], false);
     this.WS.send("connect success");
     this.handleChat = (data: object) => console.log(data);
     this.WS.subscribe("/music/chat", this.handleChat);
@@ -71,8 +72,10 @@ export default class Home extends Vue {
   }
 
   created() {
-    // ws初始化
+    //初始化接口
     this.init("test");
+    //获取当前用户信息
+    this.getCurrentUserInfo();
     
   }
 
@@ -89,6 +92,20 @@ export default class Home extends Vue {
 
     } catch (error) {
       console.error(error, "init");
+    }
+  }
+
+  async getCurrentUserInfo() {
+    console.log("getCurrentUserInfo");
+    try {
+      const res = await Request.get(
+        defaultPageApi.user.info,
+        {},
+        { isNeedToken: true }
+      );
+
+    } catch (error) {
+      console.error(error, "getCurrentUserInfo");
     }
   }
 

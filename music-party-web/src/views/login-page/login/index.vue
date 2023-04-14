@@ -1,13 +1,13 @@
 <template>
   <div>
     <el-form ref="ruleForm" :model="ruleForm" status-icon :rules="rules">
-      <p>用户名<br />
+      <p>{{ $t('login.username') }}<br />
         <!-- <el-input v-model="loginData.ruleForm.username" placeholder="请输入用户名"></el-input> -->
         <el-form-item label="用户名：" prop="username">
           <el-input v-model="ruleForm.username" autocomplete="off" />
         </el-form-item>
       </p>
-      <p>密码<br />
+      <p>{{ $t('login.password') }}<br />
         <!-- <el-input v-model="loginData.ruleForm.password" placeholder="请输入密码"></el-input> -->
         <el-form-item label="密码：" prop="password">
           <el-input v-model="ruleForm.password" type="password" autocomplete="off" />
@@ -17,7 +17,7 @@
         <input id="remember" type="checkbox" /><label for="smtxt">记住密码</label>
       </p>
       <p>
-        <el-button @click="submitForm('ruleForm')">登录</el-button>
+        <el-button @click="submitForm('ruleForm')">{{ $t('login.signin') }}</el-button>
         <el-button class="login-btn" @click="resetForm">重置</el-button>
       </p>
       <p class="smtxt">没有账号？
