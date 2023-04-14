@@ -2,6 +2,7 @@ package com.im.imparty.config.security.filter;
 
 import com.alibaba.fastjson.JSONObject;
 import com.auth0.jwt.interfaces.Claim;
+import com.im.imparty.common.util.CookieUtils;
 import com.im.imparty.common.util.JwtTokenUtils;
 import com.im.imparty.spring.authentication.LoginJwtToken;
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +35,12 @@ public class JwtVerifyAuthenticationFilter extends BasicAuthenticationFilter {
         String refreshJwtStr = null;
         if (StringUtils.isNotBlank(request.getHeader("Sec-WebSocket-Protocol"))) {
             jwtStr = request.getHeader("Sec-WebSocket-Protocol");
+            try {
+                JwtTokenUtils.decryptJwt(jwtStr);
+            } catch (Exception e) {
+                chain.doFilter(request, response);
+                return;
+            }
             LoginJwtToken loginJwtToken = new LoginJwtToken(Collections.emptyList(), jwtStr);
             // TODO refreshToken
             SecurityContextHolder.getContext().setAuthentication(loginJwtToken);
@@ -49,6 +56,14 @@ public class JwtVerifyAuthenticationFilter extends BasicAuthenticationFilter {
                 System.out.println("request.getHeader(\"Token\")" + authentication);
                 System.out.println("cookie " + cookie.getValue());
                 jwtStr = cookie == null || cookie.getValue() == null ? authentication.replace("Bearer  ", "") : cookie.getValue();
+                try {
+                    JwtTokenUtils.decryptJwt(jwtStr);
+                } catch (Exception e) {
+                    CookieUtils.remove(response, "Authentication");
+                    CookieUtils.remove(response, "refreshToken");
+                    chain.doFilter(request, response);
+                    return;
+                }
                 refreshJwtStr = refreshToken == null || refreshToken.getValue() == null ? refreshTokenHead: refreshToken.getValue();
 
                 LoginJwtToken loginJwtToken = new LoginJwtToken(Collections.emptyList(), jwtStr);
