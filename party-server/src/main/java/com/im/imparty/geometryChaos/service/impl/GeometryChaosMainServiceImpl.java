@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -40,7 +41,7 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UserStaticInfo createCharacter(String userName) {
-        List<Integer> numbers = new ArrayList<>(Arrays.asList(6, 6, 5, 5, 5)); // 初始列表
+        List<Integer> numbers = new ArrayList<>(Arrays.asList(5, 5, 5, 5, 6)); // 初始列表
         int sum = 18; // 需要添加的总数
         Random random = new Random();
         while (sum > 0) {
@@ -76,7 +77,7 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
         QueryWrapper<UserStaticInfo> wrapper = new QueryWrapper<>();
         wrapper.eq("user_name", userName);
         UserStaticInfo userStaticInfo = userStaticInfoMapper.selectOne(wrapper);
-        if(userStaticInfo == null){
+        if (userStaticInfo == null) {
             throw new CustomException("角色还未创建，需要先创立角色！", 700);
         }
 
@@ -99,11 +100,12 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
                 .setSpd(spd)
                 .setAgi(agi)
                 .setHtl(htl)
-                .setBlk(500 + agi * 50)
-                .setBlkPer(25 + agi)
-                .setCri(500 + agi * 125)
+                .setBlk(1000 + agi * 100)
+                .setBlkPer(30)
+                .setCri(500 + agi * 150)
                 .setCriPer(50 + agi * 3)
-                .setCa(500 + agi * 25)
+                .setMiss(300 + agi * 30)
+                .setCa(250 + agi * 25)
                 .setFinalAtk(new BigDecimal("1"))
                 .setFinalDef(new BigDecimal("1"))
                 .setUsedWeapon(new ArrayList<>())
@@ -268,7 +270,7 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
         // 主动指令获取
         String instructions = fightInfo.getInstructions();
         if (StrUtil.isNotBlank(instructions)) {
-            this.instructionsEffect(instructions, fighter1, fighter2, message);
+            this.instructionsEffect(instructions, fighter1, fighter2, message, fightInfo);
         }
 
         // 回合前buff判定，如果P1有chain/P2有dizzy，在本回合开始前-1
@@ -371,20 +373,34 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
 
         // 从非交集部分抽取武器，如果为空就返回empty
         for (String wp : emptySb.toString().split(",")) {
-            String randomWp = this.getRandomNonIntersectingString(wpInfoList, usedWeapon);
+            String randomWp = this.getRandomNonIntersectingString(wpInfoList, usedWeapon, false);
             if (StrUtil.isNotBlank(instructions) && instructions.contains("1@@")) {
                 String s = instructions.split("@@")[1];
                 if (!resultSb.toString().contains(s)) {
                     randomWp = s;
                 }
             }
+
             if (randomWp != null) {
+                // 如果有抽到武器
+                WpDic wpDic = wpDicMapper.selectById(randomWp);
+                String wpAtkType = wpDic.getWpAtkType();
+                String randomWpOtherHeal = "";
+                if ("heal".equals(wpAtkType)) {
+                    randomWpOtherHeal = this.getRandomNonIntersectingString(wpInfoList, usedWeapon, true);
+                }
                 if (resultSb.length() == 0) {
                     resultSb.append(randomWp);
                 } else {
                     resultSb.append(",").append(randomWp);
                 }
+
+                if (StrUtil.isNotBlank(randomWpOtherHeal)) {
+                    resultSb.append(",").append(randomWpOtherHeal);
+                }
+
             } else {
+                // 如果没有剩余武器了
                 if (resultSb.length() == 0) {
                     resultSb.append("empty");
                 } else {
@@ -396,8 +412,19 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
     }
 
 
-    private String getRandomNonIntersectingString(List<String> wpInfoList, List<String> usedWeapon) {
-        List<String> nonIntersecting = new ArrayList<>(wpInfoList);
+    private String getRandomNonIntersectingString(List<String> wpInfoList, List<String> usedWeapon, boolean ifHeal) {
+        List<String> tempWpInfoList = new ArrayList<>(wpInfoList);
+        if (ifHeal) {
+            List<String> toRemoveList = new ArrayList<>();
+            for (String wp : wpInfoList) {
+                WpDic wpDic = wpDicMapper.selectById(wp);
+                if ("heal".equals(wpDic.getWpAtkType())) {
+                    toRemoveList.add(wp);
+                }
+            }
+            tempWpInfoList.removeAll(toRemoveList);
+        }
+        List<String> nonIntersecting = new ArrayList<>(tempWpInfoList);
         // 获取非交集部分
         nonIntersecting.removeAll(usedWeapon);
         Random random = new Random();
@@ -489,31 +516,31 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
 
         if (random.nextInt(10000) < cri) {
             message = "<br>cri-2@@" + offensiveInfo.getName() + "暴击！";
-            finalAtk = finalAtk.multiply(new BigDecimal(1).add(new BigDecimal(criPer).divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP)));
+            finalAtk = finalAtk.multiply(new BigDecimal(1).add(new BigDecimal(criPer).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP)));
         }
 
         WpDic wpDic = wpDicMapper.selectById(wp);
         Integer wpInfoStr = wpDic.getWpStr();
         if (wpInfoStr != null) {
-            BigDecimal wpStr = new BigDecimal(wpInfoStr).divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP);
+            BigDecimal wpStr = new BigDecimal(wpInfoStr).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP);
             finalDmg = finalDmg.add(wpStr.multiply(new BigDecimal(str)));
         }
 
         Integer wpInfoWit = wpDic.getWpWit();
         if (wpInfoWit != null) {
-            BigDecimal wpWit = new BigDecimal(wpInfoWit).divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP);
+            BigDecimal wpWit = new BigDecimal(wpInfoWit).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP);
             finalDmg = finalDmg.add(wpWit.multiply(new BigDecimal(wit)));
         }
 
         Integer wpInfoAgi = wpDic.getWpAgi();
         if (wpInfoAgi != null) {
-            BigDecimal wpAgi = new BigDecimal(wpInfoAgi).divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP);
+            BigDecimal wpAgi = new BigDecimal(wpInfoAgi).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP);
             finalDmg = finalDmg.add(wpAgi.multiply(new BigDecimal(agi)));
         }
 
         Integer wpInfoHlt = wpDic.getWpHlt();
         if (wpInfoHlt != null) {
-            BigDecimal wpHlt = new BigDecimal(wpInfoHlt).divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP);
+            BigDecimal wpHlt = new BigDecimal(wpInfoHlt).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP);
             finalDmg = finalDmg.add(wpHlt.multiply(new BigDecimal(hlt)));
         }
 
@@ -527,12 +554,17 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
     private String getFighterFinalDef(PersonFightInfo personInfo, String wp, FightInfo wpFinalAtk, String message) {
         Integer blk = personInfo.getBlk();
         Integer blkPer = personInfo.getBlkPer();
+        Integer miss = personInfo.getMiss();
         BigDecimal finalDef = personInfo.getFinalDef();
 
         Random random = new Random();
-        if (random.nextInt(10000) < blk) {
+        Random missRandom = new Random();
+        if (missRandom.nextInt(10000) < miss) {
+            message = "<br>miss-1@@" + personInfo.getName() + "闪避！";
+            finalDef = new BigDecimal("0");
+        } else if (random.nextInt(10000) < blk) {
             message = "<br>blk-1@@" + personInfo.getName() + "格挡！";
-            finalDef = finalDef.multiply(new BigDecimal(1).subtract(new BigDecimal(blkPer).divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP)));
+            finalDef = finalDef.multiply(new BigDecimal(1).subtract(new BigDecimal(blkPer).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP)));
         }
         BigDecimal def = new BigDecimal(wpFinalAtk.getFinalNum()).multiply(finalDef);
         wpFinalAtk.setFinalNum(def.intValue());
@@ -637,7 +669,8 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
 
     private BigDecimal wpOrSkDmgUp(String wp, PersonFightInfo offensiveInfo, PersonFightInfo defenseInfo, FightInfo
             fightInfo, BigDecimal finalAtk) {
-        if ("1".equals(wp) || "7".equals(wp) || "16".equals(wp) || "17".equals(wp)) {
+        WpDic wpDic = wpDicMapper.selectById(wp);
+        if ("heal".equals(wpDic.getWpAtkType())) {
             // heal类型标记
             fightInfo.setIfHeal(1);
         }
@@ -795,76 +828,77 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
     }
 
 
-    private void instructionsEffect(String instructions, PersonFightInfo fighter1, PersonFightInfo fighter2, StringBuilder message) {
+    private void instructionsEffect(String instructions, PersonFightInfo fighter1, PersonFightInfo fighter2, StringBuilder message, FightInfo fightInfo) {
         int instructionLevel = Integer.parseInt(instructions.split("@@")[1]);
-
-        if (instructions.contains("2@@")) {
-            List<BuffInfo> f1Buff = fighter1.getBuff();
-            BuffInfo buffInfo = new BuffInfo();
-            buffInfo.setBuff("inspire")
-                    .setTurns(1 + instructionLevel);
-            f1Buff.add(buffInfo);
-            message.append("<br>buffadd-0@@").append(fighter1.getName()).append(" 使用了鼓舞激励之策！");
-            fighter1.setBuff(f1Buff);
-        }
-
-        if (instructions.contains("6@@")) {
-            List<BuffInfo> f1Buff = fighter1.getBuff();
-            BuffInfo buffInfo = new BuffInfo();
-            buffInfo.setBuff("lucky" + instructionLevel)
-                    .setTurns(1);
-            f1Buff.add(buffInfo);
-            message.append("<br>buffadd-0@@").append(fighter1.getName()).append(" 使用了强运！");
-            fighter1.setBuff(f1Buff);
-        }
-
-        if (instructions.contains("4@@")) {
-            Integer htl = fighter1.getHtl();
-            int htlMax = 20 + htl * 12;
-            if (fighter1.getHp() < htlMax) {
-                int lossHP = htlMax - fighter1.getHp();
-                BigDecimal healPer;
-                if (instructionLevel == 1) {
-                    healPer = new BigDecimal("0.1");
-                } else if (instructionLevel == 2) {
-                    healPer = new BigDecimal("0.15");
-                } else {
-                    healPer = new BigDecimal("0.2");
-                }
-                int healHP = new BigDecimal(lossHP).multiply(new BigDecimal("0.1").multiply(healPer)).intValue() + 1;
-                message.append("<br>heal-0@@").append(fighter1.getName()).append(" 使用了紧急治疗，恢复 , +").append(healHP).append("点HP。");
-                fighter1.setHp(fighter1.getHp() + healHP);
+        if (fighter1.getName().equals(fightInfo.getOffensiveName())) {
+            if (instructions.contains("2@@")) {
+                List<BuffInfo> f1Buff = fighter1.getBuff();
+                BuffInfo buffInfo = new BuffInfo();
+                buffInfo.setBuff("inspire")
+                        .setTurns(1 + instructionLevel);
+                f1Buff.add(buffInfo);
+                message.append("<br>buffadd-0@@").append(fighter1.getName()).append(" 使用了鼓舞激励之策！");
+                fighter1.setBuff(f1Buff);
             }
-        }
 
-        if (instructions.contains("5@@")) {
-            List<BuffInfo> f1Buff = fighter1.getBuff();
-            int subTurnNum = 1;
-            if (instructionLevel == 3) {
-                subTurnNum = 2;
+            if (instructions.contains("6@@")) {
+                List<BuffInfo> f1Buff = fighter1.getBuff();
+                BuffInfo buffInfo = new BuffInfo();
+                buffInfo.setBuff("lucky" + instructionLevel)
+                        .setTurns(1);
+                f1Buff.add(buffInfo);
+                message.append("<br>buffadd-0@@").append(fighter1.getName()).append(" 使用了强运！");
+                fighter1.setBuff(f1Buff);
             }
-            Iterator<BuffInfo> buffIterator = f1Buff.iterator();
-            while (buffIterator.hasNext()) {
-                BuffInfo buffInfo = buffIterator.next();
-                if ("poison".equals(buffInfo.getBuff()) || "fear".equals(buffInfo.getBuff()) || "bleed".equals(buffInfo.getBuff())) {
-                    Integer turns = buffInfo.getTurns();
-                    if (turns - subTurnNum <= 0) {
-                        message.append("<br>buffmove-0@@").append(fighter1.getName()).append(" 使用了摆脱，解除了").append(buffInfo.getBuff());
-                        buffIterator.remove();
+
+            if (instructions.contains("4@@")) {
+                Integer htl = fighter1.getHtl();
+                int htlMax = 20 + htl * 12;
+                if (fighter1.getHp() < htlMax) {
+                    int lossHP = htlMax - fighter1.getHp();
+                    BigDecimal healPer;
+                    if (instructionLevel == 1) {
+                        healPer = new BigDecimal("0.1");
+                    } else if (instructionLevel == 2) {
+                        healPer = new BigDecimal("0.15");
                     } else {
-                        buffInfo.setTurns(turns - subTurnNum);
+                        healPer = new BigDecimal("0.2");
+                    }
+                    int healHP = new BigDecimal(lossHP).multiply(new BigDecimal("0.1").multiply(healPer)).intValue() + 1;
+                    message.append("<br>heal-0@@").append(fighter1.getName()).append(" 使用了紧急治疗，恢复 , +").append(healHP).append("点HP。");
+                    fighter1.setHp(fighter1.getHp() + healHP);
+                }
+            }
+
+            if (instructions.contains("5@@")) {
+                List<BuffInfo> f1Buff = fighter1.getBuff();
+                int subTurnNum = 1;
+                if (instructionLevel == 3) {
+                    subTurnNum = 2;
+                }
+                Iterator<BuffInfo> buffIterator = f1Buff.iterator();
+                while (buffIterator.hasNext()) {
+                    BuffInfo buffInfo = buffIterator.next();
+                    if ("poison".equals(buffInfo.getBuff()) || "fear".equals(buffInfo.getBuff()) || "bleed".equals(buffInfo.getBuff())) {
+                        Integer turns = buffInfo.getTurns();
+                        if (turns - subTurnNum <= 0) {
+                            message.append("<br>buffmove-0@@").append(fighter1.getName()).append(" 使用了摆脱，解除了").append(buffInfo.getBuff());
+                            buffIterator.remove();
+                        } else {
+                            buffInfo.setTurns(turns - subTurnNum);
+                        }
                     }
                 }
-            }
 
-            String healPer = "0.05";
-            if (instructionLevel != 1) {
-                healPer = "0.1";
+                String healPer = "0.05";
+                if (instructionLevel != 1) {
+                    healPer = "0.1";
+                }
+                int maxHP = 20 + fighter1.getHtl() * 12;
+                int healHP = new BigDecimal(healPer).multiply(new BigDecimal(maxHP)).intValue() + 1;
+                message.append("<br>heal-0@@").append(fighter1.getName()).append(" 使用了摆脱，恢复 , +").append(healHP).append("点HP。");
+                fighter1.setHp(fighter1.getHp() + healHP);
             }
-            int maxHP = 20 + fighter1.getHtl() * 12;
-            int healHP = new BigDecimal(healPer).multiply(new BigDecimal(maxHP)).intValue() + 1;
-            message.append("<br>heal-0@@").append(fighter1.getName()).append(" 使用了摆脱，恢复 , +").append(healHP).append("点HP。");
-            fighter1.setHp(fighter1.getHp() + healHP);
         }
     }
 
