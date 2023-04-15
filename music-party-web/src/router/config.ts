@@ -10,6 +10,10 @@ export default {
   other: {
     module: require.context("./other", true, /\.router\.ts$/),
     routes: []
+  },
+  game: {
+    module: require.context("./game", true, /\.router\.ts$/),
+    routes: []
   }
 } as {
   [index: string]: {

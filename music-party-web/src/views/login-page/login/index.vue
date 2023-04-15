@@ -35,8 +35,10 @@ import { namespace } from "vuex-class"
 import type { FormInstance } from "element-plus"
 import { AxiosResponse } from "axios"
 import { LoginData, LoginForm } from "@/types/login"
+import { UserInfoType } from "@/types/user"
 import { Form } from "element-ui"
 import { encodeRSA } from '@/utils/common'
+import defaultPageApi from "@/api/default-page";
 
 const permissionsStore = namespace('permissionsStore')
 const userStore = namespace('userStore')
@@ -46,6 +48,7 @@ export default class Login extends Vue {
   @permissionsStore.Mutation('setPermissions') setPermissions!: Function
   @userStore.Mutation('setToken') setToken!: Function
   @userStore.Mutation('setRefreshToken') setRefreshToken!: Function
+  @userStore.Mutation('setUserInfo') setUserInfo!: Function
 
   loginData: LoginData = reactive(new LoginData())
   ruleForm: LoginForm = this.loginData.ruleForm
@@ -67,6 +70,7 @@ export default class Login extends Vue {
     (this.$refs[formName] as Form).validate((valid: boolean) => {
       if (valid) {
         this.handleLogin()
+        // this.getCurrentUserInfo()
       } else {
         console.log('error submit!')
         return false
@@ -81,7 +85,6 @@ export default class Login extends Vue {
   }
 
   async handleLogin() {
-
     const enPassword = encodeRSA(this.ruleForm.password, '')
     const formData = new FormData();
     formData.append("username", this.ruleForm.username)
@@ -110,17 +113,25 @@ export default class Login extends Vue {
     }
 
     const path = (this.$route.query.redirectUrl || '/') as string | undefined
-
-
     this.$router.replace({ path })
 
-    // try {
-    //   const res = await Request.get('/promise')
-    //   this.setPermissions(res.data)
-    // } catch (error) {
-    //   console.error(error, '获取权限出错了')
-    // }
+
   }
+
+  async getCurrentUserInfo() {
+    try {
+      const res = await Request.get(defaultPageApi.user.info, {}, { isNeedToken: true })
+      const userInfo: UserInfoType = {
+        username: res.data.msg! as string,
+        age: 24,
+        sex: 0
+      }
+      this.setUserInfo(userInfo)
+    } catch (error) {
+      console.error(error, '获取用户信息出错了')
+    }
+  }
+
 }
 </script>
 

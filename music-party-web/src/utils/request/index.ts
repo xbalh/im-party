@@ -57,9 +57,11 @@ class RequestProxy implements RequestProxyType {
         // 方案一 跳转至登录页
         store.commit('userStore/setToken', '')
         store.commit('permissionsStore/setPermissions', {})
-        router.replace({ path: '/login', query: {
-          redirectUrl: router.currentRoute.fullPath
-        } })
+        router.replace({
+          path: '/login', query: {
+            redirectUrl: router.currentRoute.fullPath
+          }
+        })
 
         // 方式二 自动刷新 token 并重新发起失败的请求
         // const res = await this.transfromRquest({
@@ -118,11 +120,13 @@ class RequestProxy implements RequestProxyType {
     if (customConfig.isNeedToken) {
 
       config.headers = {
+        ...config.headers,
         cookies: {
           Authentication: store.getters['userStore/getToken'] || '',
-          // eslint-disable-next-line @typescript-eslint/camelcase
           refreshToken: store.getters['userStore/getRefreshToken'] || ''
-        }
+        },
+        Authentication: store.getters['userStore/getToken'] || '',
+        refreshToken: store.getters['userStore/getRefreshToken'] || ''
       };
     } else {
       config.headers = {};

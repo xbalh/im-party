@@ -11,14 +11,14 @@
     <!-- 歌曲队列 -->
 
 
-
-
-
-<div>
-  <el-button @click="setCurrentTime">
-    控制当前播放进度
-  </el-button>
-</div>
+    <div>
+      <el-button @click="setCurrentTime">
+        控制当前播放进度
+      </el-button>
+      <el-button @click="gotoChaos">
+        大乱斗
+      </el-button>
+    </div>
   </div>
 </template>
 
@@ -29,10 +29,11 @@ import LangExample from "@/components/example/langExample.vue";
 import VuexExample from "@/components/example/vuexExample.vue";
 import WorkerExample from "@/components/example/workerExample.vue";
 import MusicPlayer from "@/components/music-player/index.vue";
-import defaultPageApi from "@/api/default-page"
+import defaultPageApi from "@/api/default-page";
 import Request from "@/utils/requestInstance";
 import Ws from "@/utils/ws";
 import { namespace } from "vuex-class"
+import { UserInfoType } from "@/types/user"
 
 const userStore = namespace('userStore')
 
@@ -50,6 +51,7 @@ export default class Home extends Vue {
   handleChat: (data: object) => any;
   timeId: NodeJS.Timeout;
   @userStore.Getter('getToken') getToken!: string
+  @userStore.Mutation('setUserInfo') setUserInfo!: Function
   currentUserInfo: any = null;
 
   currentTime: string = "00:00";
@@ -57,8 +59,8 @@ export default class Home extends Vue {
   constructor() {
     super();
     const token = localStorage.getItem("token");
-    if(!token) console.error("token为空");
-    this.WS = new Ws("ws://localhost:8080/musicParty/ws/1", [token!], false);
+    if (!token) console.error("token为空");
+    this.WS = new Ws("ws://localhost:8080/musicParty/ws", [token!], false);
     this.WS.send("connect success");
     this.handleChat = (data: object) => console.log(data);
     this.WS.subscribe("/music/chat", this.handleChat);
@@ -76,10 +78,10 @@ export default class Home extends Vue {
     this.init("test");
     //获取当前用户信息
     this.getCurrentUserInfo();
-    
+
   }
 
-  async init(params: | string ) {
+  async init(params: | string) {
     console.log(params, "init");
     try {
       const res = await Request.get(
@@ -96,16 +98,16 @@ export default class Home extends Vue {
   }
 
   async getCurrentUserInfo() {
-    console.log("getCurrentUserInfo");
     try {
-      const res = await Request.get(
-        defaultPageApi.user.info,
-        {},
-        { isNeedToken: true }
-      );
-
+      const res = await Request.get(defaultPageApi.user.info, {}, { isNeedToken: false })
+      const userInfo: UserInfoType = {
+        username: res.data.msg! as string,
+        age: 24,
+        sex: 0
+      }
+      this.setUserInfo(userInfo)
     } catch (error) {
-      console.error(error, "getCurrentUserInfo");
+      console.error(error, '获取用户信息出错了')
     }
   }
 
@@ -131,6 +133,9 @@ export default class Home extends Vue {
     this.WS.destroy();
   }
 
+  gotoChaos() {
+    this.$router.replace({ path: '/game/chaos' })
+  }
 
 }
 </script>

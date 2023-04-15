@@ -41,10 +41,9 @@ public class GeometryChaosMainController {
 
     @ApiOperation(value = "开始参数")
     @PostMapping("/geometryChaosMain/fightStart")
-    public BaseResult<JSONObject> fightStart(@RequestBody BattleStartInfo battleStartInfo) {
+    public BaseResult<String> fightStart(@RequestBody BattleStartInfo battleStartInfo) {
         String result = geometryChaosMainService.fightStart(battleStartInfo.getUser(), battleStartInfo.getEnemy(), battleStartInfo.getFightInfo());
-        JSONObject resultJSON = JSONObject.parseObject(result);
-        return BaseResult.ok(resultJSON);
+        return BaseResult.ok(result);
     }
 
 
