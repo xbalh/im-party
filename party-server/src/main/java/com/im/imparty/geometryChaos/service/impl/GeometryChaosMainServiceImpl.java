@@ -3,6 +3,7 @@ package com.im.imparty.geometryChaos.service.impl;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.im.imparty.common.exception.CustomException;
 import com.im.imparty.geometryChaos.mapper.BattleInfoMapper;
@@ -11,6 +12,9 @@ import com.im.imparty.geometryChaos.mapper.WpDicMapper;
 import com.im.imparty.geometryChaos.mapper.WpInfoMapper;
 import com.im.imparty.geometryChaos.service.GeometryChaosMainService;
 import com.im.imparty.geometryChaos.entity.*;
+import com.im.imparty.user.entity.UserDomain;
+import com.im.imparty.user.mapper.UserMapper;
+import com.im.imparty.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,6 +35,9 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
 
     @Autowired
     private UserStaticInfoMapper userStaticInfoMapper;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private WpInfoMapper wpInfoMapper;
@@ -253,6 +260,27 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
             }
             return battleInfo;
         }
+    }
+
+    @Override
+    public List<UserStaticInfo> getChallengableFighter(String userName) {
+        // 获取可挑战的对手
+        QueryWrapper<UserDomain> queryWrapper = new QueryWrapper<>();
+        queryWrapper.ne("username", userName);
+        List<UserDomain> list = userService.list(queryWrapper);
+        Iterator<UserDomain> userDomainIterator = list.iterator();
+        List<UserStaticInfo> userStaticInfoList = new ArrayList<>();
+        while (userDomainIterator.hasNext()) {
+            UserDomain userDomain = userDomainIterator.next();
+            String userDomainUserName = userDomain.getUserName();
+            UserStaticInfo userStaticInfo = userStaticInfoMapper.selectById(userDomainUserName);
+            if (userStaticInfo == null) {
+                userDomainIterator.remove();
+            } else {
+                userStaticInfoList.add(userStaticInfo);
+            }
+        }
+        return userStaticInfoList;
     }
 
 

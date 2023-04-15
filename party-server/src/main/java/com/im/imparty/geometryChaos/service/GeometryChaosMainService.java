@@ -3,6 +3,8 @@ package com.im.imparty.geometryChaos.service;
 import com.im.imparty.common.exception.CustomException;
 import com.im.imparty.geometryChaos.entity.*;
 
+import java.util.List;
+
 public interface GeometryChaosMainService {
     /**
      * 新建
@@ -33,4 +35,6 @@ public interface GeometryChaosMainService {
      * @param turnInfo
      **/
     BattleInfo startOneTurn(TurnInfo turnInfo);
+
+    List<UserStaticInfo> getChallengableFighter(String userName );
 }

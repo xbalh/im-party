@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @Api("瞎几百相关请求")
 @RestController
@@ -53,4 +54,13 @@ public class GeometryChaosMainController {
         BattleInfo result = geometryChaosMainService.startOneTurn(turnInfo);
         return BaseResult.ok(result);
     }
+
+
+    @ApiOperation(value = "获取可挑战的对手")
+    @PostMapping("/geometryChaosMain/getChallengableFighter")
+    public BaseResult<List<UserStaticInfo>> getChallengableFighter(@RequestBody String userName) {
+        List<UserStaticInfo> challengableFighter = geometryChaosMainService.getChallengableFighter(userName);
+        return BaseResult.ok(challengableFighter);
+    }
+
 }

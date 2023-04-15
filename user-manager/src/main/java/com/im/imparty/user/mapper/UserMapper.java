@@ -15,6 +15,7 @@ public interface UserMapper extends BaseMapper<UserDomain> {
                 )
             )
     })
+
     @Select(
             "select u.username userName, u.password password, " +
                     "u.valid_sts validSts, u.salt, u.salt_expires_time saltExpiresTime, " +
