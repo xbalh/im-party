@@ -1,8 +1,11 @@
 package com.im.imparty.geometryChaos.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.im.imparty.common.exception.CustomException;
 import com.im.imparty.geometryChaos.entity.*;
 import com.im.imparty.geometryChaos.service.GeometryChaosMainService;
+import com.im.imparty.web.vo.BaseResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,32 +24,33 @@ public class GeometryChaosMainController {
 
     @ApiOperation(value = "创建角色")
     @PostMapping("/geometryChaosMain/createCharacter")
-    public UserStaticInfo createCharacter(@RequestBody String userName) {
+    public BaseResult<UserStaticInfo> createCharacter(@RequestBody String userName) {
         UserStaticInfo geometryChaosMainServiceCharacter = geometryChaosMainService.createCharacter(userName);
-        return geometryChaosMainServiceCharacter;
+        return BaseResult.ok(geometryChaosMainServiceCharacter);
     }
 
 
     @ApiOperation(value = "获取战斗前基础属性")
     @PostMapping("/geometryChaosMain/getUserFightInfo")
-    public PersonFightInfo getUserFightInfo(@RequestBody String userName) throws CustomException {
+    public BaseResult<PersonFightInfo> getUserFightInfo(@RequestBody String userName) throws CustomException {
         PersonFightInfo userFightInfo = geometryChaosMainService.getUserFightInfo(userName);
-        return userFightInfo;
+        return BaseResult.ok(userFightInfo);
     }
 
 
     @ApiOperation(value = "开始参数")
     @PostMapping("/geometryChaosMain/fightStart")
-    public String fightStart(@RequestBody BattleStartInfo battleStartInfo) {
+    public BaseResult<JSONObject> fightStart(@RequestBody BattleStartInfo battleStartInfo) {
         String result = geometryChaosMainService.fightStart(battleStartInfo.getUser(), battleStartInfo.getEnemy(), battleStartInfo.getFightInfo());
-        return result;
+        JSONObject resultJSON = JSONObject.parseObject(result);
+        return BaseResult.ok(resultJSON);
     }
 
 
     @ApiOperation(value = "开始单个回合")
     @PostMapping("/geometryChaosMain/startOneTurn")
-    public BattleInfo startOneTurn(@RequestBody TurnInfo turnInfo) {
+    public BaseResult<BattleInfo> startOneTurn(@RequestBody TurnInfo turnInfo) {
         BattleInfo result = geometryChaosMainService.startOneTurn(turnInfo);
-        return result;
+        return BaseResult.ok(result);
     }
 }
