@@ -1,5 +1,6 @@
 package com.im.imparty.geometryChaos.service;
 
+import com.im.imparty.common.exception.CustomException;
 import com.im.imparty.geometryChaos.entity.*;
 
 public interface GeometryChaosMainService {
@@ -15,7 +16,7 @@ public interface GeometryChaosMainService {
      *
      * @param userName
      **/
-    PersonFightInfo getUserFightInfo(String userName);
+    PersonFightInfo getUserFightInfo(String userName) throws CustomException;
 
     /**
      * 开始参数

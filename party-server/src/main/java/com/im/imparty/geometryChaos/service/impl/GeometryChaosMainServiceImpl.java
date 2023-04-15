@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.im.imparty.common.exception.CustomException;
 import com.im.imparty.geometryChaos.mapper.BattleInfoMapper;
 import com.im.imparty.geometryChaos.mapper.UserStaticInfoMapper;
 import com.im.imparty.geometryChaos.mapper.WpDicMapper;
@@ -71,10 +72,13 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
 
 
     @Override
-    public PersonFightInfo getUserFightInfo(String userName) {
+    public PersonFightInfo getUserFightInfo(String userName) throws CustomException {
         QueryWrapper<UserStaticInfo> wrapper = new QueryWrapper<>();
         wrapper.eq("user_name", userName);
         UserStaticInfo userStaticInfo = userStaticInfoMapper.selectOne(wrapper);
+        if(userStaticInfo == null){
+            throw new CustomException("角色还未创建，需要先创立角色！", 700);
+        }
 
         QueryWrapper<WpInfo> wpWrapper = new QueryWrapper<>();
         wpWrapper.eq("user_name", userName);
@@ -176,8 +180,8 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
                         message = this.ifTurnContinue(battleResultInfo, otherSideBattleResultInfo.getDefenseInfo(), otherSideBattleResultInfo.getOffensiveInfo(), fightInfo, message);
                     }
 
-                    battleInfo.setOffensiveInfo(JSON.toJSON(otherSideBattleResultInfo.getDefenseInfo()).toString())
-                            .setDefenseInfo(JSON.toJSON(otherSideBattleResultInfo.getOffensiveInfo()).toString())
+                    battleInfo.setOffensiveInfo(JSON.toJSON(otherSideBattleResultInfo.getOffensiveInfo()).toString())
+                            .setDefenseInfo(JSON.toJSON(otherSideBattleResultInfo.getDefenseInfo()).toString())
                             .setFightInfo(JSON.toJSON(otherSideBattleResultInfo.getFightInfo()).toString());
                 }
             } else {
@@ -201,8 +205,8 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
                         message = this.ifTurnContinue(battleResultInfo, otherSideBattleResultInfo.getOffensiveInfo(), otherSideBattleResultInfo.getDefenseInfo(), fightInfo, message);
                     }
 
-                    battleInfo.setOffensiveInfo(JSON.toJSON(battleResultInfo.getOffensiveInfo()).toString())
-                            .setDefenseInfo(JSON.toJSON(battleResultInfo.getDefenseInfo()).toString())
+                    battleInfo.setOffensiveInfo(JSON.toJSON(otherSideBattleResultInfo.getDefenseInfo()).toString())
+                            .setDefenseInfo(JSON.toJSON(otherSideBattleResultInfo.getOffensiveInfo()).toString())
                             .setFightInfo(JSON.toJSON(otherSideBattleResultInfo.getFightInfo()).toString());
                 }
             }
@@ -218,6 +222,7 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
                     .setFightInfo(JSON.toJSON(fightInfo).toString())
                     .setCreateTime(new Date())
                     .setRound(round)
+                    .setIfEnd(true)
                     .setMessage(message + "<br>defeat-0@@挑战者" + offensiveInfo.getName() + "战败了。");
             return battleInfo;
         } else if (defenseInfo.getHp() <= 0) {
@@ -227,6 +232,7 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
                     .setFightInfo(JSON.toJSON(fightInfo).toString())
                     .setCreateTime(new Date())
                     .setRound(round)
+                    .setIfEnd(true)
                     .setMessage(message + "<br>victory-0@@挑战者" + offensiveInfo.getName() + "获得了胜利！");
             return battleInfo;
         } else {
@@ -237,6 +243,7 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
                     .setFightInfo(JSON.toJSON(fightInfo).toString())
                     .setCreateTime(new Date())
                     .setRound(round)
+                    .setIfEnd(false)
                     .setMessage(message);
             int insertResult = battleInfoMapper.insert(battleInfo);
             if (insertResult == 0) {
@@ -772,9 +779,15 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
         }
 
         if (fighter1.getHp() <= 0 || fighter2.getHp() <= 0) {
+            String name = fighter1.getName();
+            if (name.equals(fightInfo.getOffensiveName())) {
+                resultInfo.setOffensiveInfo(fighter1)
+                        .setDefenseInfo(fighter2);
+            } else {
+                resultInfo.setOffensiveInfo(fighter2)
+                        .setDefenseInfo(fighter1);
+            }
             resultInfo.setMessage(message.toString())
-                    .setOffensiveInfo(fighter1)
-                    .setDefenseInfo(fighter2)
                     .setFightInfo(fightInfo);
             return true;
         }

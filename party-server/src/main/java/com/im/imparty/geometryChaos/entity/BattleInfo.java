@@ -21,4 +21,5 @@ public class BattleInfo {
     private Date createTime;
     private String message;
     private String surplusCd;
+    private Boolean ifEnd;
 }

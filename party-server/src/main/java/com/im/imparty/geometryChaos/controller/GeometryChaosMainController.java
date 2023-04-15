@@ -1,5 +1,6 @@
 package com.im.imparty.geometryChaos.controller;
 
+import com.im.imparty.common.exception.CustomException;
 import com.im.imparty.geometryChaos.entity.*;
 import com.im.imparty.geometryChaos.service.GeometryChaosMainService;
 import io.swagger.annotations.Api;
@@ -28,7 +29,7 @@ public class GeometryChaosMainController {
 
     @ApiOperation(value = "获取战斗前基础属性")
     @PostMapping("/geometryChaosMain/getUserFightInfo")
-    public PersonFightInfo getUserFightInfo(@RequestBody String userName) {
+    public PersonFightInfo getUserFightInfo(@RequestBody String userName) throws CustomException {
         PersonFightInfo userFightInfo = geometryChaosMainService.getUserFightInfo(userName);
         return userFightInfo;
     }
