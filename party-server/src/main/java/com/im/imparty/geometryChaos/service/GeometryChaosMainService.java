@@ -2,6 +2,7 @@ package com.im.imparty.geometryChaos.service;
 
 import com.im.imparty.common.exception.CustomException;
 import com.im.imparty.geometryChaos.entity.*;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -36,5 +37,7 @@ public interface GeometryChaosMainService {
      **/
     BattleInfo startOneTurn(TurnInfo turnInfo);
 
-    List<UserStaticInfo> getChallengableFighter(String userName );
+    List<UserStaticInfo> getChallengableFighter(String userName);
+
+    String fighterLevelUp(String userName);
 }

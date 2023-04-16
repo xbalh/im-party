@@ -31,7 +31,15 @@ public class GeometryChaosMainController {
     }
 
 
-    @ApiOperation(value = "获取战斗前基础属性")
+    @ApiOperation(value = "升级")
+    @PostMapping("/geometryChaosMain/fighterLevelUp")
+    public BaseResult<List<UserStaticInfo>> fighterLevelUp(@RequestBody String userName) {
+        List<UserStaticInfo> challengableFighter = geometryChaosMainService.getChallengableFighter(userName);
+        return BaseResult.ok(challengableFighter);
+    }
+
+
+    @ApiOperation(value = "获取战斗的基础属性")
     @PostMapping("/geometryChaosMain/getUserFightInfo")
     public BaseResult<PersonFightInfo> getUserFightInfo(@RequestBody String userName) throws CustomException {
         PersonFightInfo userFightInfo = geometryChaosMainService.getUserFightInfo(userName);
