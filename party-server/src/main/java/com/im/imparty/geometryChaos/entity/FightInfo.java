@@ -1,5 +1,7 @@
 package com.im.imparty.geometryChaos.entity;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -19,7 +21,7 @@ public class FightInfo {
     private List<BuffUpInfo> ifBuff;
     private Integer finalNum;
     private String instructions;
-    private String message;
+    private JSONArray message;
     private String offensiveName;
     private String defenseName;
 }

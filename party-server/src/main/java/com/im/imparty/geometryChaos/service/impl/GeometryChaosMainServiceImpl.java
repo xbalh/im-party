@@ -1,10 +1,13 @@
 package com.im.imparty.geometryChaos.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.im.imparty.common.dic.LevelDic;
 import com.im.imparty.common.exception.CustomException;
 import com.im.imparty.geometryChaos.mapper.BattleInfoMapper;
 import com.im.imparty.geometryChaos.mapper.UserStaticInfoMapper;
@@ -15,6 +18,7 @@ import com.im.imparty.geometryChaos.entity.*;
 import com.im.imparty.user.entity.UserDomain;
 import com.im.imparty.user.mapper.UserMapper;
 import com.im.imparty.user.service.UserService;
+import javafx.scene.control.CustomMenuItem;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -69,7 +73,11 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
                 .setWit(numbers.get(2))
                 .setSpd(numbers.get(3))
                 .setHtl(numbers.get(4))
-                .setYb(0);
+                .setYb(0)
+                .setInsPoint(0)
+                .setAttrPoint(0)
+                .setSkPoint(0)
+                .setPower(100);
         // save PersonInfo
         int insertResult = userStaticInfoMapper.insert(userStaticInfo);
         if (insertResult == 0) {
@@ -124,6 +132,14 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public String fightStart(PersonFightInfo user, PersonFightInfo enemy, FightInfo fightInfo) {
+        // 扣除挑战者10点体力
+        UserStaticInfo userStaticInfo = userStaticInfoMapper.selectById(user.getName());
+        if (userStaticInfo.getPower() < 10) {
+            throw new CustomException("体力不足10点！", 700);
+        }
+        userStaticInfo.setPower(userStaticInfo.getPower() - 10);
+        userStaticInfoMapper.updateById(userStaticInfo);
+
         BattleInfo battleInfo = new BattleInfo();
         String uuid = UUID.randomUUID().toString().replaceAll("-", "");
         battleInfo.setId(uuid)
@@ -153,28 +169,33 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
                 .setDefenseName(defenseInfo.getName());
         fightInfo.setInstructions(turnInfo.getInstructions());
         Integer round = battleInfo.getRound();
-        String message = "";
+        JSONArray message = new JSONArray();
 
         if (offensiveInfo.getHp() > 0 && defenseInfo.getHp() > 0 && fightInfo.getIfVictory() == null) {
             round++;
             fightInfo.setRound(round);
-            message = "<br>回合 " + round + " 开始：";
+            JSONObject roundMsg = this.newMsgCreate("回合 " + round + " 开始：", null, null, null);
+            message.add(roundMsg);
             if (round >= 20) {
-                message = message + "回合 >=20 结算伤害 *10";
+                JSONObject newMsgCreate = this.newMsgCreate("回合大于等于20，结算伤害至十倍！", null, null, null);
+                message.add(newMsgCreate);
             } else if (round >= 15) {
-                message = message + "回合 >=15 结算伤害 *5";
+                JSONObject newMsgCreate = this.newMsgCreate("回合大于等于15，结算伤害至五倍！", null, null, null);
+                message.add(newMsgCreate);
             } else if (round >= 10) {
-                message = message + "回合 >=10 结算伤害 *2";
+                JSONObject newMsgCreate = this.newMsgCreate("回合大于等于10，结算伤害至两倍！", null, null, null);
+                message.add(newMsgCreate);
             }
 
             // 根据 speed 大小交替行动，行动后判定是否需要结束战斗，根据buff判定是否继续行动
             if (offensiveInfo.getSpd() >= defenseInfo.getSpd()) {
-                message += offensiveInfo.getName() + " 先手！";
+                JSONObject newMsgCreate = this.newMsgCreate(offensiveInfo.getName() + " 先手！", null, null, null);
+                message.add(newMsgCreate);
                 BattleResultInfo battleResultInfo = this.fightOneTurn(offensiveInfo, defenseInfo, fightInfo);
-                message += battleResultInfo.getMessage();
+                message.addAll(battleResultInfo.getMessage());
 
                 if (battleResultInfo.getDefenseInfo().getHp() > 0 && battleResultInfo.getOffensiveInfo().getHp() > 0) {
-                    message = this.ifTurnContinue(battleResultInfo, battleResultInfo.getOffensiveInfo(), battleResultInfo.getDefenseInfo(), fightInfo, message);
+                    this.ifTurnContinue(battleResultInfo, battleResultInfo.getOffensiveInfo(), battleResultInfo.getDefenseInfo(), fightInfo, message);
                 }
 
                 battleInfo.setOffensiveInfo(JSON.toJSON(battleResultInfo.getOffensiveInfo()).toString())
@@ -183,10 +204,10 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
 
                 if (battleResultInfo.getDefenseInfo().getHp() > 0 && battleResultInfo.getOffensiveInfo().getHp() > 0) {
                     BattleResultInfo otherSideBattleResultInfo = this.fightOneTurn(battleResultInfo.getDefenseInfo(), battleResultInfo.getOffensiveInfo(), fightInfo);
-                    message += otherSideBattleResultInfo.getMessage();
+                    message.addAll(otherSideBattleResultInfo.getMessage());
 
                     if (battleResultInfo.getDefenseInfo().getHp() > 0 && battleResultInfo.getOffensiveInfo().getHp() > 0) {
-                        message = this.ifTurnContinue(battleResultInfo, otherSideBattleResultInfo.getDefenseInfo(), otherSideBattleResultInfo.getOffensiveInfo(), fightInfo, message);
+                        this.ifTurnContinue(battleResultInfo, otherSideBattleResultInfo.getDefenseInfo(), otherSideBattleResultInfo.getOffensiveInfo(), fightInfo, message);
                     }
 
                     battleInfo.setOffensiveInfo(JSON.toJSON(otherSideBattleResultInfo.getOffensiveInfo()).toString())
@@ -194,12 +215,13 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
                             .setFightInfo(JSON.toJSON(otherSideBattleResultInfo.getFightInfo()).toString());
                 }
             } else {
-                message += defenseInfo.getName() + " 先手！";
+                JSONObject newMsgCreate = this.newMsgCreate(defenseInfo.getName() + " 先手！", null, null, null);
+                message.add(newMsgCreate);
                 BattleResultInfo battleResultInfo = this.fightOneTurn(defenseInfo, offensiveInfo, fightInfo);
-                message += battleResultInfo.getMessage();
+                message.addAll(battleResultInfo.getMessage());
 
                 if (battleResultInfo.getDefenseInfo().getHp() > 0 && battleResultInfo.getOffensiveInfo().getHp() > 0) {
-                    message = this.ifTurnContinue(battleResultInfo, battleResultInfo.getDefenseInfo(), battleResultInfo.getOffensiveInfo(), fightInfo, message);
+                    this.ifTurnContinue(battleResultInfo, battleResultInfo.getDefenseInfo(), battleResultInfo.getOffensiveInfo(), fightInfo, message);
                 }
 
                 battleInfo.setOffensiveInfo(JSON.toJSON(battleResultInfo.getOffensiveInfo()).toString())
@@ -208,10 +230,10 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
 
                 if (battleResultInfo.getOffensiveInfo().getHp() > 0 && battleResultInfo.getDefenseInfo().getHp() > 0) {
                     BattleResultInfo otherSideBattleResultInfo = this.fightOneTurn(battleResultInfo.getOffensiveInfo(), battleResultInfo.getDefenseInfo(), fightInfo);
-                    message += otherSideBattleResultInfo.getMessage();
+                    message.addAll(otherSideBattleResultInfo.getMessage());
 
                     if (otherSideBattleResultInfo.getDefenseInfo().getHp() > 0 && otherSideBattleResultInfo.getOffensiveInfo().getHp() > 0) {
-                        message = this.ifTurnContinue(battleResultInfo, otherSideBattleResultInfo.getOffensiveInfo(), otherSideBattleResultInfo.getDefenseInfo(), fightInfo, message);
+                        this.ifTurnContinue(battleResultInfo, otherSideBattleResultInfo.getOffensiveInfo(), otherSideBattleResultInfo.getDefenseInfo(), fightInfo, message);
                     }
 
                     battleInfo.setOffensiveInfo(JSON.toJSON(otherSideBattleResultInfo.getDefenseInfo()).toString())
@@ -225,6 +247,11 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
         defenseInfo = JSONObject.parseObject(battleInfo.getDefenseInfo(), PersonFightInfo.class);
         fightInfo = JSONObject.parseObject(battleInfo.getFightInfo(), FightInfo.class);
         if (offensiveInfo.getHp() <= 0) {
+            JSONObject newMsgCreate = this.newMsgCreate("挑战者" + offensiveInfo.getName() + "战败了。挑战者获得20点经验与6音币。",
+                    null,
+                    "defeat",
+                    3);
+            message.add(newMsgCreate);
             battleInfo.setId(uuid)
                     .setOffensiveInfo(JSON.toJSON(offensiveInfo).toString())
                     .setDefenseInfo(JSON.toJSON(defenseInfo).toString())
@@ -232,9 +259,22 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
                     .setCreateTime(new Date())
                     .setRound(round)
                     .setIfEnd(true)
-                    .setMessage(message + "<br>defeat-0@@挑战者" + offensiveInfo.getName() + "战败了。");
+                    .setMessage(message);
+            // 战斗失败，挑战者获得20点经验与6音币
+            UserStaticInfo userStaticInfo = userStaticInfoMapper.selectById(offensiveInfo.getName());
+            userStaticInfo.setExpe(userStaticInfo.getExpe() + 20)
+                    .setYb(userStaticInfo.getYb() + 6);
+            int updateById = userStaticInfoMapper.updateById(userStaticInfo);
+            if (updateById == 0) {
+                log.error("更新战斗后角色信息失败 {}", userStaticInfo);
+            }
             return battleInfo;
         } else if (defenseInfo.getHp() <= 0) {
+            JSONObject newMsgCreate = this.newMsgCreate("挑战者" + offensiveInfo.getName() + "获得了胜利！挑战者获得30点经验与8音币！",
+                    null,
+                    "victory",
+                    3);
+            message.add(newMsgCreate);
             battleInfo.setId(uuid)
                     .setOffensiveInfo(JSON.toJSON(offensiveInfo).toString())
                     .setDefenseInfo(JSON.toJSON(defenseInfo).toString())
@@ -242,7 +282,15 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
                     .setCreateTime(new Date())
                     .setRound(round)
                     .setIfEnd(true)
-                    .setMessage(message + "<br>victory-0@@挑战者" + offensiveInfo.getName() + "获得了胜利！");
+                    .setMessage(message);
+            // 战斗胜利，挑战者获得30点经验与8音币
+            UserStaticInfo userStaticInfo = userStaticInfoMapper.selectById(offensiveInfo.getName());
+            userStaticInfo.setExpe(userStaticInfo.getExpe() + 30)
+                    .setYb(userStaticInfo.getYb() + 8);
+            int updateById = userStaticInfoMapper.updateById(userStaticInfo);
+            if (updateById == 0) {
+                log.error("更新战斗后角色信息失败 {}", userStaticInfo);
+            }
             return battleInfo;
         } else {
             String uuidNew = UUID.randomUUID().toString().replaceAll("-", "");
@@ -283,10 +331,57 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
         return userStaticInfoList;
     }
 
+    @Override
+    public String fighterLevelUp(String userName) {
+        StringBuilder resultStr = new StringBuilder();
+        UserStaticInfo userStaticInfo = userStaticInfoMapper.selectById(userName);
+        Integer lv = userStaticInfo.getLv();
+        Integer expe = userStaticInfo.getExpe();
+        BigDecimal calculateExperience = LevelDic.calculateExperience(lv);
+        if (expe < calculateExperience.intValue()) {
+            throw new CustomException("经验不足", 700);
+        }
+        userStaticInfo.setLv(lv + 1)
+                .setExpe(expe - calculateExperience.intValue())
+                .setAttrPoint(userStaticInfo.getAttrPoint() + 1);
+        resultStr.append("升级了！目前等级：").append(lv + 1).append(" 级，经验剩余：").append(expe - calculateExperience.intValue()).append("，获得了1点可自由分配的属性点。");
+
+        // 随机获得2点属性点
+        List<Integer> numbers = new ArrayList<>(Arrays.asList(0, 0, 0, 0, 0)); // 初始列表
+        int sum = 2; // 需要添加的总数
+        Random random = new Random();
+        while (sum > 0) {
+            // 随机选择一个数字
+            int index = random.nextInt(numbers.size());
+            if (numbers.get(index) >= 15) {
+                continue;
+            }
+            numbers.set(index, numbers.get(index) + 1);
+            sum -= 1;
+        }
+
+        userStaticInfo.setStr(userStaticInfo.getStr() + numbers.get(0))
+                .setAgi(userStaticInfo.getAgi() + numbers.get(1))
+                .setWit(userStaticInfo.getWit() + numbers.get(2))
+                .setSpd(userStaticInfo.getSpd() + numbers.get(3))
+                .setHtl(userStaticInfo.getHtl() + numbers.get(4));
+
+        // 有30%获得武器，70%获得一个被动技能
+
+
+        // 每5级获得一个主动技能点
+        if ((lv + 1) % 5 == 0) {
+            userStaticInfo.setInsPoint(userStaticInfo.getInsPoint() + 1);
+            resultStr.append("<br>等级达到了5的倍数，获得了一点指令技能点！");
+        }
+
+        return null;
+    }
+
 
     private BattleResultInfo fightOneTurn(PersonFightInfo fighter1, PersonFightInfo fighter2, FightInfo fightInfo) {
         // 返回消息
-        StringBuilder message = new StringBuilder();
+        JSONArray message = new JSONArray();
 
         // 战斗信息
         BattleResultInfo resultInfo = new BattleResultInfo();
@@ -320,8 +415,7 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
 
         // 每把武器都进行一轮战斗
         for (String oneWp : wp.split(",")) {
-            String btSettlement = this.btSettlement(fightInfo, fighter1, fighter2, oneWp, new StringBuilder());
-            message.append(btSettlement);
+            this.btSettlement(fightInfo, fighter1, fighter2, oneWp, message);
             // 判定是否结束战斗
             boolean ifBattleEnd = this.ifBattleEnd(fighter1, fighter2, resultInfo, message, fightInfo, instructions);
             if (ifBattleEnd) {
@@ -329,10 +423,7 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
             }
 
             // 将待触发buff列表判定一次
-            String buffMessage = this.wpBuffEffect(fightInfo, fighter1, fighter2, wp, new StringBuilder());
-            if (StrUtil.isNotBlank(buffMessage)) {
-                message.append(buffMessage);
-            }
+            this.wpBuffEffect(fightInfo, fighter1, fighter2, wp, message);
         }
 
         // 判定是否触发反击
@@ -341,15 +432,16 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
             List<String> debuffStrList = fighter2.getBuff().stream().map(BuffInfo::getBuff).collect(Collectors.toList());
             // 反击方获取武器并进行一次战斗判定
             if (!debuffStrList.contains("dizzy") && random.nextInt(10000) < fighter2.getCa()) {
-                message.append("<br>buffadd-0@@").append(fighter2.getName()).append(" 反击！");
+                JSONObject newMsgCreate = this.newMsgCreate(fighter2.getName() + " 反击！",
+                        "orange",
+                        "buffadd",
+                        1);
+                message.add(newMsgCreate);
+
                 String enemyRandomWpInfo = this.getUserRandomWpInfo(fighter2, 1, null);
-                String btSettlement = this.btSettlement(fightInfo, fighter2, fighter1, enemyRandomWpInfo, new StringBuilder());
-                message.append(btSettlement);
+                this.btSettlement(fightInfo, fighter2, fighter1, enemyRandomWpInfo, message);
                 // 将待触发buff列表判定一次
-                String buffMessage = this.wpBuffEffect(fightInfo, fighter1, fighter2, wp, new StringBuilder());
-                if (StrUtil.isNotBlank(buffMessage)) {
-                    message.append(buffMessage);
-                }
+                this.wpBuffEffect(fightInfo, fighter1, fighter2, wp, message);
             }
         }
 
@@ -372,7 +464,7 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
                     .setDefenseInfo(fighter1);
         }
 
-        resultInfo.setMessage(message.toString())
+        resultInfo.setMessage(message)
                 .setFightInfo(fightInfo);
         return resultInfo;
     }
@@ -467,7 +559,7 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
 
 
     private FightInfo getWpFinalAtk(PersonFightInfo offensiveInfo, PersonFightInfo defenseInfo, String
-            wp, FightInfo fightInfo, String message) {
+            wp, FightInfo fightInfo, JSONArray message) {
         BigDecimal finalDmg = new BigDecimal(0);
         Integer str = offensiveInfo.getStr();
         Integer wit = offensiveInfo.getWit();
@@ -543,7 +635,11 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
         }
 
         if (random.nextInt(10000) < cri) {
-            message = "<br>cri-2@@" + offensiveInfo.getName() + "暴击！";
+            JSONObject newMsgCreate = this.newMsgCreate(offensiveInfo.getName() + "暴击！",
+                    null,
+                    "cri",
+                    2);
+            message.add(newMsgCreate);
             finalAtk = finalAtk.multiply(new BigDecimal(1).add(new BigDecimal(criPer).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP)));
         }
 
@@ -579,7 +675,7 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
     }
 
 
-    private String getFighterFinalDef(PersonFightInfo personInfo, String wp, FightInfo wpFinalAtk, String message) {
+    private JSONArray getFighterFinalDef(PersonFightInfo personInfo, String wp, FightInfo wpFinalAtk, JSONArray message) {
         Integer blk = personInfo.getBlk();
         Integer blkPer = personInfo.getBlkPer();
         Integer miss = personInfo.getMiss();
@@ -588,10 +684,18 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
         Random random = new Random();
         Random missRandom = new Random();
         if (missRandom.nextInt(10000) < miss) {
-            message = "<br>miss-1@@" + personInfo.getName() + "闪避！";
+            JSONObject btMsgCreate = this.newMsgCreate(personInfo.getName() + "敏捷的闪避了本次攻击！",
+                    "grey",
+                    "miss",
+                    1);
+            message.add(btMsgCreate);
             finalDef = new BigDecimal("0");
         } else if (random.nextInt(10000) < blk) {
-            message = "<br>blk-1@@" + personInfo.getName() + "格挡！";
+            JSONObject btMsgCreate = this.newMsgCreate(personInfo.getName() + "格挡住了本次攻击！",
+                    "peru",
+                    "blk",
+                    1);
+            message.add(btMsgCreate);
             finalDef = finalDef.multiply(new BigDecimal(1).subtract(new BigDecimal(blkPer).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP)));
         }
         BigDecimal def = new BigDecimal(wpFinalAtk.getFinalNum()).multiply(finalDef);
@@ -600,8 +704,8 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
     }
 
 
-    private String btSettlement(FightInfo fightInfo, PersonFightInfo offensiveInfo, PersonFightInfo
-            defenseInfo, String wpInfo, StringBuilder message) {
+    private void btSettlement(FightInfo fightInfo, PersonFightInfo offensiveInfo, PersonFightInfo
+            defenseInfo, String wpInfo, JSONArray message) {
         fightInfo.setIfHeal(null)
                 .setIfBuff(null);
         Random random = new Random();
@@ -615,29 +719,41 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
             }
             for (int i = 0; i < attackNum; i++) {
                 // 计算实际伤害
-                FightInfo wpFinalAtk = this.getWpFinalAtk(offensiveInfo, defenseInfo, wpInfo, fightInfo, "");
-                if (StrUtil.isNotBlank(wpFinalAtk.getMessage())) {
-                    message.append(wpFinalAtk.getMessage());
+                FightInfo wpFinalAtk = this.getWpFinalAtk(offensiveInfo, defenseInfo, wpInfo, fightInfo, message);
+                if (CollectionUtil.isNotEmpty(wpFinalAtk.getMessage())) {
+                    message.addAll(wpFinalAtk.getMessage());
                 }
                 if (wpFinalAtk.getIfHeal() != null && wpFinalAtk.getIfHeal() == 1) {
                     offensiveInfo.setHp(offensiveInfo.getHp() + wpFinalAtk.getFinalNum());
-                    message.append("<br>heal-0@@").append(offensiveInfo.getName()).append(" 使用了 ").append(wpDic.getWpName()).append("，对 ").append(offensiveInfo.getName()).append(" 治疗了 ").append(wpFinalAtk.getFinalNum()).append(" 点HP");
+
+                    JSONObject newMsgCreate = this.newMsgCreate(offensiveInfo.getName() + " 使用了 " + wpDic.getWpName() + "，对 " + offensiveInfo.getName() + " 治疗了 " + wpFinalAtk.getFinalNum() + " 点HP",
+                            "limegreen",
+                            "heal",
+                            null);
+                    message.add(newMsgCreate);
                 } else {
                     // 判定伤害是否被格挡，治疗不会格挡
                     if (wpFinalAtk.getIfHeal() != null && wpFinalAtk.getIfHeal() != 1) {
-                        String fighterFinalDef = this.getFighterFinalDef(defenseInfo, wpInfo, wpFinalAtk, "");
-                        if (StrUtil.isNotBlank(fighterFinalDef)) {
-                            message.append(fighterFinalDef);
-                        }
+                        this.getFighterFinalDef(defenseInfo, wpInfo, wpFinalAtk, message);
                     }
 
                     defenseInfo.setHp(defenseInfo.getHp() - wpFinalAtk.getFinalNum());
-                    message.append("<br>dmg-1@@").append(offensiveInfo.getName()).append(" 使用了 ").append(wpDic.getWpName()).append("，对 ").append(defenseInfo.getName()).append(" 造成了 ").append(wpFinalAtk.getFinalNum()).append(" 点伤害");
+
+                    JSONObject newMsgCreate = this.newMsgCreate(offensiveInfo.getName() + " 使用了 " + wpDic.getWpName() + "，对 " + offensiveInfo.getName() + " 造成了 " + wpFinalAtk.getFinalNum() + " 点伤害",
+                            "red",
+                            "damage",
+                            1);
+                    message.add(newMsgCreate);
 
                     if ("9".equals(wpInfo)) {
                         // heal self HP
                         offensiveInfo.setHp(offensiveInfo.getHp() + wpFinalAtk.getFinalNum());
-                        message.append("<br>heal-0@@").append(offensiveInfo.getName()).append(" 使用了 ").append(wpDic.getWpName()).append("，对 ").append(offensiveInfo.getName()).append(" 治疗了 ").append(wpFinalAtk.getFinalNum()).append(" 点HP");
+
+                        JSONObject btMsgCreate = this.newMsgCreate(offensiveInfo.getName() + " 使用了 " + wpDic.getWpName() + "，对 " + offensiveInfo.getName() + " 治疗了 " + wpFinalAtk.getFinalNum() + " 点HP",
+                                "limegreen",
+                                "heal",
+                                null);
+                        message.add(btMsgCreate);
                     }
 
                     if ("13".equals(wpInfo)) {
@@ -645,23 +761,31 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
                         Integer finalNum = wpFinalAtk.getFinalNum();
                         BigDecimal multiply = new BigDecimal(finalNum).multiply(new BigDecimal("0.2"));
                         offensiveInfo.setHp(offensiveInfo.getHp() - multiply.intValue());
-                        message.append("<br>dmg-1@@").append(offensiveInfo.getName()).append(" 使用了 ").append(wpDic.getWpName()).append("，对 ").append(offensiveInfo.getName()).append(" 造成了 ").append(multiply.intValue()).append(" 点伤害");
+
+                        JSONObject btMsgCreate = this.newMsgCreate(offensiveInfo.getName() + " 使用了 " + wpDic.getWpName() + "，自爆卡车对自己造成了 " + multiply.intValue() + " 点伤害",
+                                "limegreen",
+                                "heal",
+                                null);
+                        message.add(btMsgCreate);
                     }
                 }
             }
         } else {
-            message.append("<br>miss-0@@").append(offensiveInfo.getName()).append(" 使用了 ").append(wpDic.getWpName()).append(" 但是没打中！ ");
+            JSONObject btMsgCreate = this.newMsgCreate(offensiveInfo.getName() + " 使用了 " + wpDic.getWpName() + "，但是手滑了，没打中！ ",
+                    "grey",
+                    "miss",
+                    null);
+            message.add(btMsgCreate);
         }
 
         List<String> usedWeapon = offensiveInfo.getUsedWeapon();
         usedWeapon.add(wpInfo);
         offensiveInfo.setUsedWeapon(usedWeapon);
-        return message.toString();
     }
 
 
-    private String wpBuffEffect(FightInfo fightInfo, PersonFightInfo fighter1, PersonFightInfo fighter2, String
-            wpInfo, StringBuilder message) {
+    private JSONArray wpBuffEffect(FightInfo fightInfo, PersonFightInfo fighter1, PersonFightInfo fighter2, String
+            wpInfo, JSONArray message) {
         List<BuffInfo> f1Buff = fighter1.getBuff();
         List<BuffInfo> f2Buff = fighter2.getBuff();
         List<BuffUpInfo> ifBuff = fightInfo.getIfBuff();
@@ -676,7 +800,12 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
                                 .setTurns(buffUpInfo.getTurns());
                         f1Buff.add(buffInfo);
                         fighter1.setBuff(f1Buff);
-                        message.append("<br>buffadd-0").append(fighter1.getName()).append(" 受到了状态 ").append(buffInfo.getBuff()).append(buffInfo.getTurns()).append(" 回合");
+
+                        JSONObject newMsgCreate = this.newMsgCreate(fighter1.getName() + " 受到了状态 " + buffInfo.getBuff() + " " + buffInfo.getTurns() + " 回合",
+                                "orange",
+                                "buffadd",
+                                1);
+                        message.add(newMsgCreate);
                     }
                 }
                 if (fighter2.getName().equals(target)) {
@@ -686,12 +815,16 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
                                 .setTurns(buffUpInfo.getTurns());
                         f2Buff.add(buffInfo);
                         fighter2.setBuff(f2Buff);
-                        message.append("<br>buffadd-0").append(fighter2.getName()).append(" 受到了状态 ").append(buffInfo.getBuff()).append(buffInfo.getTurns()).append(" 回合");
+                        JSONObject newMsgCreate = this.newMsgCreate(fighter2.getName() + " 受到了状态 " + buffInfo.getBuff() + " " + buffInfo.getTurns() + " 回合",
+                                "orange",
+                                "buffadd",
+                                1);
+                        message.add(newMsgCreate);
                     }
                 }
             }
         }
-        return message.toString();
+        return message;
     }
 
 
@@ -791,51 +924,66 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
     }
 
 
-    private String ifTurnContinue(BattleResultInfo battleResultInfo, PersonFightInfo offensiveInfo, PersonFightInfo
-            defenseInfo, FightInfo fightInfo, String message) {
+    private JSONArray ifTurnContinue(BattleResultInfo battleResultInfo, PersonFightInfo offensiveInfo, PersonFightInfo
+            defenseInfo, FightInfo fightInfo, JSONArray message) {
         boolean ifContinue = false;
-        StringBuilder messageBuilder = new StringBuilder(message);
         while (!ifContinue) {
             if (battleResultInfo.getDefenseInfo().getHp() > 0 && battleResultInfo.getOffensiveInfo().getHp() > 0) {
                 ifContinue = true;
                 List<String> buffStrList = offensiveInfo.getBuff().stream().map(BuffInfo::getBuff).collect(Collectors.toList());
                 // 判断己方有没有连动，双方是否有眩晕
                 if (buffStrList.contains("chain")) {
-                    messageBuilder.append("<br>buffadd-0").append(offensiveInfo.getName()).append(" 进入连动状态!");
+                    JSONObject newMsgCreate = this.newMsgCreate(offensiveInfo.getName() + " 进入连动状态!",
+                            "orange",
+                            "buffadd",
+                            null);
+                    message.add(newMsgCreate);
                     BattleResultInfo battleResultInfo1 = this.fightOneTurn(offensiveInfo, defenseInfo, fightInfo);
-                    messageBuilder.append(battleResultInfo1.getMessage());
+                    message.addAll(battleResultInfo1.getMessage());
                     ifContinue = false;
                 }
 
                 List<String> afterCaDebuffStrList = defenseInfo.getBuff().stream().map(BuffInfo::getBuff).collect(Collectors.toList());
                 if (afterCaDebuffStrList.contains("dizzy")) {
-                    messageBuilder.append("<br>buffadd-0").append(defenseInfo.getName()).append(" 眩晕，下回合出手的为 ").append(offensiveInfo.getName());
+                    JSONObject newMsgCreate = this.newMsgCreate(defenseInfo.getName() + " 眩晕，下回合出手的为 " + offensiveInfo.getName(),
+                            "orange",
+                            "buffadd",
+                            null);
+                    message.add(newMsgCreate);
                     BattleResultInfo battleResultInfo1 = this.fightOneTurn(offensiveInfo, defenseInfo, fightInfo);
-                    messageBuilder.append(battleResultInfo1.getMessage());
+                    message.addAll(battleResultInfo1.getMessage());
                     ifContinue = false;
                 }
 
                 List<String> userDebuffStrList = offensiveInfo.getBuff().stream().map(BuffInfo::getBuff).collect(Collectors.toList());
                 if (userDebuffStrList.contains("dizzy")) {
-                    messageBuilder.append("<br>buffadd-0").append(offensiveInfo.getName()).append(" 眩晕，下回合出手的为 ").append(defenseInfo.getName());
+                    JSONObject newMsgCreate = this.newMsgCreate(offensiveInfo.getName() + " 眩晕，下回合出手的为 " + defenseInfo.getName(),
+                            "orange",
+                            "buffadd",
+                            null);
+                    message.add(newMsgCreate);
                     BattleResultInfo battleResultInfo1 = this.fightOneTurn(defenseInfo, offensiveInfo, fightInfo);
-                    messageBuilder.append(battleResultInfo1.getMessage());
+                    message.addAll(battleResultInfo1.getMessage());
                     ifContinue = false;
                 }
             } else {
                 ifContinue = true;
             }
         }
-        message = messageBuilder.toString();
         return message;
     }
 
 
-    private boolean ifBattleEnd(PersonFightInfo fighter1, PersonFightInfo fighter2, BattleResultInfo resultInfo, StringBuilder message, FightInfo fightInfo, String instructions) {
+    private boolean ifBattleEnd(PersonFightInfo fighter1, PersonFightInfo fighter2, BattleResultInfo resultInfo, JSONArray message, FightInfo fightInfo, String instructions) {
         if (fighter1.getHp() <= 0 && (StrUtil.isNotBlank(instructions) && instructions.contains("3@@"))) {
             int instructionLevel = Integer.parseInt(instructions.split("@@")[1]);
             int maxHP = fighter1.getHtl() * 12 + 20;
             int healNum = new BigDecimal(maxHP).multiply(new BigDecimal("0.05")).multiply(new BigDecimal(instructionLevel)).intValue() + 1;
+            JSONObject newMsgCreate = this.newMsgCreate(fighter1.getName() + " 装死触发了！抵抗死亡并恢复了 " + healNum + "点HP！",
+                    "limegreen",
+                    "heal",
+                    1);
+            message.add(newMsgCreate);
             fighter1.setHp(healNum);
         }
 
@@ -848,7 +996,7 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
                 resultInfo.setOffensiveInfo(fighter2)
                         .setDefenseInfo(fighter1);
             }
-            resultInfo.setMessage(message.toString())
+            resultInfo.setMessage(message)
                     .setFightInfo(fightInfo);
             return true;
         }
@@ -856,7 +1004,7 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
     }
 
 
-    private void instructionsEffect(String instructions, PersonFightInfo fighter1, PersonFightInfo fighter2, StringBuilder message, FightInfo fightInfo) {
+    private JSONArray instructionsEffect(String instructions, PersonFightInfo fighter1, PersonFightInfo fighter2, JSONArray message, FightInfo fightInfo) {
         int instructionLevel = Integer.parseInt(instructions.split("@@")[1]);
         if (fighter1.getName().equals(fightInfo.getOffensiveName())) {
             if (instructions.contains("2@@")) {
@@ -865,7 +1013,13 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
                 buffInfo.setBuff("inspire")
                         .setTurns(1 + instructionLevel);
                 f1Buff.add(buffInfo);
-                message.append("<br>buffadd-0@@").append(fighter1.getName()).append(" 使用了鼓舞激励之策！");
+
+                JSONObject newMsgCreate = this.newMsgCreate(fighter1.getName() + " 使用了鼓舞激励之策！",
+                        "orange",
+                        "buffadd",
+                        null);
+                message.add(newMsgCreate);
+
                 fighter1.setBuff(f1Buff);
             }
 
@@ -875,7 +1029,13 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
                 buffInfo.setBuff("lucky" + instructionLevel)
                         .setTurns(1);
                 f1Buff.add(buffInfo);
-                message.append("<br>buffadd-0@@").append(fighter1.getName()).append(" 使用了强运！");
+
+                JSONObject newMsgCreate = this.newMsgCreate(fighter1.getName() + " 使用了强运！",
+                        "orange",
+                        "buffadd",
+                        null);
+                message.add(newMsgCreate);
+
                 fighter1.setBuff(f1Buff);
             }
 
@@ -893,7 +1053,14 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
                         healPer = new BigDecimal("0.2");
                     }
                     int healHP = new BigDecimal(lossHP).multiply(new BigDecimal("0.1").multiply(healPer)).intValue() + 1;
-                    message.append("<br>heal-0@@").append(fighter1.getName()).append(" 使用了紧急治疗，恢复 , +").append(healHP).append("点HP。");
+
+
+                    JSONObject newMsgCreate = this.newMsgCreate(fighter1.getName() + " 使用了紧急治疗！，恢复 " + healHP + " 点HP。",
+                            "limegreen",
+                            "heal",
+                            null);
+                    message.add(newMsgCreate);
+
                     fighter1.setHp(fighter1.getHp() + healHP);
                 }
             }
@@ -910,7 +1077,13 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
                     if ("poison".equals(buffInfo.getBuff()) || "fear".equals(buffInfo.getBuff()) || "bleed".equals(buffInfo.getBuff())) {
                         Integer turns = buffInfo.getTurns();
                         if (turns - subTurnNum <= 0) {
-                            message.append("<br>buffmove-0@@").append(fighter1.getName()).append(" 使用了摆脱，解除了").append(buffInfo.getBuff());
+
+                            JSONObject newMsgCreate = this.newMsgCreate(fighter1.getName() + " 使用了摆脱，解除了" + buffInfo.getBuff(),
+                                    "darkturquoise",
+                                    "buffmove",
+                                    null);
+                            message.add(newMsgCreate);
+
                             buffIterator.remove();
                         } else {
                             buffInfo.setTurns(turns - subTurnNum);
@@ -924,10 +1097,17 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
                 }
                 int maxHP = 20 + fighter1.getHtl() * 12;
                 int healHP = new BigDecimal(healPer).multiply(new BigDecimal(maxHP)).intValue() + 1;
-                message.append("<br>heal-0@@").append(fighter1.getName()).append(" 使用了摆脱，恢复 , +").append(healHP).append("点HP。");
+
+                JSONObject newMsgCreate = this.newMsgCreate(fighter1.getName() + " 使用了摆脱，恢复了  " + healHP + " 点HP。",
+                        "limegreen",
+                        "heal",
+                        null);
+                message.add(newMsgCreate);
+
                 fighter1.setHp(fighter1.getHp() + healHP);
             }
         }
+        return message;
     }
 
 
@@ -962,7 +1142,7 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
     }
 
 
-    private void calBuffEffect(PersonFightInfo fighter1, PersonFightInfo fighter2, StringBuilder message) {
+    private void calBuffEffect(PersonFightInfo fighter1, PersonFightInfo fighter2, JSONArray message) {
         // 检查buff列表并生效
         List<String> buffStrList = fighter1.getBuff().stream().map(BuffInfo::getBuff).collect(Collectors.toList());
 
@@ -973,8 +1153,12 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
             BigDecimal multiply = new BigDecimal(hp).multiply(new BigDecimal("0.1"));
             int restoreHp = multiply.intValue() + 1;
             fighter1.setHp(hp + restoreHp);
-            // message
-            message.append("<br>heal-0@@").append(fighter1.getName()).append(" 恢复 , +").append(restoreHp);
+
+            JSONObject newMsgCreate = this.newMsgCreate(fighter1.getName() + "因为恢复效果，回复了 " + restoreHp + "点HP。",
+                    "limegreen",
+                    "heal",
+                    null);
+            message.add(newMsgCreate);
         }
 
         if (buffStrList.contains("bleed")) {
@@ -984,10 +1168,18 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
                 BigDecimal multiply = new BigDecimal(hp).multiply(new BigDecimal("0.1"));
                 int bleedDmg = multiply.intValue() + 1;
                 fighter1.setHp(hp - bleedDmg);
-                // message
-                message.append("<br>bleed-1@@").append(fighter1.getName()).append(" 流血 , -").append(bleedDmg);
+
+                JSONObject newMsgCreate = this.newMsgCreate(fighter1.getName() + "因为流血效果，损失了 " + bleedDmg + "点HP。",
+                        "darkred",
+                        "bleed",
+                        null);
+                message.add(newMsgCreate);
             } else {
-                message.append("<br>bleed-1@@").append(fighter1.getName()).append(" 流血 , 但其仅剩1HP");
+                JSONObject newMsgCreate = this.newMsgCreate(fighter1.getName() + "因为血量太低，没受到流血的损伤。",
+                        "darkred",
+                        "bleed",
+                        null);
+                message.add(newMsgCreate);
             }
         }
 
@@ -998,14 +1190,23 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
                 BigDecimal multiply = new BigDecimal(hp).multiply(new BigDecimal("0.05"));
                 int poisonDmg = multiply.intValue();
                 fighter1.setHp(hp - poisonDmg + 1);
-                // message
-                message.append("<br>poison-1@@").append(fighter1.getName()).append(" 中毒 , -").append(poisonDmg);
+
+                JSONObject newMsgCreate = this.newMsgCreate(fighter1.getName() + "因为中毒效果，损失了 " + poisonDmg + "点生命。",
+                        "darkgreen",
+                        "poison",
+                        null);
+                message.add(newMsgCreate);
             } else {
-                message.append("<br>poison-1@@").append(fighter1.getName()).append(" 中毒 , 但其仅剩1HP");
+                // 因为只剩1点血，不会受到中毒扣血
+                JSONObject newMsgCreate = this.newMsgCreate(fighter1.getName() + " 因为血量太低，没受到中毒的损伤。",
+                        "darkgreen",
+                        "poison",
+                        null);
+                message.add(newMsgCreate);
             }
         }
 
-        // 除了眩晕和连动，所有buff回合-1
+        // 除了眩晕和连动（忽略回合），进攻方所有剩余buff回合-1
         List<BuffInfo> f1BuffList = fighter1.getBuff();
         Iterator<BuffInfo> f1BuffIterator = f1BuffList.iterator();
         while (f1BuffIterator.hasNext()) {
@@ -1022,4 +1223,34 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
         fighter1.setBuff(f1BuffList);
     }
 
+    private JSONObject newMsgCreate(String msg, String color, String type, Integer level) {
+        if (StrUtil.isBlank(color)) {
+            color = "black";
+        }
+        if (StrUtil.isBlank(type)) {
+            type = "normal";
+        }
+        if (level == null) {
+            level = 0;
+        }
+
+        // 基本消息构造
+        JSONObject newMessage = new JSONObject();
+        newMessage.put("msg", msg);
+        newMessage.put("color", color);
+        newMessage.put("type", type);
+        newMessage.put("level", level);
+
+        // 消息停留时长
+        int ms = 0;
+        if ("cri".equals(type) || "buffadd".equals(type) || "buffmove".equals(type) || "normal".equals(type)) {
+            ms += 600;
+        } else if ("dmg".equals(type) || "heal".equals(type)) {
+            ms += 900;
+        } else {
+            ms += 300;
+        }
+        newMessage.put("ms", ms);
+        return newMessage;
+    }
 }

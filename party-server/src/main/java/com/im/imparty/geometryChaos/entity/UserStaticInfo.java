@@ -22,4 +22,8 @@ public class UserStaticInfo {
     private Integer yb;
     private Integer lv;
     private Integer expe;
+    private Integer attrPoint;
+    private Integer skPoint;
+    private Integer insPoint;
+    private Integer power;
 }
