@@ -224,8 +224,8 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
                     this.ifTurnContinue(battleResultInfo, battleResultInfo.getDefenseInfo(), battleResultInfo.getOffensiveInfo(), fightInfo, message);
                 }
 
-                battleInfo.setOffensiveInfo(JSON.toJSON(battleResultInfo.getOffensiveInfo()).toString())
-                        .setDefenseInfo(JSON.toJSON(battleResultInfo.getDefenseInfo()).toString())
+                battleInfo.setOffensiveInfo(JSON.toJSON(battleResultInfo.getDefenseInfo()).toString())
+                        .setDefenseInfo(JSON.toJSON(battleResultInfo.getOffensiveInfo()).toString())
                         .setFightInfo(JSON.toJSON(battleResultInfo.getFightInfo()).toString());
 
                 if (battleResultInfo.getOffensiveInfo().getHp() > 0 && battleResultInfo.getDefenseInfo().getHp() > 0) {
@@ -236,8 +236,8 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
                         this.ifTurnContinue(battleResultInfo, otherSideBattleResultInfo.getOffensiveInfo(), otherSideBattleResultInfo.getDefenseInfo(), fightInfo, message);
                     }
 
-                    battleInfo.setOffensiveInfo(JSON.toJSON(otherSideBattleResultInfo.getDefenseInfo()).toString())
-                            .setDefenseInfo(JSON.toJSON(otherSideBattleResultInfo.getOffensiveInfo()).toString())
+                    battleInfo.setOffensiveInfo(JSON.toJSON(otherSideBattleResultInfo.getOffensiveInfo()).toString())
+                            .setDefenseInfo(JSON.toJSON(otherSideBattleResultInfo.getDefenseInfo()).toString())
                             .setFightInfo(JSON.toJSON(otherSideBattleResultInfo.getFightInfo()).toString());
                 }
             }
@@ -375,7 +375,7 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
             resultStr.append("<br>等级达到了5的倍数，获得了一点指令技能点！");
         }
 
-        return null;
+        return resultStr.toString();
     }
 
 
@@ -489,7 +489,10 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
         List<String> usedWeapon = user.getUsedWeapon();
 
         WpInfo wpInfo = user.getWpInfo();
-        List<String> wpInfoList = Arrays.asList(wpInfo.getWpHolding().split(","));
+        List<String> wpInfoList = new ArrayList<>();
+        if (wpInfo.getWpHolding() != null) {
+            wpInfoList = Arrays.asList(wpInfo.getWpHolding().split(","));
+        }
 
         // 从非交集部分抽取武器，如果为空就返回empty
         for (String wp : emptySb.toString().split(",")) {
@@ -720,9 +723,7 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
             for (int i = 0; i < attackNum; i++) {
                 // 计算实际伤害
                 FightInfo wpFinalAtk = this.getWpFinalAtk(offensiveInfo, defenseInfo, wpInfo, fightInfo, message);
-                if (CollectionUtil.isNotEmpty(wpFinalAtk.getMessage())) {
-                    message.addAll(wpFinalAtk.getMessage());
-                }
+
                 if (wpFinalAtk.getIfHeal() != null && wpFinalAtk.getIfHeal() == 1) {
                     offensiveInfo.setHp(offensiveInfo.getHp() + wpFinalAtk.getFinalNum());
 
@@ -1169,7 +1170,7 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
                 int bleedDmg = multiply.intValue() + 1;
                 fighter1.setHp(hp - bleedDmg);
 
-                JSONObject newMsgCreate = this.newMsgCreate(fighter1.getName() + "因为流血效果，损失了 " + bleedDmg + "点HP。",
+                JSONObject newMsgCreate = this.newMsgCreate(fighter1.getName() + "因为流血效果，损失了 " + bleedDmg + " 点HP。",
                         "darkred",
                         "bleed",
                         null);
@@ -1191,7 +1192,7 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
                 int poisonDmg = multiply.intValue();
                 fighter1.setHp(hp - poisonDmg + 1);
 
-                JSONObject newMsgCreate = this.newMsgCreate(fighter1.getName() + "因为中毒效果，损失了 " + poisonDmg + "点生命。",
+                JSONObject newMsgCreate = this.newMsgCreate(fighter1.getName() + "因为中毒效果，损失了 " + poisonDmg + " 点HP。",
                         "darkgreen",
                         "poison",
                         null);
@@ -1236,20 +1237,19 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
 
         // 基本消息构造
         JSONObject newMessage = new JSONObject();
+
+        // 消息停留时长
+        int ms = 0;
+        if ("dmg".equals(type) || "heal".equals(type)) {
+            ms += 500;
+        } else {
+            ms += 250;
+        }
+
         newMessage.put("msg", msg);
         newMessage.put("color", color);
         newMessage.put("type", type);
         newMessage.put("level", level);
-
-        // 消息停留时长
-        int ms = 0;
-        if ("cri".equals(type) || "buffadd".equals(type) || "buffmove".equals(type) || "normal".equals(type)) {
-            ms += 600;
-        } else if ("dmg".equals(type) || "heal".equals(type)) {
-            ms += 900;
-        } else {
-            ms += 300;
-        }
         newMessage.put("ms", ms);
         return newMessage;
     }

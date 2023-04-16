@@ -36,7 +36,7 @@ export interface BattleInfo {
     fightInfo: string,
     id: string,
     ifEnd: boolean,
-    message: string,
+    message: Array<string>,
     offensiveInfo: PersonFightInfo,
     round: number,
     surplusCd: string

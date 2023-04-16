@@ -3,33 +3,41 @@
     <div v-if="!loadedSelf">
       <el-button @click="createCharacter">创建角色</el-button>
     </div>
-    <div class="parent" style="background-color: lightgrey;" v-if="loadedSelf">
-      <div class="child" style="background-color: lightblue;">挑战者
+    <div class="parent" style="background-color: lightgrey" v-if="loadedSelf">
+      <div class="child" style="background-color: lightblue">
+        挑战者
         <span>
-          名称：{{ selfInfo?.name }}<br>
-          血量：{{ selfInfo?.hp }}<br>
+          名称：{{ selfInfo?.name }}<br />
+          血量：{{ selfInfo?.hp }}<br />
         </span>
       </div>
-      <div class="child" style="background-color: lightgreen;">被挑战者
+      <div class="child" style="background-color: lightgreen">
+        被挑战者
         <div v-if="!loadedEnemy">
-          <el-button @click="selectEnemyDialogVisble = true">选择一位想要挑战的对象</el-button>
+          <el-button @click="selectEnemyDialogVisble = true"
+            >选择一位想要挑战的对象</el-button
+          >
         </div>
         <span>
-          名称：{{ enemyInfo?.name }}<br>
-          血量：{{ enemyInfo?.hp }}<br>
+          名称：{{ enemyInfo?.name }}<br />
+          血量：{{ enemyInfo?.hp }}<br />
         </span>
       </div>
     </div>
     <div>
-      当前回合: {{ round }}<br>
-      <span v-html='finghtMessage'></span><br>
+      当前回合: {{ round }}<br />
+      <span v-html="fightMessage"></span><br />
       <span v-if="isEnd">对局已结束</span>
     </div>
     <el-dialog title="选择挑战对象" :visible.sync="selectEnemyDialogVisble" width="35%">
-      <el-table ref="enemysTable" :data="enemysTableData" highlight-current-row @current-change="handleCurrentChange"
-        style="width: 100%">
-        <el-table-column prop="name" label="名称" width="180">
-        </el-table-column>
+      <el-table
+        ref="enemysTable"
+        :data="enemysTableData"
+        highlight-current-row
+        @current-change="handleCurrentChange"
+        style="width: 100%"
+      >
+        <el-table-column prop="name" label="名称" width="180"> </el-table-column>
       </el-table>
       <el-button @click="confirmEnemy">确定</el-button>
     </el-dialog>
@@ -53,17 +61,17 @@ import gameApi from "@/api/game";
 import Request from "@/utils/requestInstance";
 import Ws from "@/utils/ws";
 import { namespace } from "vuex-class";
-import { PersonFightInfo, BuffInfo, WpInfo, BattleInfo } from "@/types/game/chaos"
-import { UserInfoType } from "@/types/user"
+import { PersonFightInfo, BuffInfo, WpInfo, BattleInfo } from "@/types/game/chaos";
+import { UserInfoType } from "@/types/user";
 import ElementUI, { Table } from "element-ui";
 import { ElementUIComponent } from "element-ui/types/component";
 import { TableRefs } from "element-plus";
+import { JsonObject } from "type-fest";
 
-const userStore = namespace('userStore')
+const userStore = namespace("userStore");
 
 interface EnemyTableRowType {
-  name: string,
-
+  name: string;
 }
 
 @Component({
@@ -72,44 +80,44 @@ interface EnemyTableRowType {
     LangExample,
     VuexExample,
     WorkerExample,
-    MusicPlayer
-  }
+    MusicPlayer,
+  },
 })
 export default class GeometryChaos extends Vue {
   //本人信息
-  selfInfo: PersonFightInfo | any
+  selfInfo: PersonFightInfo | any;
   //敌人信息
-  enemyInfo: PersonFightInfo | any
+  enemyInfo: PersonFightInfo | any;
   //本人是否已加载
-  loadedSelf: boolean = false
+  loadedSelf: boolean = false;
   //敌人是否已加载
-  loadedEnemy: boolean = false
+  loadedEnemy: boolean = false;
   //选择敌人的弹窗可见性
-  selectEnemyDialogVisble: boolean = false
-  isStarted: boolean = false
-  enemysTableData: Array<EnemyTableRowType> | null
-  currentRow: any = null
-  curUserInfo: UserInfoType
-  fightId: any = null
-  fightInfo: BattleInfo | any
-  finghtMessage: string = ""
-  round: number = 0
+  selectEnemyDialogVisble: boolean = false;
+  isStarted: boolean = false;
+  enemysTableData: Array<EnemyTableRowType> | null;
+  currentRow: any = null;
+  curUserInfo: UserInfoType;
+  fightId: any = null;
+  fightInfo: BattleInfo | any;
+  fightMessage: string = "";
+  round: number = 0;
   //对局是否已结束
-  isEnd: boolean = false
+  isEnd: boolean = false;
 
   constructor() {
     super();
     this.enemysTableData = [
       {
-        name: "test666"
+        name: "test666",
       },
       {
-        name: "test2333"
+        name: "test2333",
       },
       {
-        name: "test1"
+        name: "test1",
       },
-    ]
+    ];
     this.curUserInfo = JSON.parse(localStorage.getItem("userInfo") as string);
   }
 
@@ -117,7 +125,6 @@ export default class GeometryChaos extends Vue {
     //获取当前用户对战信息
     this.getCurrentUserInfo();
     //获取敌人选择列表
-
   }
 
   async getCurrentUserInfo() {
@@ -126,7 +133,7 @@ export default class GeometryChaos extends Vue {
       {
         data: this.curUserInfo.username,
         headers: {
-          'Content-Type': 'application/json; charset=utf-8'
+          "Content-Type": "application/json; charset=utf-8",
         },
       },
       { isNeedToken: true }
@@ -135,13 +142,13 @@ export default class GeometryChaos extends Vue {
     if (res.data.code === 700) {
       this.$message({
         message: "第一次游戏，需要创建角色",
-        type: 'warning'
-      })
+        type: "warning",
+      });
     }
     if (res.data.code === 200) {
-      this.selfInfo = res.data.data
-      console.log("自己信息：" + this.selfInfo)
-      this.loadedSelf = true
+      this.selfInfo = res.data.data;
+      console.log("自己信息：" + this.selfInfo);
+      this.loadedSelf = true;
     }
   }
 
@@ -151,16 +158,16 @@ export default class GeometryChaos extends Vue {
       {
         data: userName,
         headers: {
-          'Content-Type': 'application/json; charset=utf-8'
+          "Content-Type": "application/json; charset=utf-8",
         },
       },
       { isNeedToken: true }
     );
     if (res.data.code === 200) {
-      this.enemyInfo = res.data.data
-      console.log("敌人信息：" + this.enemyInfo)
-      this.loadedEnemy = true
-      this.selectEnemyDialogVisble = false
+      this.enemyInfo = res.data.data;
+      console.log("敌人信息：" + this.enemyInfo);
+      this.loadedEnemy = true;
+      this.selectEnemyDialogVisble = false;
     }
   }
 
@@ -169,7 +176,7 @@ export default class GeometryChaos extends Vue {
       gameApi.geometrychaos.createCharacter,
       {
         headers: {
-          'Content-Type': 'application/json; charset=utf-8'
+          "Content-Type": "application/json; charset=utf-8",
         },
         data: this.curUserInfo.username as string,
       },
@@ -184,10 +191,10 @@ export default class GeometryChaos extends Vue {
     if (!this.currentRow) {
       this.$message({
         message: "需要选择一位玩家进行挑战",
-        type: 'warning'
-      })
+        type: "warning",
+      });
     }
-    this.getEnemyInfo(this.currentRow.name)
+    this.getEnemyInfo(this.currentRow.name);
   }
 
   handleCurrentChange(val: any) {
@@ -198,53 +205,58 @@ export default class GeometryChaos extends Vue {
     const startFightParam = {
       user: this.selfInfo,
       enemy: this.enemyInfo,
-      fightInfo: {}
-    }
-    const res = await Request.post(
-      gameApi.geometrychaos.fightStart,
-      {
-        headers: {
-          'Content-Type': 'application/json; charset=utf-8'
-        },
-        data: startFightParam,
-      }
-    );
+      fightInfo: {},
+    };
+    const res = await Request.post(gameApi.geometrychaos.fightStart, {
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+      },
+      data: startFightParam,
+    });
     if (res.data.code !== 200) {
       this.$message({
         message: "对局开始失败",
-        type: 'warning'
-      })
+        type: "warning",
+      });
     }
-    this.fightId = res.data.msg
-    this.isStarted = true
-    this.nextTurn()
+    this.fightId = res.data.msg;
+    this.isStarted = true;
+    this.nextTurn();
   }
 
   async nextTurn() {
-    const res = await Request.post(
-      gameApi.geometrychaos.startOneTurn,
-      {
-        headers: {
-          'Content-Type': 'application/json; charset=utf-8'
-        },
-        data: {
-          uuid: this.fightId,
-        }
-      }
-    );
+    this.fightMessage += "<br>";
+    const res = await Request.post(gameApi.geometrychaos.startOneTurn, {
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+      },
+      data: {
+        uuid: this.fightId,
+      },
+    });
 
-    this.fightInfo = res.data.data
-    this.selfInfo = JSON.parse(this.fightInfo.offensiveInfo) 
-    this.enemyInfo = JSON.parse(this.fightInfo.defenseInfo) 
-    this.finghtMessage = this.fightInfo.message
-    this.round = this.fightInfo.round
-    this.fightId = this.fightInfo.id
-    this.isEnd = this.fightInfo.ifEnd
+    this.fightInfo = res.data.data;
+    this.selfInfo = JSON.parse(this.fightInfo.offensiveInfo);
+    this.enemyInfo = JSON.parse(this.fightInfo.defenseInfo);
+    for (const oneTurnMessage of this.fightInfo.message) {
+      const toViewMsg = oneTurnMessage.msg;
+      await new Promise<void>((resolve) => {
+        setTimeout(() => {
+          this.fightMessage +=
+            '<br/><span style="color:' +
+            oneTurnMessage.color +
+            '">' +
+            toViewMsg +
+            "</span>";
+          resolve(undefined);
+        }, oneTurnMessage.ms);
+      });
+    }
 
-
+    this.round = this.fightInfo.round;
+    this.fightId = this.fightInfo.id;
+    this.isEnd = this.fightInfo.ifEnd;
   }
-
-
 }
 </script>
 
@@ -252,6 +264,10 @@ export default class GeometryChaos extends Vue {
 body,
 p {
   margin: 0;
+}
+
+span {
+  line-height: 2;
 }
 
 .parent {
@@ -263,7 +279,7 @@ p {
   height: 100px;
 }
 
-.child+.child {
+.child + .child {
   margin-left: 20px;
 }
 </style>
