@@ -100,13 +100,14 @@ export default class Login extends Vue {
           }
         }
       )
-      if (res.status !== 200 || !res.data.accessToken || res.data.accessToken == '') {
+      const result = res.data
+      if (result.code !== 200 || !result.data.accessToken || result.data.accessToken == '') {
         this.$message.error('账号或密码错误！');
         return
       }
 
-      this.setToken(res.data.accessToken)
-      this.setRefreshToken(res.data.refreshToken)
+      this.setToken(result.data.accessToken)
+      this.setRefreshToken(result.data.refreshToken)
 
     } catch (error) {
       console.log(error, "login error")

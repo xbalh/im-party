@@ -37,7 +37,7 @@
         @current-change="handleCurrentChange"
         style="width: 100%"
       >
-        <el-table-column prop="name" label="名称" width="180"> </el-table-column>
+        <el-table-column prop="userName" label="名称" width="180"> </el-table-column>
       </el-table>
       <el-button @click="confirmEnemy">确定</el-button>
     </el-dialog>
@@ -71,7 +71,7 @@ import { JsonObject } from "type-fest";
 const userStore = namespace("userStore");
 
 interface EnemyTableRowType {
-  name: string;
+  userName: string;
 }
 
 @Component({
@@ -107,17 +107,7 @@ export default class GeometryChaos extends Vue {
 
   constructor() {
     super();
-    this.enemysTableData = [
-      {
-        name: "test666",
-      },
-      {
-        name: "test2333",
-      },
-      {
-        name: "test1",
-      },
-    ];
+    this.enemysTableData = [];
     this.curUserInfo = JSON.parse(localStorage.getItem("userInfo") as string);
   }
 
@@ -125,6 +115,7 @@ export default class GeometryChaos extends Vue {
     //获取当前用户对战信息
     this.getCurrentUserInfo();
     //获取敌人选择列表
+    this.getEnemyList()
   }
 
   async getCurrentUserInfo() {
@@ -150,6 +141,23 @@ export default class GeometryChaos extends Vue {
       console.log("自己信息：" + this.selfInfo);
       this.loadedSelf = true;
     }
+  }
+
+  async getEnemyList(){
+    const res = await Request.post(
+      gameApi.geometrychaos.getChallengableFighter,
+      {
+        data: this.curUserInfo.username,
+        headers: {
+          "Content-Type": "application/json; charset=utf-8",
+        },
+      }
+    );
+
+      if(res.data.code === 200){
+        this.enemysTableData = res.data.data
+      }
+
   }
 
   async getEnemyInfo(userName: string) {
@@ -194,7 +202,7 @@ export default class GeometryChaos extends Vue {
         type: "warning",
       });
     }
-    this.getEnemyInfo(this.currentRow.name);
+    this.getEnemyInfo(this.currentRow.userName);
   }
 
   handleCurrentChange(val: any) {

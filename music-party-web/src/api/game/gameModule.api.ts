@@ -9,5 +9,7 @@ export const geometrychaos = {
   // 获取战斗前基础属性
   getUserFightInfo: '/geometryChaosMain/getUserFightInfo',
   //开始单个回合
-  startOneTurn: '/geometryChaosMain/startOneTurn'
+  startOneTurn: '/geometryChaosMain/startOneTurn',
+  //获取可挑战的对手列表
+  getChallengableFighter: '/geometryChaosMain/getChallengableFighter'
 }
