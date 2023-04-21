@@ -22,6 +22,19 @@ public class GeometryChaosMainController {
     @Resource
     private GeometryChaosMainService geometryChaosMainService;
 
+    // TODO 1.升级
+    // TODO 2.扭蛋
+    // TODO 3.被动技能
+    // TODO 4.主动技能学习及升级
+    // TODO 5.属性加点
+    // TODO 6.PVE，爬塔
+    // TODO 7.道具
+    // TODO 8.商城
+    // TODO 9.门派，门派技能学习，门派武器，门派任务
+    // TODO 10.武器强化
+    // TODO 11.战策
+    // TODO 12.友方支援
+    // TODO 13.装备
 
     @ApiOperation(value = "创建角色")
     @PostMapping("/geometryChaosMain/createCharacter")

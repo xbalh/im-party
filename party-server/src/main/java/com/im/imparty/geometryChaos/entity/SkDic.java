@@ -11,12 +11,10 @@ import lombok.experimental.Accessors;
  **/
 @Data
 @Accessors(chain = true)
-public class WpInfo {
+public class SkDic {
     @TableId
-    private String userName;
-    private String wpHolding;
-    private String skHolding;
-    private String friendHolding;
-    private String insHolding;
-    private String strategyHolding;
+    private String id;
+    private String skName;
+    private String skType;
+    private String skDetail;
 }
