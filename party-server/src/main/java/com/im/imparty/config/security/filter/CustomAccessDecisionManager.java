@@ -16,7 +16,7 @@ import java.util.Iterator;
 /**
  * 自定义权限决策管理器
  */
-//@Component
+@Component
 public class CustomAccessDecisionManager implements AccessDecisionManager {
 
     /**

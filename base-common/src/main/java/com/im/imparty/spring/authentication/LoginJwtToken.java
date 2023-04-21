@@ -41,4 +41,9 @@ public class LoginJwtToken extends AbstractAuthenticationToken {
         super(authorities);
         this.jwtString = jwtString;
     }
+
+    @Override
+    public boolean isAuthenticated() {
+        return "Y".equals(validStr);
+    }
 }

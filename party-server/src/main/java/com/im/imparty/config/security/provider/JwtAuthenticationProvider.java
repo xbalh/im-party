@@ -82,6 +82,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
                 throw new JwtValidException("cookie有问题！");
             }
         }
+        verify.setValidStr("Y");
         return verify;
     }
 
