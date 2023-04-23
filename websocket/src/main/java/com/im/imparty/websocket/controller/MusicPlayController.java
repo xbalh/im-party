@@ -4,6 +4,8 @@ import com.im.imparty.websocket.WebsocketSessionImpl;
 import com.im.imparty.websocket.annotation.ActionController;
 import com.im.imparty.websocket.annotation.ActionMethod;
 
+import java.io.IOException;
+
 @ActionController("/music")
 public class MusicPlayController {
 
@@ -19,8 +21,9 @@ public class MusicPlayController {
      * @param msg
      */
     @ActionMethod("/chat")
-    public void receiveChatMsg(WebsocketSessionImpl session, String msg) {
+    public void receiveChatMsg(WebsocketSessionImpl session, String msg) throws IOException {
         session.getSessionManager().broadcastMsg(msg);
+        session.sendMessage("收到了");
     }
 
 }
