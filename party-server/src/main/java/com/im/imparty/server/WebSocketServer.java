@@ -1,27 +1,39 @@
 package com.im.imparty.server;
 
-import com.im.imparty.websocket.WebsocketSession;
-import com.im.imparty.websocket.WebsocketSessionImpl;
-import com.im.imparty.websocket.WebsocketSessionManager;
+import com.im.imparty.websocket.*;
 import com.im.imparty.websocket.util.SessionUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
 @Component
 @Slf4j
 @ServerEndpoint("/musicParty/ws/{roomId}")
-public class WebSocketServer {
+public class WebSocketServer implements ApplicationContextAware {
 
     // private static WebsocketSessionManager sessionManager = new WebsocketSessionManager();
 
     private static Map<Integer, WebsocketSessionManager> roomMap = new ConcurrentHashMap<>();
+
+    private static List<ActionFilter> filterList;
+
+    @Autowired
+    public static void setFilterList(List<ActionFilter> filterList) {
+        AnnotationAwareOrderComparator.sort(filterList);
+        WebSocketServer.filterList = filterList;
+    }
 
     private Integer roomId;
     /**
@@ -74,7 +86,9 @@ public class WebSocketServer {
         //群发消息
         try {
             WebsocketSessionManager sessionManager = roomMap.get(roomId);
-            sessionManager.getSessionByUserName(userName).sendMessage(message);
+            WebsocketSessionImpl session1 = sessionManager.getSessionByUserName(userName);
+            session1.sendMessage(message);
+            new ActionFilterChain(filterList).doFilter(message, session1);
         } catch (IOException e) {
             log.error("发送消息失败！", e);
         }
@@ -97,4 +111,14 @@ public class WebSocketServer {
         session.sendMessage(message);
     }
 
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        List<ActionFilter> resList = new ArrayList<>();
+        String[] beanNamesForType = applicationContext.getBeanNamesForType(ActionFilter.class);
+        for (String name : beanNamesForType) {
+            resList.add(applicationContext.getBean(name, ActionFilter.class));
+        }
+        AnnotationAwareOrderComparator.sort(resList);
+        WebSocketServer.filterList = resList;
+    }
 }

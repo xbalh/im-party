@@ -65,6 +65,8 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
                 throw new JwtExpiredException("cookie已经过期");
             }
             if (refreshMap.get("expiredTime").asInstant().isBefore(LocalDateTime.now().toInstant(ZoneOffset.UTC))) {
+                CookieUtils.remove(response, "Authentication");
+                CookieUtils.remove(response, "refreshToken");
                 throw new JwtExpiredException("cookie已经过期");
             }
             String randomStr = refreshMap.get("validStr").asString();

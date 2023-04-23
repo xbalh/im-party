@@ -42,8 +42,12 @@ public class WebsocketSessionImpl implements WebsocketSession {
     }
 
     @Override
-    public void sendMessage(String msg) throws IOException {
-        session.getBasicRemote().sendText(msg);
+    public void sendMessage(String msg) {
+        try {
+            session.getBasicRemote().sendText(msg);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
