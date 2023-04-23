@@ -1,19 +1,20 @@
 package com.im.imparty.music.service;
 
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 
 public interface MusicLoginService {
-    String getLoginQr();
 
-    @Cacheable(cacheNames = "MusicLogin", key = "key")
-    String getQrKey();
+    String getLoginQr(String userName);
 
-    @Cacheable(cacheNames = "MusicLogin", key = "key", unless = "#result != null")
-    String getQrKeyInCache();
 
-    String getCookie();
+    String getQrKey(String userName);
 
-    @CacheEvict(cacheNames = "MusicLogin", key = "key")
-    void clearQrKey();
+    int getCookie(String userName);
+
+
+    void clearQrKey(String userName);
+
+    JSONObject getUserInfo();
 }
