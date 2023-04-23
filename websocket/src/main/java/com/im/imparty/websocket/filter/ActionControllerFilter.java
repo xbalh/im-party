@@ -61,7 +61,17 @@ public class ActionControllerFilter implements ActionFilter, ApplicationContextA
                 }
             }
             try {
-                methodWrapper.getMethod().invoke(methodWrapper.object, params.toArray());
+                Object invoke = methodWrapper.getMethod().invoke(methodWrapper.object, params.toArray());
+                if (invoke != null) {
+                    JSONObject res = new JSONObject();
+                    res.put("method", msgJson.getString("method"));
+                    if (invoke instanceof String) {
+                        res.put("data", invoke);
+                    } else {
+                        res.put("data", JSONObject.toJSONString(invoke));
+                    }
+                    session.sendMessage(res.toJSONString());
+                }
             } catch (WebsocketMsgException e) {
                 session.sendMessage("消息格式错误");
             }

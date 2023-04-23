@@ -77,12 +77,7 @@ public class WebsocketSessionManager {
 
     public void broadcastMsg(String msg) {
         for (WebsocketSessionImpl value : socketStore.values()) {
-            try {
-                value.sendMessage(msg);
-            } catch (IOException e) {
-                log.error("广播失败");
-                close(value);
-            }
+            value.sendMessage(msg);
         }
     }
 

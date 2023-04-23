@@ -21,9 +21,8 @@ public class MusicPlayController {
      * @param msg
      */
     @ActionMethod("/chat")
-    public void receiveChatMsg(WebsocketSessionImpl session, String msg) throws IOException {
-        session.getSessionManager().broadcastMsg(msg);
-        session.sendMessage("收到了");
+    public String receiveChatMsg(WebsocketSessionImpl session, String msg) throws IOException {
+        return "收到了";
     }
 
 }

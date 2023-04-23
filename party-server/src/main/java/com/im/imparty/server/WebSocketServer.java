@@ -55,7 +55,7 @@ public class WebSocketServer implements ApplicationContextAware {
             WebsocketSessionImpl sessionBySession = sessionManager.getSessionBySession(session);
             sessionBySession.sendMessage("conn_success");
             log.info("有新窗口开始监听:" + sessionBySession.getUserName() + ",当前在线人数为:" + sessionManager.count());
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("websocket IO Exception");
         }
     }
@@ -87,9 +87,8 @@ public class WebSocketServer implements ApplicationContextAware {
         try {
             WebsocketSessionManager sessionManager = roomMap.get(roomId);
             WebsocketSessionImpl session1 = sessionManager.getSessionByUserName(userName);
-            session1.sendMessage(message);
             new ActionFilterChain(filterList).doFilter(message, session1);
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("发送消息失败！", e);
         }
     }
