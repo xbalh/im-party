@@ -6,8 +6,25 @@
 </head>
 <body>
 <img th:src="${image}"/>
+<div id="result" style="word-break:break-word; width:500px"></div>
 </body>
-<script>
-set
+<script language='javascript'>
+    window.addEventListener('load', () => {
+        let timer = setInterval(() => {
+            let httpRequest = new XMLHttpRequest();//第一步：建立所需的对象
+            httpRequest.open('GET', '/music/getUserInfo?timestamp=' + new Date().getTime(), true);//第二步：打开连接  将请求参数写在url中  ps:"http://localhost:8080/rest/xxx"
+            httpRequest.send();//第三步：发送请求  将请求参数写在URL中
+            /**
+             * 获取数据后的处理程序
+             */
+            httpRequest.onreadystatechange = function () {
+                if (httpRequest.readyState == 4 && httpRequest.status == 200) {
+                    let json = httpRequest.responseText;//获取到json字符串，还需解析
+                    console.log(json);
+                    document.getElementById('result').innerText = json
+                }
+            };
+        }, 5000)
+    })
 </script>
 </html>

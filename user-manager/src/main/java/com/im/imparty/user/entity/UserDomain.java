@@ -31,4 +31,7 @@ public class UserDomain extends BaseDomain<UserDomain> {
 
     private LocalDateTime saltExpiresTime;
 
+    @TableField("wyy_cookie")
+    private String wyyCookie;
+
 }

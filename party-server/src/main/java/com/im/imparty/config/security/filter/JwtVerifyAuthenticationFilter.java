@@ -53,8 +53,8 @@ public class JwtVerifyAuthenticationFilter extends BasicAuthenticationFilter {
             String authentication = request.getHeader("Authentication");
             String refreshTokenHead = request.getHeader("refreshToken");
             if (cookie != null || authentication != null) {
-                System.out.println("request.getHeader(\"Token\")" + authentication);
-                System.out.println("cookie " + cookie);
+                //System.out.println("request.getHeader(\"Token\")" + authentication);
+                //System.out.println("cookie " + cookie);
                 jwtStr = cookie == null || cookie.getValue() == null ? authentication.replace("Bearer  ", "") : cookie.getValue();
                 try {
                     JwtTokenUtils.decryptJwt(jwtStr);

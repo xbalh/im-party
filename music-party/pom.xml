@@ -21,6 +21,10 @@
             <groupId>com.im</groupId>
             <artifactId>base-common</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.im</groupId>
+            <artifactId>user-manager</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
