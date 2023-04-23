@@ -25,6 +25,7 @@ public class PersonFightInfo {
     private Integer criPer;
     private Integer blk;
     private Integer blkPer;
+    private Integer miss;
     private Integer ca;
     private BigDecimal finalAtk;
     private BigDecimal finalDef;

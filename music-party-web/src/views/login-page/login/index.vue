@@ -1,13 +1,13 @@
 <template>
   <div>
     <el-form ref="ruleForm" :model="ruleForm" status-icon :rules="rules">
-      <p>用户名<br />
+      <p>{{ $t('login.username') }}<br />
         <!-- <el-input v-model="loginData.ruleForm.username" placeholder="请输入用户名"></el-input> -->
         <el-form-item label="用户名：" prop="username">
           <el-input v-model="ruleForm.username" autocomplete="off" />
         </el-form-item>
       </p>
-      <p>密码<br />
+      <p>{{ $t('login.password') }}<br />
         <!-- <el-input v-model="loginData.ruleForm.password" placeholder="请输入密码"></el-input> -->
         <el-form-item label="密码：" prop="password">
           <el-input v-model="ruleForm.password" type="password" autocomplete="off" />
@@ -17,7 +17,7 @@
         <input id="remember" type="checkbox" /><label for="smtxt">记住密码</label>
       </p>
       <p>
-        <el-button @click="submitForm('ruleForm')">登录</el-button>
+        <el-button @click="submitForm('ruleForm')">{{ $t('login.signin') }}</el-button>
         <el-button class="login-btn" @click="resetForm">重置</el-button>
       </p>
       <p class="smtxt">没有账号？
@@ -35,8 +35,10 @@ import { namespace } from "vuex-class"
 import type { FormInstance } from "element-plus"
 import { AxiosResponse } from "axios"
 import { LoginData, LoginForm } from "@/types/login"
+import { UserInfoType } from "@/types/user"
 import { Form } from "element-ui"
 import { encodeRSA } from '@/utils/common'
+import defaultPageApi from "@/api/default-page";
 
 const permissionsStore = namespace('permissionsStore')
 const userStore = namespace('userStore')
@@ -46,6 +48,7 @@ export default class Login extends Vue {
   @permissionsStore.Mutation('setPermissions') setPermissions!: Function
   @userStore.Mutation('setToken') setToken!: Function
   @userStore.Mutation('setRefreshToken') setRefreshToken!: Function
+  @userStore.Mutation('setUserInfo') setUserInfo!: Function
 
   loginData: LoginData = reactive(new LoginData())
   ruleForm: LoginForm = this.loginData.ruleForm
@@ -67,6 +70,7 @@ export default class Login extends Vue {
     (this.$refs[formName] as Form).validate((valid: boolean) => {
       if (valid) {
         this.handleLogin()
+        // this.getCurrentUserInfo()
       } else {
         console.log('error submit!')
         return false
@@ -81,7 +85,6 @@ export default class Login extends Vue {
   }
 
   async handleLogin() {
-
     const enPassword = encodeRSA(this.ruleForm.password, '')
     const formData = new FormData();
     formData.append("username", this.ruleForm.username)
@@ -97,30 +100,39 @@ export default class Login extends Vue {
           }
         }
       )
-      if (res.status !== 200 || !res.data.accessToken || res.data.accessToken == '') {
+      const result = res.data
+      if (result.code !== 200 || !result.data.accessToken || result.data.accessToken == '') {
         this.$message.error('账号或密码错误！');
         return
       }
 
-      this.setToken(res.data.accessToken)
-      this.setRefreshToken(res.data.refreshToken)
+      this.setToken(result.data.accessToken)
+      this.setRefreshToken(result.data.refreshToken)
 
     } catch (error) {
       console.log(error, "login error")
     }
 
     const path = (this.$route.query.redirectUrl || '/') as string | undefined
-
-
     this.$router.replace({ path })
 
-    // try {
-    //   const res = await Request.get('/promise')
-    //   this.setPermissions(res.data)
-    // } catch (error) {
-    //   console.error(error, '获取权限出错了')
-    // }
+
   }
+
+  async getCurrentUserInfo() {
+    try {
+      const res = await Request.get(defaultPageApi.user.info, {}, { isNeedToken: true })
+      const userInfo: UserInfoType = {
+        username: res.data.msg! as string,
+        age: 24,
+        sex: 0
+      }
+      this.setUserInfo(userInfo)
+    } catch (error) {
+      console.error(error, '获取用户信息出错了')
+    }
+  }
+
 }
 </script>
 

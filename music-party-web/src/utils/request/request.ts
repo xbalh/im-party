@@ -63,11 +63,11 @@ class Request implements RequestType {
         });
         // 对响应数据做点什么
         const { code = -1, data = {}, msg = "" } = response.data;
-        if (code === 200) {
+        if (code !== 500) {
           return Promise.resolve({
             ...response,
             code,
-            data: data,
+            data: response.data,
             status: response.status
           });
         }

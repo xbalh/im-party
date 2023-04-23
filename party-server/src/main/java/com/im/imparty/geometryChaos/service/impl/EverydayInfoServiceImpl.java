@@ -1,5 +1,7 @@
 package com.im.imparty.geometryChaos.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.im.imparty.geometryChaos.entity.UserStaticInfo;
@@ -81,13 +83,16 @@ public class EverydayInfoServiceImpl extends ServiceImpl<EverydayInfoMapper, Eve
             finalCoin = finalCoin * 3;
         }
 
-        userImportantInfo.setYb(userImportantInfo.getYb() + finalCoin);
+        userImportantInfo.setYb(userImportantInfo.getYb() + finalCoin)
+                .setPower(userImportantInfo.getPower() + 50);
         userStaticInfoMapper.updateById(userImportantInfo);
 
         everydayInfo.setDaysCount(String.valueOf(finalCoin));
         everydayInfoMapper.insert(everydayInfo);
 
-        return "签到第 " + (Integer.parseInt(everydayInfo.getEverydayNum())) + " 天，获得 " + finalCoin + " 硬币，共 " + userImportantInfo.getYb() + " 硬币。";
+        return "签到第 " + (Integer.parseInt(everydayInfo.getEverydayNum())) + " 天，获得 "
+                + finalCoin + " 音币，共 " + userImportantInfo.getYb() + " 音币。"
+                + "获得 50 点体力。";
     }
 
     private boolean isWeekend() {

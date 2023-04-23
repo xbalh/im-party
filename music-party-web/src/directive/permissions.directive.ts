@@ -1,7 +1,7 @@
-import { DirectiveOptions } from 'vue'
+import { ObjectDirective } from 'vue'
 import store from '@/store'
 
-const permissions: DirectiveOptions = {
+const permissions: ObjectDirective = {
   inserted(el, binding) {
     const { value, arg = '' } = binding
     const permissions = store.getters['permissionsStore/getPermissions']

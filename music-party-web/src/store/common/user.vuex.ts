@@ -1,7 +1,7 @@
 import { Module } from "vuex";
 
 interface UserInfoType {
-  name: string;
+  username: string;
   age: number;
   sex: number;
 }
@@ -16,7 +16,7 @@ const userStore: Module<UserStateType, any> = {
 
   state: {
     userInfo: {
-      name: "Tome",
+      username: "",
       age: 20,
       sex: 1,
     },
@@ -38,6 +38,10 @@ const userStore: Module<UserStateType, any> = {
     setRefreshToken(state, refreshToken) {
       state.refreshToken = refreshToken;
       localStorage.setItem("refreshToken", refreshToken);
+    },
+    setUserInfo(state, userInfo: UserInfoType) {
+      state.userInfo = userInfo;
+      localStorage.setItem("userInfo", JSON.stringify(userInfo));
     },
   },
 };

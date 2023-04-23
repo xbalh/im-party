@@ -4,3 +4,7 @@
 export const home = {
   init: '/init-base'
 }
+
+export const user = {
+  info: '/users/info'
+}

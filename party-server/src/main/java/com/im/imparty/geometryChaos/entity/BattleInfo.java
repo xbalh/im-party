@@ -1,5 +1,6 @@
 package com.im.imparty.geometryChaos.entity;
 
+import com.alibaba.fastjson.JSONArray;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -19,6 +20,7 @@ public class BattleInfo {
     private String fightInfo;
     private Integer round;
     private Date createTime;
-    private String message;
+    private JSONArray message;
     private String surplusCd;
+    private Boolean ifEnd;
 }

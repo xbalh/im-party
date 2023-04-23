@@ -1,7 +1,7 @@
 console.log(process.env.VUE_APP_REQUEST_URL);
 
 const autoprefixer = require('autoprefixer');
-// const pxtorem = require("postcss-pxtorem");
+const pxtorem = require("postcss-pxtorem");
 const pxtoViewPort = require("postcss-px-to-viewport");
 
 module.exports = {
@@ -56,7 +56,6 @@ module.exports = {
       postcss: {
         plugins: [
           autoprefixer(),
-
           // px -> rem
           // pxtorem({
           //   rootValue: 75,
@@ -91,6 +90,7 @@ module.exports = {
       },
     }
   },
+  
 
   // chainWebpack(config) {
   //   config

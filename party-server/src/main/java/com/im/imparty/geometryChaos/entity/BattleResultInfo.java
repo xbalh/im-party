@@ -1,9 +1,12 @@
 package com.im.imparty.geometryChaos.entity;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @Description
@@ -16,5 +19,5 @@ public class BattleResultInfo {
     private PersonFightInfo offensiveInfo;
     private PersonFightInfo defenseInfo;
     private FightInfo fightInfo;
-    private String message;
+    private JSONArray message;
 }
