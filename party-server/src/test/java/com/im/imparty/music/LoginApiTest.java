@@ -22,8 +22,8 @@ public class LoginApiTest extends BaseTest {
 
     @Test
     public void test() {
-        String s = musicApi.getSong(Arrays.asList("210049"), "exhigh");
-        System.out.println(s);
+        //String s = musicApi.getSong(Arrays.asList("210049"), "exhigh");
+        //System.out.println(s);
     }
 
     @Test

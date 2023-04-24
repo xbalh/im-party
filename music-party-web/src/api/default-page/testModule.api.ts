@@ -8,3 +8,7 @@ export const home = {
 export const user = {
   info: '/users/info'
 }
+
+export const room = {
+  list: '/room/list'
+}

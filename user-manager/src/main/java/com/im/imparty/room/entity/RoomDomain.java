@@ -32,6 +32,8 @@ public class RoomDomain extends BaseDomain {
 
     private String roomOwner;
 
+    private String roomStyle;
+
     private LocalDateTime createTime;
 
 

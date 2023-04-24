@@ -22,6 +22,10 @@ public class MusicPlayController {
      */
     @ActionMethod("/chat")
     public String receiveChatMsg(WebsocketSessionImpl session, String msg) throws IOException {
+
+        session.getSessionManager().broadcastMsg("asd");
+        session.getSessionManager().count();
+        session.sendMessage("sss");
         return "收到了";
     }
 
