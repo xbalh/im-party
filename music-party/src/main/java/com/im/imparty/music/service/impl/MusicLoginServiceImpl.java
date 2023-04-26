@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -23,6 +24,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 @Slf4j
+@Order(Integer.MAX_VALUE)
 @Service
 public class MusicLoginServiceImpl implements MusicLoginService, ApplicationContextAware {
 
@@ -162,6 +164,6 @@ public class MusicLoginServiceImpl implements MusicLoginService, ApplicationCont
                     }
                 }
             }
-        }, 1000, 3000);
+        }, 5000, 3000);
     }
 }

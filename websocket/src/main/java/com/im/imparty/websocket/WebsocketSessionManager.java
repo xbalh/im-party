@@ -1,6 +1,8 @@
 package com.im.imparty.websocket;
 
 import com.im.imparty.spring.authentication.LoginJwtToken;
+import com.im.imparty.websocket.conts.MsgJSON;
+import com.im.imparty.websocket.timer.PlayTimer;
 import com.im.imparty.websocket.util.SessionUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,6 +23,9 @@ public class WebsocketSessionManager {
 
     private static AtomicInteger count = new AtomicInteger();
 
+    // 播放计时器
+    private PlayTimer playTimer;
+
     public boolean addUser(Session session) {
         Principal userPrincipal = session.getUserPrincipal();
         String name = userPrincipal.getName();
@@ -28,7 +33,7 @@ public class WebsocketSessionManager {
             return false;
         }
         WebsocketSessionImpl websocketSession = new WebsocketSessionImpl(session, name, this);
-
+        websocketSession.setValidFlag(true);
         if (userPrincipal instanceof LoginJwtToken) {
             Collection<GrantedAuthority> authorities = ((LoginJwtToken) userPrincipal).getAuthorities();
             List<String> roles = new ArrayList<>();
@@ -96,5 +101,29 @@ public class WebsocketSessionManager {
             return authorities;
         }
         return Collections.emptyList();
+    }
+
+    public PlayTimer init() {
+        this.playTimer = new PlayTimer(10, (o) -> {
+            if (o) {
+                broadcastMsg(MsgJSON.nextPlay("1", "http://baidu.com").toJSONString());
+                playTimer.play(0);
+            } else {
+                broadcastMsg(MsgJSON.currentTime(getCurrentTime()).toJSONString());
+            }
+            return null;
+        });
+        return playTimer;
+    }
+
+    public void play(long startTime) {
+        if (this.playTimer == null) {
+            init();
+        }
+        playTimer.play(startTime);
+    }
+
+    public long getCurrentTime() {
+        return playTimer.getCurrentTime();
     }
 }

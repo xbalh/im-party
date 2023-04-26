@@ -19,7 +19,6 @@ import com.im.imparty.geometryChaos.entity.*;
 import com.im.imparty.user.entity.UserDomain;
 import com.im.imparty.user.mapper.UserMapper;
 import com.im.imparty.user.service.UserService;
-import javafx.scene.control.CustomMenuItem;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

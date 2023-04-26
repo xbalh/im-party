@@ -1,6 +1,8 @@
 package com.im.imparty.websocket;
 
 
+import com.im.imparty.common.util.StatusUtils;
+import com.im.imparty.websocket.enums.RoomAuthority;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,6 +19,11 @@ public class WebsocketSessionImpl implements WebsocketSession {
     private String userName;
 
     private List<String> roleList;
+
+    private boolean validFlag;
+
+    // 默认给所有权限了
+    private int authority = StatusUtils.addAuthority(0, RoomAuthority.getAll());
 
     private WebsocketSessionManager sessionManager;
 
@@ -57,5 +64,21 @@ public class WebsocketSessionImpl implements WebsocketSession {
         } catch (IOException e) {
             log.error("关闭session失败");
         }
+    }
+
+    public void setValidFlag(boolean validFlag) {
+        this.validFlag = validFlag;
+    }
+
+    public boolean isValidFlag() {
+        return validFlag;
+    }
+
+    public int getAuthority() {
+        return authority;
+    }
+
+    public void setAuthority(int authority) {
+        this.authority = authority;
     }
 }

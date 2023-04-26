@@ -25,7 +25,7 @@ public class WebSocketServer implements ApplicationContextAware {
 
     // private static WebsocketSessionManager sessionManager = new WebsocketSessionManager();
 
-    private static Map<Integer, WebsocketSessionManager> roomMap = new ConcurrentHashMap<>();
+    public static Map<Integer, WebsocketSessionManager> roomMap = new ConcurrentHashMap<>();
 
     private static List<ActionFilter> filterList;
 
