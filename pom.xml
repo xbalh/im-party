@@ -8,6 +8,7 @@
         <module>music-party</module>
         <module>user-manager</module>
         <module>party-server</module>
+        <module>websocket</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
