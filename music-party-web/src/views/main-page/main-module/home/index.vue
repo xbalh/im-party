@@ -1,26 +1,39 @@
 <template>
   <div class="home">
     <!-- 房间列表 -->
-    <div class="leftArea">
-      <div class="roomList">
+    <div class="baseArea leftArea">
+      <el-aside>
+        <div class="toggle-button" @click="toggleCollapse">|||</div>
         <el-tree class="filter-tree" :data="roomTree" :props="roomTreeProps" default-expand-all
           :filter-node-method="filterNode" ref="tree" @node-click="handleNodeClick">
         </el-tree>
-      </div>
+      </el-aside>
     </div>
-    <div class="midArea">
+    <div class="baseArea midArea" :style="{'visibility': joinSuccess? 'visible':'hidden'}">
       <!-- 播放器 -->
-      <div class="player" v-if="isInRoom">
-        <MusicPlayer @currentTime="currentTime"></MusicPlayer>
+      <div class="player" ref="player" id="drag-top">
+        <!-- <MusicPlayer @currentTime="currentTime"></MusicPlayer> -->
+        <audio controls>
+          <source src="../../../../assets/music/test.mp3" />
+        </audio>
       </div>
+      <!-- 收缩栏 -->
+      <!-- <div class="resize-line" title="收缩侧边栏" ref="resize" id="resize" @mousedown="handleMouseDown">
+      </div> -->
       <!-- 聊天区域 -->
-      <div class="charArea">
-
+      <div class="chatArea" ref="charArea" id="drag-down">
+        <Chat></Chat>
       </div>
     </div>
 
     <!-- 房间在线用户列表以及播放队列 -->
-    <div class="rightArea">
+    <div class="baseArea rightArea">
+      <div class="">
+        <el-tabs v-model="activeName" @tab-click="tabClickHandle">
+          <el-tab-pane label="歌曲队列" name="songList">歌曲队列</el-tab-pane>
+          <el-tab-pane label="用户列表" name="userList">用户列表</el-tab-pane>
+        </el-tabs>
+      </div>
 
     </div>
 
@@ -49,7 +62,8 @@ import Ws from "@/utils/ws";
 import { namespace } from "vuex-class"
 import { UserInfoType } from "@/types/user"
 import { Room } from "@/types/room"
-import { TreeNode } from "element-ui/types/tree";
+import { Loading } from 'element-ui';
+import Chat from "@/components/chat/index.vue";
 
 const userStore = namespace('userStore')
 
@@ -59,13 +73,13 @@ const userStore = namespace('userStore')
     LangExample,
     VuexExample,
     WorkerExample,
-    MusicPlayer
+    MusicPlayer,
+    Chat
   }
 })
 export default class Home extends Vue {
-  WS: Ws;
-  handleChat: (data: object) => any;
-  timeId: NodeJS.Timeout;
+  WS: Ws | any;
+  timeId: NodeJS.Timeout | any;
   @userStore.Getter('getToken') getToken!: string
   @userStore.Mutation('setUserInfo') setUserInfo!: Function
   currentUserInfo: any = null;
@@ -73,24 +87,15 @@ export default class Home extends Vue {
   roomTreeProps: any;
 
   currentTime: string = "00:00";
-  isInRoom: boolean = false;
+  joinSuccess: boolean = false;
   treeClickCount: number = 0;
+  currentRoomInfo: Room | any;
+
+  activeName: string = 'songList'
+  dragState: any;
 
   constructor() {
     super();
-    const token = localStorage.getItem("token");
-    if (!token) console.error("token为空");
-    this.WS = new Ws("ws://localhost:8080/musicParty/ws", [token!], false);
-    this.WS.send("connect success");
-    this.handleChat = (data: object) => console.log(data);
-    this.WS.subscribe("/music/chat", this.handleChat);
-
-    let count = 0;
-    this.timeId = setInterval(() => {
-      ++count;
-      this.WS.send(`count: ${count}`);
-    }, 10000);
-
     this.roomTreeProps = {
       children: 'roomList',
       label: 'label'
@@ -165,6 +170,7 @@ export default class Home extends Vue {
   }
 
   handleNodeClick(data: any, node: any) {
+    if (node.level < 2) return
     //记录点击次数
     this.treeClickCount++;
     //单次点击次数超过2次不作处理,直接返回,也可以拓展成多击事件
@@ -187,17 +193,56 @@ export default class Home extends Vue {
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          this.$message({
-            type: 'success',
-            message: '进入成功!'
-          });
+          this.joinRoom(data)
         })
 
       }
     }, 300);
   }
 
+  joinRoom(roomInfo: Room) {
+    this.joinSuccess = false
+    if (!this.WS && this.WS instanceof Ws) this.WS.destroy()
+    const loadingInstance = Loading.service({ fullscreen: true });
+    const token = localStorage.getItem("token");
+    if (!token) console.error("token为空");
+    try {
+      //ws连接
+      this.WS = new Ws("ws://localhost:8080/musicParty/ws/" + roomInfo.roomNo, [token!], false);
+      this.WS.send("connect success");
+      this.WS.subscribe("/music/chat", this.handleChat);
+      //加载房间信息
 
+    } catch (error) {
+      this.$message({
+        showClose: true,
+        message: '出了点问题，加入房间失败了，重试一下吧',
+        type: 'error'
+      });
+      return
+    } finally {
+      loadingInstance.close();
+    }
+
+    const count = 0;
+    this.timeId = setInterval(() => {
+      count;
+      this.WS.send(`count: ${count}`);
+    }, 10000);
+
+    this.currentRoomInfo = roomInfo;
+    this.joinSuccess = true
+    // this.dragControllerDiv();
+    this.$notify({
+      title: '成功',
+      message: '成功进入房间！',
+      type: 'success'
+    });
+  }
+
+  handleChat(data: object) {
+    console.log(data)
+  }
 
   setCurrentTime() {
     this.currentTime = "01:01"
@@ -212,6 +257,15 @@ export default class Home extends Vue {
     return data.label.indexOf(value) !== -1;
   }
 
+  tabClickHandle(tab: any, event: any) {
+    console.log(tab, event);
+  }
+
+  toggleCollapse(){
+    console.log('1')
+  }
+
+
 }
 </script>
 
@@ -225,20 +279,99 @@ h1 {
 .home {
   width: 100%;
   display: flex;
+  // max-height: 500px;
 }
+
+.baseArea {}
 
 .leftArea {
   // background-color: red;
   width: 20%;
+
 }
 
 .midArea {
   // background-color: white;
   width: 60%;
+  visibility:hidden;
 }
 
 .rightArea {
   // background-color: blue;
   width: 20%;
+}
+
+.roomList {
+  margin: 0 2px 0 1px;
+  border: 10px black;
+  border-radius: 2px
+}
+
+.player {
+  margin-left: 5%;
+  width: 100%;
+  /*左侧初始化宽度*/
+  height: 15%;
+  // background-color: burlywood;
+}
+
+.chatArea {
+  margin-left: 5px;
+  width: 95%;
+  /*右侧初始化宽度*/
+  height: 85%;
+  box-shadow: -1px 4px 5px 3px rgba(0, 0, 0, 0.11);
+  // background-color: aqua;
+}
+
+/*拖拽区div样式*/
+.resize {
+  cursor: row-resize;
+  position: relative;
+  background-color: #d6d6d6;
+  border-radius: 5px;
+  width: 100%;
+  height: 10px;
+  background-size: cover;
+  background-position: center;
+  font-size: 32px;
+  color: white;
+}
+
+/*拖拽区鼠标悬停样式*/
+.resize:hover {
+  color: #444444;
+}
+
+#drag-box {
+  height: 500px;
+}
+
+.data-list {
+  // overflow-y: scroll;
+  border-bottom: 1px solid #e3e5eb;
+  height: calc(50% - 4px);
+  min-height: 65px;
+  max-height: 100%;
+}
+
+.target-list {
+  height: 50%;
+  min-height: 65px;
+}
+
+.resize-line {
+  height: 4px;
+  cursor: move;
+}
+
+.toggle-button {
+  background-color: #4A5064; //背景色(浅灰)
+  font-size: 10px; //字体大小10像素
+  line-height: 24px; //行高24像素
+  color: #fff; //字体颜色白色
+  text-align: center; //字体居中
+  letter-spacing: 0.2em; //字体之间的距离
+  cursor: pointer; //鼠标的形状（手形）
 }
 </style>
