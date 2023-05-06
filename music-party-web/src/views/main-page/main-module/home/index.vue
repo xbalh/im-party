@@ -3,33 +3,37 @@
     <!-- 房间列表 -->
     <div class="baseArea leftArea">
       <el-aside>
-        <el-tree class="filter-tree" :data="roomTree" :props="roomTreeProps" default-expand-all
-          :filter-node-method="filterNode" ref="tree" @node-click="handleNodeClick">
+        <el-tree class="room-tree" :data="roomTree" :props="roomTreeProps" default-expand-all
+          :filter-node-method="filterNode" ref="tree" @node-click="handleNodeClick" empty-text="当前房间列表为空">
         </el-tree>
       </el-aside>
     </div>
-    <div class="baseArea midArea" :style="{'visibility': joinSuccess? 'visible':'hidden'}">
-      <!-- 播放器 -->
-      <div class="player" ref="player" id="drag-top">
-        <!-- <MusicPlayer @currentTime="currentTime"></MusicPlayer> -->
-        <audio controls>
-          <!-- <source src="../../../../assets/music/test.mp3" /> -->
-          <source src="https://su-wsm.github.io/assets/music/test.mp3" />
-        </audio>
-      </div>
-      <!-- 收缩栏 -->
-      <!-- <div class="resize-line" title="收缩侧边栏" ref="resize" id="resize" @mousedown="handleMouseDown">
+    <div class="baseArea midArea">
+      <el-empty description="先加入一个喜欢的房间吧" v-if="!joinSuccess"></el-empty>
+      <div :style="{ 'visibility': joinSuccess ? 'visible' : 'hidden', 'height': '100%' }">
+        <!-- 播放器 -->
+        <div class="player" ref="player" id="drag-top">
+          <!-- <MusicPlayer @currentTime="currentTime"></MusicPlayer> -->
+          <audio controls>
+            <!-- <source src="../../../../assets/music/test.mp3" /> -->
+            <source src="https://su-wsm.github.io/assets/music/test.mp3" />
+          </audio>
+        </div>
+        <!-- 收缩栏 -->
+        <!-- <div class="resize-line" title="收缩侧边栏" ref="resize" id="resize" @mousedown="handleMouseDown">
       </div> -->
-      <!-- 聊天区域 -->
-      <div class="chatArea" ref="charArea" id="drag-down">
-        <Chat></Chat>
+        <!-- 聊天区域 -->
+        <div class="chatArea" ref="charArea" id="drag-down">
+          <Chat></Chat>
+        </div>
       </div>
+
     </div>
 
     <!-- 房间在线用户列表以及播放队列 -->
     <div class="baseArea rightArea">
       <div class="">
-        <el-tabs v-model="activeName" @tab-click="tabClickHandle">
+        <el-tabs v-model="activeName" @tab-click="tabClickHandle" stretch>
           <el-tab-pane label="歌曲队列" name="songList">歌曲队列</el-tab-pane>
           <el-tab-pane label="用户列表" name="userList">用户列表</el-tab-pane>
         </el-tabs>
@@ -260,7 +264,7 @@ export default class Home extends Vue {
     console.log(tab, event);
   }
 
-  toggleCollapse(){
+  toggleCollapse() {
     console.log('1')
   }
 
@@ -293,7 +297,7 @@ h1 {
 .midArea {
   // background-color: white;
   width: 60%;
-  visibility:hidden;
+  // visibility: hidden;
 }
 
 .rightArea {
@@ -365,4 +369,31 @@ h1 {
   cursor: move;
 }
 
+.room-tree {
+  user-select: none;
+}
+
+@keyframes colorChange {
+  0% {
+    background: linear-gradient(to top, hsla(6, 90%, 68%, 0), hsla(336, 99%, 66%, 0));
+  }
+
+  50% {
+    background: linear-gradient(to top, hsla(6, 90%, 68%, 50%), hsla(336, 99%, 66%, 50%));
+  }
+  100% {
+    background: linear-gradient(to top, hsla(6, 90%, 68%, 100%), hsla(336, 99%, 66%, 100%));
+  }
+}
+
+.el-tree-node>.el-tree-node__content {
+  background-color: hsla(6, 90%, 68%, 0%);
+}
+
+.el-tree-node.is-current>.el-tree-node__content {
+  // background-image: linear-gradient(to top, #ff0844 0%, #ffb199 100%);
+  // background: linear-gradient(to top, hsla(6, 90%, 68%, 100%), hsla(336, 99%, 66%, 100%));
+  background-color: hsla(6, 90%, 68%, 100%);
+  transition: background-color 0.5s ease-in-out;
+}
 </style>
