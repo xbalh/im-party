@@ -32,7 +32,6 @@ import { reactive, toRefs, ref } from "vue"
 import { Vue, Component } from "vue-property-decorator"
 import Request from '@/utils/requestInstance'
 import { namespace } from "vuex-class"
-import type { FormInstance } from "element-plus"
 import { AxiosResponse } from "axios"
 import { LoginData, LoginForm } from "@/types/login"
 import { UserInfoType } from "@/types/user"

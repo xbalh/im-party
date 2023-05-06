@@ -65,7 +65,6 @@ import { PersonFightInfo, BuffInfo, WpInfo, BattleInfo } from "@/types/game/chao
 import { UserInfoType } from "@/types/user";
 import ElementUI, { Table } from "element-ui";
 import { ElementUIComponent } from "element-ui/types/component";
-import { TableRefs } from "element-plus";
 import { JsonObject } from "type-fest";
 
 const userStore = namespace("userStore");
