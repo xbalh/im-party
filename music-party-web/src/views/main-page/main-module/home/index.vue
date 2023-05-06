@@ -3,7 +3,6 @@
     <!-- 房间列表 -->
     <div class="baseArea leftArea">
       <el-aside>
-        <div class="toggle-button" @click="toggleCollapse">|||</div>
         <el-tree class="filter-tree" :data="roomTree" :props="roomTreeProps" default-expand-all
           :filter-node-method="filterNode" ref="tree" @node-click="handleNodeClick">
         </el-tree>
@@ -233,7 +232,6 @@ export default class Home extends Vue {
 
     this.currentRoomInfo = roomInfo;
     this.joinSuccess = true
-    // this.dragControllerDiv();
     this.$notify({
       title: '成功',
       message: '成功进入房间！',
@@ -366,13 +364,4 @@ h1 {
   cursor: move;
 }
 
-.toggle-button {
-  background-color: #4A5064; //背景色(浅灰)
-  font-size: 10px; //字体大小10像素
-  line-height: 24px; //行高24像素
-  color: #fff; //字体颜色白色
-  text-align: center; //字体居中
-  letter-spacing: 0.2em; //字体之间的距离
-  cursor: pointer; //鼠标的形状（手形）
-}
 </style>
