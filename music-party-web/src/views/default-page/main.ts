@@ -5,11 +5,11 @@ import router from "@/router";
 // Vuex
 import store from "@/store";
 // 国际化
-import i18n from "@/i18n/index.ts";
+import i18n from "@/i18n/index";
 // 自动设置 html 元素的大小 配合 postcss-pxtorem 实现响应式
-// import "amfe-flexible";
+import "amfe-flexible";
 // 加载 element-ui 组件
-import "@/utils/useElement.ts";
+import "@/utils/useElement";
 // 配置主题
 import "@/theme/index.css";
 // 自定义指令
@@ -31,5 +31,18 @@ new Vue({
   router,
   store,
   i18n,
-  render: h => h(App)
+  render: h => h(App),
+  created() {
+    window.addEventListener("resize", this.setAppHeight);
+  },
+  mounted() {
+    this.setAppHeight();
+  },
+  methods: {
+    setAppHeight() {
+      const app = document.getElementById("app");
+      const height = document.documentElement.clientHeight || window.innerHeight;
+      app!.style.height = `${height}px`;
+    }
+  }
 }).$mount("#app");

@@ -31,5 +31,18 @@ new Vue({
   router,
   store,
   i18n,
-  render: h => h(App)
+  render: h => h(App),
+  created() {
+    window.addEventListener("resize", this.setAppHeight);
+  },
+  mounted() {
+    this.setAppHeight();
+  },
+  methods: {
+    setAppHeight() {
+      const app = document.getElementById("app");
+      const height = document.documentElement.clientHeight || window.innerHeight;
+      app!.style.height = `${height}px`;
+    }
+  }
 }).$mount("#app");

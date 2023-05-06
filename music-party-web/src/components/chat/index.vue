@@ -128,7 +128,7 @@ export default {
     height: 350px;
     border-top: 1px #ebebeb solid;
     border-bottom: 1px #ebebeb solid;
-    overflow: scroll;
+    overflow: hidden;
     overflow-x: hidden;
     padding: 10px;
 
