@@ -106,11 +106,11 @@ export default {
 }
 
 .wrapper {
-    position: relative;
-    width: 650px;
+    /* position: relative; */
+    /* width: 650px; */
     background-color: #fff;
     opacity: 0.85;
-    height: 610px;
+    /* height: 610px; */
     border-radius: 4px;
     border: 1px #ebebeb solid;
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);

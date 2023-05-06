@@ -51,7 +51,7 @@ class RequestProxy implements RequestProxyType {
     } catch (error) {
       const { code, config } = error
 
-      if (code === 401) {
+      if (code === 1001) {
         // 解决 token 失效的
 
         // 方案一 跳转至登录页
