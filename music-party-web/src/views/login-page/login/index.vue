@@ -112,7 +112,7 @@ export default class Login extends Vue {
       console.log(error, "login error")
     }
 
-    const path = (this.$route.query.redirectUrl || '/') as string | undefined
+    const path = (this.$route.query.redirectUrl || '/home') as string | undefined
     this.$router.replace({ path })
 
 

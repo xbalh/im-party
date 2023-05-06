@@ -2,8 +2,8 @@ import { RouteConfig } from 'vue-router'
 
 const routes: RouteConfig[] = [
   {
-    path: "home",
-    name: "Home",
+    path: "home1",
+    name: "Home1",
     component: () =>
       import(/* webpackChunkName: "home" */ "@/views/default-page/test-module/home/index.vue")
   },

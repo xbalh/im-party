@@ -7,6 +7,10 @@ export default {
     module: require.context("./default", true, /\.router\.ts$/),
     routes: []
   },
+  main: {
+    module: require.context("./main", true, /\.router\.ts$/),
+    routes: []
+  },
   other: {
     module: require.context("./other", true, /\.router\.ts$/),
     routes: []

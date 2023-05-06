@@ -12,7 +12,7 @@
       <el-container>
         <el-aside width="200px">
           <ul id="nav">
-            <li><router-link to="/home">Home</router-link></li>
+            <li><router-link to="/home1">Home1</router-link></li>
             <li><router-link to="/home2">Home2</router-link></li>
             <li>
               <router-link to="/other/news1" target="_blank">List</router-link>
