@@ -14,7 +14,8 @@
       <div class="player" ref="player" id="drag-top">
         <!-- <MusicPlayer @currentTime="currentTime"></MusicPlayer> -->
         <audio controls>
-          <source src="../../../../assets/music/test.mp3" />
+          <!-- <source src="../../../../assets/music/test.mp3" /> -->
+          <source src="https://su-wsm.github.io/assets/music/test.mp3" />
         </audio>
       </div>
       <!-- 收缩栏 -->
