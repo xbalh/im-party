@@ -276,6 +276,7 @@ h1 {
 }
 
 .home {
+  height: 100%;
   width: 100%;
   display: flex;
   // max-height: 500px;

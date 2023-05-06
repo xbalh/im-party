@@ -32,3 +32,4 @@ build/
 ### VS Code ###
 .vscode/
 music-party-web/package-lock.json
+test.json

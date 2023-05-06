@@ -59,10 +59,10 @@ export default {
     },
     mounted() {
         this.userName = this.$route.query.name;
-        this.$socket.emit('login', {
-            userid: 1,
-            username: this.userName
-        })
+        // this.$socket.emit('login', {
+        //     userid: 1,
+        //     username: this.userName
+        // })
     },
     sockets: {
         connect: function () {
@@ -120,12 +120,12 @@ export default {
     flex-direction: column;
     align-items: center;
     padding-top: 10px;
-
+    height: 100%;
 }
 
 .message-panel {
     width: 85%;
-    height: 350px;
+    height: 80%;
     border-top: 1px #ebebeb solid;
     border-bottom: 1px #ebebeb solid;
     overflow: hidden;
@@ -137,15 +137,16 @@ export default {
 .input-area {
     width: 85%;
     border-radius: 4px;
-    height: 120px;
+    height: 20%;
     margin-top: 20px;
     border: 0 solid black;
+    overflow: hidden;
 }
 
 .send-btn {
-    position: absolute;
-    right: 10px;
-    bottom: 10px;
+    position: relative;
+    float: right;
+    bottom: 80px;
 }
 
 .input {
@@ -155,6 +156,7 @@ export default {
     border-radius: 4px;
     outline: none;
     padding: 5px;
+    resize: vertical;
 }
 
 .fix-top {

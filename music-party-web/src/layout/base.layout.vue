@@ -7,8 +7,8 @@
   <div class="base-layout">
     <el-container>
       <!-- <el-header>
-        <h3>base-layout</h3>
-      </el-header> -->
+                    <h3>base-layout</h3>
+                  </el-header> -->
       <el-container>
         <el-aside :class="asideStatus ? 'aside_main_unfold' : 'aside_main_collapse'">
           <ul id="nav">
@@ -21,8 +21,8 @@
         </el-aside>
         <el-main>
           <div class="aside_open_close" @click="asidechange">
-            <i class="el-icon-arrow-left" v-if="asideOpenClose"></i>
-            <i class="el-icon-arrow-right" v-else></i>
+            <i class="el-icon-arrow-left" :class="{ rotate180: !asideStatus }" v-if="asideOpenClose"></i>
+            <i class="el-icon-arrow-right" :class="{ rotate180: asideStatus }" v-else></i>
           </div>
           <transition name="page">
             <router-view />
@@ -34,14 +34,14 @@
 </template>
 
 <script lang="ts">
-import { Vue } from "vue-property-decorator";
+import { Vue, Component } from "vue-property-decorator"
 import Request from "@/utils/requestInstance";
 import defaultPageApi from "@/api/default-page"
 
+@Component
 export default class BaseLayout extends Vue {
   asideStatus: boolean = false;
   asideOpenClose: boolean = false;
-
   // constructor() {
   //   super();
   //   this.asideStatus = false;
@@ -51,6 +51,8 @@ export default class BaseLayout extends Vue {
   created() {
     this.init("test");
   }
+
+
 
 
   async init(params: | string) {
@@ -70,7 +72,7 @@ export default class BaseLayout extends Vue {
     }
   }
 
-  asidechange = () => {
+  asidechange() {
     this.asideStatus = !this.asideStatus
 
     if (this.asideStatus) {
@@ -164,4 +166,23 @@ export default class BaseLayout extends Vue {
   background-color: #FF8E2B;
   color: #fff;
 }
+
+@keyframes rotate180 {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(90deg);
+  }
+  100% {
+    transform: rotate(180deg);
+  }
+}
+
+.rotate180 {
+  animation-name: rotate180;
+  animation-duration: 0.5s;
+  animation-fill-mode: forwards;
+}
+
 </style>
