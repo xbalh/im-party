@@ -43,8 +43,8 @@
       <div class="arsenal">
         <div v-for="(url, index) in wpUrls" 
         :key="index" 
-        class="wp-image" 
-        :style="{ 'background-image': `url(${url})` }">
+        class="wp-image">
+        <img :src="url" class="wp-image" >
         </div>
         
       </div>
@@ -126,7 +126,7 @@ export default class GeometryChaos extends Vue {
   fightId: any = null;
   fightInfo: BattleInfo | any;
   fightMessage: string = "";
-  wpUrls: Array<string> = [];
+  wpUrls: Array<NodeRequire> = [];
   round: number = 0;
   //对局是否已结束
   isEnd: boolean = false;
@@ -167,7 +167,7 @@ export default class GeometryChaos extends Vue {
       console.log("自己信息：" + this.selfInfo);
       const wpNames = this.selfInfo.wpInfo.wpNameHolding.split(",");
       this.wpUrls = wpNames.map(
-        (wpName: string) => '../assets/gcimages/' + wpName.trim() + '.png'
+        (wpName: string) => require('../../../../assets/gcimages/' + wpName.trim() + '.png')
       );
       
       this.loadedSelf = true;
@@ -356,5 +356,6 @@ span {
   background-repeat: no-repeat;
   background-size: cover;
   border-radius: 50%;
+  display: inline-block;
 }
 </style>
