@@ -1,7 +1,7 @@
-package com.im.imparty.music.api;
+package com.im.imparty.api.music;
 
 import com.alibaba.fastjson.JSONObject;
-import com.im.imparty.music.interceptor.MusicRequestInterceptor;
+import com.im.imparty.api.interceptor.MusicRequestInterceptor;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;

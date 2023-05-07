@@ -2,7 +2,7 @@ package com.im.imparty.music.service.impl;
 
 import cn.hutool.core.collection.ConcurrentHashSet;
 import com.alibaba.fastjson.JSONObject;
-import com.im.imparty.music.api.LoginApi;
+import com.im.imparty.api.music.LoginApi;
 import com.im.imparty.music.service.MusicLoginService;
 import com.im.imparty.spring.util.MusicCacheUtils;
 import com.im.imparty.user.service.UserService;

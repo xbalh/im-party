@@ -1,13 +1,12 @@
 package com.im.imparty.music;
 
 import com.im.imparty.BaseTest;
-import com.im.imparty.music.api.LoginApi;
-import com.im.imparty.music.api.MusicApi;
+import com.im.imparty.api.music.LoginApi;
+import com.im.imparty.api.music.MusicApi;
 import com.im.imparty.music.service.MusicLoginService;
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
 
 public class LoginApiTest extends BaseTest {
 

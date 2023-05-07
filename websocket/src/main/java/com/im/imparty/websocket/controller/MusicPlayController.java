@@ -1,8 +1,10 @@
 package com.im.imparty.websocket.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.im.imparty.websocket.WebsocketSessionImpl;
 import com.im.imparty.websocket.annotation.ActionController;
 import com.im.imparty.websocket.annotation.ActionMethod;
+import com.im.imparty.websocket.util.MsgData;
 
 import java.io.IOException;
 
@@ -21,12 +23,12 @@ public class MusicPlayController {
      * @param msg
      */
     @ActionMethod("/chat")
-    public String receiveChatMsg(WebsocketSessionImpl session, String msg) throws IOException {
-
-        session.getSessionManager().broadcastMsg("asd");
-        session.getSessionManager().count();
-        session.sendMessage("sss");
-        return "收到了";
+    public void receiveChatMsg(WebsocketSessionImpl session, String msg) throws IOException {
+        MsgData res = new MsgData("/music/chat");
+        res.putData("from", session.getUserName());
+        res.putData("msg", msg);
+        res.putData("timestamp", System.currentTimeMillis());
+        session.getSessionManager().broadcastMsg(res.toJSONString());
     }
 
 }

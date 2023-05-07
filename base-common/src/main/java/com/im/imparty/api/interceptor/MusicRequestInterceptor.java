@@ -1,4 +1,4 @@
-package com.im.imparty.music.interceptor;
+package com.im.imparty.api.interceptor;
 
 import com.im.imparty.spring.util.MusicCacheUtils;
 import feign.RequestInterceptor;

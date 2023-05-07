@@ -2,7 +2,7 @@ package com.im.imparty.music.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.im.imparty.music.api.MusicApi;
+import com.im.imparty.api.music.MusicApi;
 import com.im.imparty.music.service.MusicSongService;
 import org.springframework.stereotype.Service;
 
