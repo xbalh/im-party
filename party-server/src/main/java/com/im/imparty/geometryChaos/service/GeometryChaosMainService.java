@@ -19,7 +19,7 @@ public interface GeometryChaosMainService {
      *
      * @param userName
      **/
-    PersonFightInfo getUserFightInfo(String userName) throws CustomException;
+    PersonFightInfo getUserFightInfo(String userName);
 
     /**
      * 开始参数

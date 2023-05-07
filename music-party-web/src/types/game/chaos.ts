@@ -28,8 +28,21 @@ export interface WpInfo {
     userName: string,
     wpHolding: string,
     wpNameHolding: string,
+    wpDicList: Array<WpDic>,
 }
 
+export interface WpDic {
+    wpStr: number;
+    wpWit: number;
+    wpAgi: number;
+    wpHlt: number;
+    wpType: string;
+    wpName: string;
+    wpRarity: string;
+    wpSize: string;
+    wpAtkType: string;
+    wpDetail: string;
+}
 
 export interface BattleInfo {
     createTime: string,
@@ -43,3 +56,7 @@ export interface BattleInfo {
     surplusCd: string
 }
 
+export interface WpNodesInfo {
+    imageUrl: NodeRequire,
+    wpDic : WpDic
+}

@@ -19,6 +19,7 @@ public class WpDic {
     private Integer wpAgi;
     private Integer wpHlt;
     private String wpType;
+    private String wpDetail;
     private String wpName;
     private String wpRarity;
     private String wpSize;

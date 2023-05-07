@@ -20,6 +20,7 @@ import com.im.imparty.user.entity.UserDomain;
 import com.im.imparty.user.mapper.UserMapper;
 import com.im.imparty.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -100,6 +101,7 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
         wpWrapper.eq("user_name", userName);
         WpInfo wpInfo = wpInfoMapper.selectOne(wpWrapper);
         String wpNameStr = "";
+        List<WpDic> wpDics = new ArrayList<>();
         for (String wpStr : wpInfo.getWpHolding().split(",")) {
             WpDic wpDic = wpDicMapper.selectById(wpStr);
             String wpName = wpDic.getWpName();
@@ -108,10 +110,14 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
             } else {
                 wpNameStr = wpNameStr + "," + wpName;
             }
+            wpDics.add(wpDic);
         }
         if (StrUtil.isNotBlank(wpNameStr)) {
             wpInfo.setWpNameHolding(wpNameStr);
         }
+        WpInfoResp wpInfoResp = new WpInfoResp();
+        BeanUtils.copyProperties(wpInfo, wpInfoResp);
+        wpInfoResp.setWpDicList(wpDics);
         PersonFightInfo personFightInfo = new PersonFightInfo();
         Integer str = userStaticInfo.getStr();
         Integer agi = userStaticInfo.getAgi();
@@ -129,9 +135,8 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
 
             }
         }
-
         personFightInfo.setName(userStaticInfo.getUserName())
-                .setWpInfo(wpInfo)
+                .setWpInfo(wpInfoResp)
                 .setHp(DataConstant.STATIC_HEALTH + htl * DataConstant.HTL_TO_HEALTH)
                 .setStr(str)
                 .setWit(wit)
@@ -511,7 +516,7 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
         });
         List<String> usedWeapon = user.getUsedWeapon();
 
-        WpInfo wpInfo = user.getWpInfo();
+        WpInfoResp wpInfo = user.getWpInfo();
         List<String> wpInfoList = new ArrayList<>();
         if (wpInfo.getWpHolding() != null) {
             wpInfoList = Arrays.asList(wpInfo.getWpHolding().split(","));

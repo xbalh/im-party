@@ -17,7 +17,7 @@ public class DataConstant {
 
     public static final Integer HTL_TO_HEALTH = 12;
     public static final Integer AGI_TO_BLK = 100;
-    public static final Integer AGI_TO_BLK_PER = 0;
+    public static final Integer AGI_TO_BLK_PER = 1;
     public static final Integer AGI_TO_CRI = 150;
     public static final Integer AGI_TO_CRI_PER = 3;
     public static final Integer AGI_TO_MISS = 30;

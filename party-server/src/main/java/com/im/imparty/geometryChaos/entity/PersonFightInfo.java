@@ -31,5 +31,5 @@ public class PersonFightInfo {
     private BigDecimal finalDef;
     private List<String> usedWeapon;
     private List<BuffInfo> buff;
-    private WpInfo wpInfo;
+    private WpInfoResp wpInfo;
 }

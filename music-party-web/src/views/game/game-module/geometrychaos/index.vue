@@ -5,26 +5,35 @@
     </div>
     <div class="parent" v-if="loadedSelf">
       <div class="child">
-        挑战者
+        进攻方
+        <br>
+        <br>
         <span>
-          名称：{{ selfInfo?.name }}<br />
-          血量：{{ selfInfo?.hp }}<br />
+          <!-- 名称：{{ selfInfo?.name }}<br /> -->
+          HP：{{ selfInfo?.hp }}<br />
         </span>
       </div>
-      <div class="child">
-        被挑战者
-        <div v-if="!loadedEnemy">
+      <div class="child" >
+        防守方
+        <br>
+        <br>
+        <span>
+          <!-- 名称：{{ enemyInfo?.name }}<br /> -->
+          HP：{{ enemyInfo?.hp ? enemyInfo.hp : '？' }}
+          <br />
+        </span>
+      </div>
+      
+      <div v-if="!loadedEnemy" class="fightButton">
           <el-button @click="selectEnemyDialogVisble = true"
-            >选择一位想要挑战的对象</el-button
+            >选择挑战对象</el-button
           >
         </div>
-        <span>
-          名称：{{ enemyInfo?.name }}<br />
-          血量：{{ enemyInfo?.hp }}<br />
-        </span>
-      </div>
     </div>
-    <div v-if="!isStarted" class="selfInfo" style="margin-top: 50px; margin-left: 75px">
+    <div
+      v-if="!isStarted"
+      class="selfInfo"
+    >
       <div class="selfKeyInfo">
         <div v-for="(value, key) in selfInfo" :key="key">
           <span v-if="isMessageStringOrNumber(value)"
@@ -41,12 +50,18 @@
     <div>
       <span>军火库展示</span>
       <div class="arsenal">
-        <div v-for="(url, index) in wpUrls" 
-        :key="index" 
-        class="wp-image">
-        <img :src="url" class="wp-image" >
+        <div v-for="(url, index) in wpUrls" :key="index" class="wp-image-div">
+          <img
+            :src="url.imageUrl"
+            class="wp-image"
+            @mouseover="showaPOP($event, url.wpDic)"
+            @mouseout="showaPOP($event, url.wpDic)"
+            @touchend="showaPOP($event, url.wpDic)"
+          />
+          <div class="popup">
+            <p></p>
+          </div>
         </div>
-        
       </div>
     </div>
 
@@ -55,7 +70,11 @@
       <span v-html="fightMessage"></span><br />
       <span v-if="isEnd">对局已结束</span>
     </div>
-    <el-dialog title="选择挑战对象" :visible.sync="selectEnemyDialogVisble" width="35%">
+    <el-dialog
+      title="选择挑战对象"
+      :visible.sync="selectEnemyDialogVisble"
+      width="35%"
+    >
       <el-table
         ref="enemysTable"
         :data="enemysTableData"
@@ -63,7 +82,8 @@
         @current-change="handleCurrentChange"
         style="width: 100%"
       >
-        <el-table-column prop="userName" label="名称" width="180"> </el-table-column>
+        <el-table-column prop="userName" label="名称" width="180">
+        </el-table-column>
       </el-table>
       <el-button @click="confirmEnemy">确定</el-button>
     </el-dialog>
@@ -87,7 +107,14 @@ import gameApi from "@/api/game";
 import Request from "@/utils/requestInstance";
 import Ws from "@/utils/ws";
 import { namespace } from "vuex-class";
-import { PersonFightInfo, BuffInfo, WpInfo, BattleInfo } from "@/types/game/chaos";
+import {
+  PersonFightInfo,
+  BuffInfo,
+  WpInfo,
+  BattleInfo,
+  WpNodesInfo,
+  WpDic,
+} from "@/types/game/chaos";
 import { UserInfoType } from "@/types/user";
 import ElementUI, { Table } from "element-ui";
 import { ElementUIComponent } from "element-ui/types/component";
@@ -126,10 +153,11 @@ export default class GeometryChaos extends Vue {
   fightId: any = null;
   fightInfo: BattleInfo | any;
   fightMessage: string = "";
-  wpUrls: Array<NodeRequire> = [];
+  wpUrls: Array<WpNodesInfo> = [];
   round: number = 0;
   //对局是否已结束
   isEnd: boolean = false;
+  showPopup: boolean = false;
 
   constructor() {
     super();
@@ -166,21 +194,31 @@ export default class GeometryChaos extends Vue {
       this.selfInfo = res.data.data;
       console.log("自己信息：" + this.selfInfo);
       const wpNames = this.selfInfo.wpInfo.wpNameHolding.split(",");
-      this.wpUrls = wpNames.map(
-        (wpName: string) => require('../../../../assets/gcimages/' + wpName.trim() + '.png')
-      );
-      
+      this.wpUrls = wpNames.map((wpName: string) => {
+        return {
+          imageUrl: require("../../../../assets/gcimages/" +
+            wpName.trim() +
+            ".png"),
+          wpDic: this.selfInfo.wpInfo.wpDicList.find(
+            (item: WpDic) => wpName === item.wpName
+          ),
+        };
+      });
+
       this.loadedSelf = true;
     }
   }
 
   async getEnemyList() {
-    const res = await Request.post(gameApi.geometrychaos.getChallengableFighter, {
-      data: this.curUserInfo.username,
-      headers: {
-        "Content-Type": "application/json; charset=utf-8",
-      },
-    });
+    const res = await Request.post(
+      gameApi.geometrychaos.getChallengableFighter,
+      {
+        data: this.curUserInfo.username,
+        headers: {
+          "Content-Type": "application/json; charset=utf-8",
+        },
+      }
+    );
 
     if (res.data.code === 200) {
       this.enemysTableData = res.data.data;
@@ -297,6 +335,22 @@ export default class GeometryChaos extends Vue {
   isMessageStringOrNumber(value: any) {
     return typeof value === "string" || typeof value === "number";
   }
+
+  showaPOP(event: MouseEvent | TouchEvent, wpDic: WpDic) {
+    console.log(event);
+    console.log(wpDic);
+    const target = event.target as HTMLElement;
+    const nextSibling = target.nextElementSibling as HTMLElement;
+    if (event.type == "mouseover") {
+      nextSibling.setAttribute("class", "popup popupMouseOver");
+      const p = nextSibling.children[0];
+      p.innerHTML = wpDic.wpName +"<br><br>"+ wpDic.wpRarity +"<br><br>"+ wpDic.wpDetail;
+    } else {
+      nextSibling.setAttribute("class", "popup");
+    }
+  }
+
+  
 }
 </script>
 
@@ -304,17 +358,20 @@ export default class GeometryChaos extends Vue {
 .el-main {
   text-align: left !important;
 }
-body,
-p {
+body {
   background-image: linear-gradient(-20deg, #e9defa 0%, #fbfcdb 100%);
   margin: 0;
 }
-
+p {
+  margin: 0;
+}
 span {
   line-height: 2;
+  font-size:20px;
 }
 
 .parent {
+  margin: 5%;
   display: flex;
 }
 
@@ -327,11 +384,15 @@ span {
   margin-left: 20px;
 }
 
+.fightButton {
+  display:inline-block;
+  float:right;
+}
+
 .selfInfo {
-  margin-left: 20px;
+  margin: 5%;
   div {
-    font-size: 16px;
-    width: 120px;
+    width: 100px;
     text-align: left;
   }
 }
@@ -345,7 +406,7 @@ span {
 }
 
 .arsenal {
-  width: 30%;
+  width: 50%;
   background-image: linear-gradient(to right, #ffecd2 0%, #fcb69f 100%);
 }
 
@@ -355,7 +416,48 @@ span {
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
-  border-radius: 50%;
+  background-image: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
+  border-radius: 99%;
   display: inline-block;
 }
+
+.wp-image-div {
+  width: 80px;
+  height: 80px;
+  margin: 8px;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border-radius: 99%;
+  display: inline-block;
+  position: relative;
+}
+
+.popup {
+  position: absolute;
+  visibility: hidden;
+  display: block;
+  z-index: 999;
+  top: -110px;
+  right: -210px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #ddd;
+  border: 1px solid #ccc;
+  padding: 10px;
+  width: 200px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+}
+
+.popupMouseOver {
+  visibility: visible !important;
+  transition: opacity 0.4s ease-in-out;
+  opacity: 1 !important;
+}
+
+// .wp-image:hover {
+//   .popup {
+//     opacity: 1;transition: opacity 0.4s ease-in-out; /* 设置渐变过渡效果 */
+//   }
+// }
 </style>

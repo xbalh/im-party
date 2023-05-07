@@ -15,6 +15,7 @@ import com.im.imparty.geometryChaos.service.PVEMainService;
 import com.im.imparty.user.entity.UserDomain;
 import com.im.imparty.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,7 +76,7 @@ public class PVEMainServiceImpl implements PVEMainService {
         List<SkDic> skDics = skDicMapper.selectList(skDicQueryWrapper);
         List<SkDic> chooseSk = new ArrayList<>();
         if (specialSkNum >= skDics.size()) {
-            chooseSk=  skDics;
+            chooseSk = skDics;
         }
         Random randomSk = new Random(System.currentTimeMillis());
         while (chooseSk.size() < specialSkNum) {
@@ -121,6 +122,8 @@ public class PVEMainServiceImpl implements PVEMainService {
         QueryWrapper<WpInfo> wpWrapper = new QueryWrapper<>();
         wpWrapper.eq("user_name", userName);
         WpInfo wpInfo = wpInfoMapper.selectOne(wpWrapper);
+        WpInfoResp wpInfoResp = new WpInfoResp();
+        BeanUtils.copyProperties(wpInfo, wpInfoResp);
         PersonFightInfo personFightInfo = new PersonFightInfo();
         Integer str = userStaticInfo.getStr();
         Integer agi = userStaticInfo.getAgi();
@@ -140,8 +143,8 @@ public class PVEMainServiceImpl implements PVEMainService {
         }
 
         personFightInfo.setName(userStaticInfo.getUserName())
-                .setWpInfo(wpInfo)
-                .setHp(DataConstant.STATIC_HEALTH + htl * DataConstant.HTL_TO_HEALTH)
+                .setWpInfo(wpInfoResp)
+                .setHp((int) (DataConstant.STATIC_HEALTH + htl * DataConstant.HTL_TO_HEALTH))
                 .setStr(str)
                 .setWit(wit)
                 .setSpd(spd)
