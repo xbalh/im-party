@@ -3,15 +3,15 @@
     <div v-if="!loadedSelf">
       <el-button @click="createCharacter">创建角色</el-button>
     </div>
-    <div class="parent" style="background-color: lightgrey" v-if="loadedSelf">
-      <div class="child" style="background-color: lightblue">
+    <div class="parent" v-if="loadedSelf">
+      <div class="child">
         挑战者
         <span>
           名称：{{ selfInfo?.name }}<br />
           血量：{{ selfInfo?.hp }}<br />
         </span>
       </div>
-      <div class="child" style="background-color: lightgreen">
+      <div class="child">
         被挑战者
         <div v-if="!loadedEnemy">
           <el-button @click="selectEnemyDialogVisble = true"
@@ -24,7 +24,33 @@
         </span>
       </div>
     </div>
+    <div v-if="!isStarted" class="selfInfo" style="margin-top: 50px; margin-left: 75px">
+      <div class="selfKeyInfo">
+        <div v-for="(value, key) in selfInfo" :key="key">
+          <span v-if="isMessageStringOrNumber(value)"
+            >{{ $t(`geometryChaos.${key}`) }}
+          </span>
+        </div>
+      </div>
+      <div class="selfValueInfo">
+        <div v-for="(value, key) in selfInfo" :key="key">
+          <span v-if="isMessageStringOrNumber(value)"> {{ value }} </span>
+        </div>
+      </div>
+    </div>
     <div>
+      <span>军火库展示</span>
+      <div class="arsenal">
+        <div v-for="(url, index) in wpUrls" 
+        :key="index" 
+        class="wp-image" 
+        :style="{ 'background-image': `url(${url})` }">
+        </div>
+        
+      </div>
+    </div>
+
+    <div v-if="isStarted">
       当前回合: {{ round }}<br />
       <span v-html="fightMessage"></span><br />
       <span v-if="isEnd">对局已结束</span>
@@ -100,6 +126,7 @@ export default class GeometryChaos extends Vue {
   fightId: any = null;
   fightInfo: BattleInfo | any;
   fightMessage: string = "";
+  wpUrls: Array<string> = [];
   round: number = 0;
   //对局是否已结束
   isEnd: boolean = false;
@@ -114,7 +141,7 @@ export default class GeometryChaos extends Vue {
     //获取当前用户对战信息
     this.getCurrentUserInfo();
     //获取敌人选择列表
-    this.getEnemyList()
+    this.getEnemyList();
   }
 
   async getCurrentUserInfo() {
@@ -138,25 +165,26 @@ export default class GeometryChaos extends Vue {
     if (res.data.code === 200) {
       this.selfInfo = res.data.data;
       console.log("自己信息：" + this.selfInfo);
+      const wpNames = this.selfInfo.wpInfo.wpNameHolding.split(",");
+      this.wpUrls = wpNames.map(
+        (wpName: string) => '../assets/gcimages/' + wpName.trim() + '.png'
+      );
+      
       this.loadedSelf = true;
     }
   }
 
-  async getEnemyList(){
-    const res = await Request.post(
-      gameApi.geometrychaos.getChallengableFighter,
-      {
-        data: this.curUserInfo.username,
-        headers: {
-          "Content-Type": "application/json; charset=utf-8",
-        },
-      }
-    );
+  async getEnemyList() {
+    const res = await Request.post(gameApi.geometrychaos.getChallengableFighter, {
+      data: this.curUserInfo.username,
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+      },
+    });
 
-      if(res.data.code === 200){
-        this.enemysTableData = res.data.data
-      }
-
+    if (res.data.code === 200) {
+      this.enemysTableData = res.data.data;
+    }
   }
 
   async getEnemyInfo(userName: string) {
@@ -205,6 +233,7 @@ export default class GeometryChaos extends Vue {
   }
 
   handleCurrentChange(val: any) {
+    console.log(val);
     this.currentRow = val;
   }
 
@@ -264,12 +293,20 @@ export default class GeometryChaos extends Vue {
     this.fightId = this.fightInfo.id;
     this.isEnd = this.fightInfo.ifEnd;
   }
+
+  isMessageStringOrNumber(value: any) {
+    return typeof value === "string" || typeof value === "number";
+  }
 }
 </script>
 
 <style lang="scss">
+.el-main {
+  text-align: left !important;
+}
 body,
 p {
+  background-image: linear-gradient(-20deg, #e9defa 0%, #fbfcdb 100%);
   margin: 0;
 }
 
@@ -288,5 +325,36 @@ span {
 
 .child + .child {
   margin-left: 20px;
+}
+
+.selfInfo {
+  margin-left: 20px;
+  div {
+    font-size: 16px;
+    width: 120px;
+    text-align: left;
+  }
+}
+
+.selfKeyInfo {
+  display: inline-block;
+}
+
+.selfValueInfo {
+  display: inline-block;
+}
+
+.arsenal {
+  width: 30%;
+  background-image: linear-gradient(to right, #ffecd2 0%, #fcb69f 100%);
+}
+
+.wp-image {
+  width: 80px;
+  height: 80px;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border-radius: 50%;
 }
 </style>

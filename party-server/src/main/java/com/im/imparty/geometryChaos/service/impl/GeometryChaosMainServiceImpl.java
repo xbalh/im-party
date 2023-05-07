@@ -99,6 +99,19 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
         QueryWrapper<WpInfo> wpWrapper = new QueryWrapper<>();
         wpWrapper.eq("user_name", userName);
         WpInfo wpInfo = wpInfoMapper.selectOne(wpWrapper);
+        String wpNameStr = "";
+        for (String wpStr : wpInfo.getWpHolding().split(",")) {
+            WpDic wpDic = wpDicMapper.selectById(wpStr);
+            String wpName = wpDic.getWpName();
+            if (StrUtil.isBlank(wpNameStr)) {
+                wpNameStr = wpName;
+            } else {
+                wpNameStr = wpNameStr + "," + wpName;
+            }
+        }
+        if (StrUtil.isNotBlank(wpNameStr)) {
+            wpInfo.setWpNameHolding(wpNameStr);
+        }
         PersonFightInfo personFightInfo = new PersonFightInfo();
         Integer str = userStaticInfo.getStr();
         Integer agi = userStaticInfo.getAgi();
@@ -1262,76 +1275,76 @@ public class GeometryChaosMainServiceImpl implements GeometryChaosMainService {
     public static void main(String[] args) {
         JSONObject resultJSON = new JSONObject();
         // 流量信息
-        resultJSON.put("todayHighwayTotal","3.8"); // 全省高速流量
-        resultJSON.put("intoTotal","20.07"); // 入浙流量
-        resultJSON.put("outTotal","18.7"); // 出浙流量
-        resultJSON.put("hzIntoTotal","3.27"); // 杭州市在途数
-        resultJSON.put("delayIndex","1.32"); // 延误指数
-        resultJSON.put("hzIntoTotalYearOnYearPer","24"); // 杭州市在途数同比
-        resultJSON.put("hzIntoTotalRingPer","-4"); // 杭州市在途数环比
+        resultJSON.put("todayHighwayTotal", "3.8"); // 全省高速流量
+        resultJSON.put("intoTotal", "20.07"); // 入浙流量
+        resultJSON.put("outTotal", "18.7"); // 出浙流量
+        resultJSON.put("hzIntoTotal", "3.27"); // 杭州市在途数
+        resultJSON.put("delayIndex", "1.32"); // 延误指数
+        resultJSON.put("hzIntoTotalYearOnYearPer", "24"); // 杭州市在途数同比
+        resultJSON.put("hzIntoTotalRingPer", "-4"); // 杭州市在途数环比
 
         // 警情信息
-        resultJSON.put("todayIllegalTotal","32700"); // 全省总量
-        resultJSON.put("todayIllegalTotalYearOnYearPer","-9.66"); // 全省总量同比
-        resultJSON.put("todayIllegalTotalRingPer","-7.30"); // 全省总量环比
-        resultJSON.put("todayPoliceTotal","19300"); // 重大警情
-        resultJSON.put("todayPoliceTotalYearOnYearPer","-11.51"); // 重大警情同比
-        resultJSON.put("todayPoliceTotalRingPer","-8.86"); // 重大警情环比
+        resultJSON.put("todayIllegalTotal", "32700"); // 全省总量
+        resultJSON.put("todayIllegalTotalYearOnYearPer", "-9.66"); // 全省总量同比
+        resultJSON.put("todayIllegalTotalRingPer", "-7.30"); // 全省总量环比
+        resultJSON.put("todayPoliceTotal", "19300"); // 重大警情
+        resultJSON.put("todayPoliceTotalYearOnYearPer", "-11.51"); // 重大警情同比
+        resultJSON.put("todayPoliceTotalRingPer", "-8.86"); // 重大警情环比
 
         // 违法信息
-        resultJSON.put("importantIllegalTotal","6.45"); // 重点违法数量
-        resultJSON.put("importantIllegalTotalYearOnYearPer","11.01"); // 重点违法数量同比
-        resultJSON.put("importantIllegalTotalRingPer","11.01"); // 重点违法数量环比
-        resultJSON.put("onsiteIllegalTotal","97"); // 现场查处数量
-        resultJSON.put("onsiteIllegalTotalYearOnYearPer","-48.01"); // 现场查处数量同比
-        resultJSON.put("onsiteIllegalTotalRingPer","-43.42"); // 现场查处数量环比
+        resultJSON.put("importantIllegalTotal", "6.45"); // 重点违法数量
+        resultJSON.put("importantIllegalTotalYearOnYearPer", "11.01"); // 重点违法数量同比
+        resultJSON.put("importantIllegalTotalRingPer", "11.01"); // 重点违法数量环比
+        resultJSON.put("onsiteIllegalTotal", "97"); // 现场查处数量
+        resultJSON.put("onsiteIllegalTotalYearOnYearPer", "-48.01"); // 现场查处数量同比
+        resultJSON.put("onsiteIllegalTotalRingPer", "-43.42"); // 现场查处数量环比
 
         // 事故信息
-        resultJSON.put("accidentTotal","74"); // 事故总数
-        resultJSON.put("accidentTotalYearOnYearPer","-21.20"); // 事故总数同比
-        resultJSON.put("accidentTotalRingPer","-21.20"); //事故总数环比
-        resultJSON.put("quickHandleTotal","25.4"); // 浙里快处
-        resultJSON.put("quickHandleTotalYearOnYearPer","-11.10"); // 浙里快处同比
-        resultJSON.put("quickHandleTotalRingPer","-11.10"); // 浙里快处环比
-        resultJSON.put("accidentDieTotal","21"); // 亡人数量
-        resultJSON.put("foreignAffairTotal","38"); // 涉外总数
-        resultJSON.put("commuterLineTotal","0"); // 通勤路线数量
+        resultJSON.put("accidentTotal", "74"); // 事故总数
+        resultJSON.put("accidentTotalYearOnYearPer", "-21.20"); // 事故总数同比
+        resultJSON.put("accidentTotalRingPer", "-21.20"); //事故总数环比
+        resultJSON.put("quickHandleTotal", "25.4"); // 浙里快处
+        resultJSON.put("quickHandleTotalYearOnYearPer", "-11.10"); // 浙里快处同比
+        resultJSON.put("quickHandleTotalRingPer", "-11.10"); // 浙里快处环比
+        resultJSON.put("accidentDieTotal", "21"); // 亡人数量
+        resultJSON.put("foreignAffairTotal", "38"); // 涉外总数
+        resultJSON.put("commuterLineTotal", "0"); // 通勤路线数量
 
         // 文明信息
-        resultJSON.put("illegalPer","98"); // 综合守法率
-        resultJSON.put("illegalPerYearOnYearPer","24"); // 综合守法率同比
-        resultJSON.put("illegalPerRingPer","24"); // 综合守法率环比
-        resultJSON.put("illegalPerVehicle","98"); // 综合守法率-机动车
-        resultJSON.put("illegalPerNonVehicle","98"); // 综合守法率-非机动车
-        resultJSON.put("illegalPerPedestrian","98"); // 综合守法率-行人
+        resultJSON.put("illegalPer", "98"); // 综合守法率
+        resultJSON.put("illegalPerYearOnYearPer", "24"); // 综合守法率同比
+        resultJSON.put("illegalPerRingPer", "24"); // 综合守法率环比
+        resultJSON.put("illegalPerVehicle", "98"); // 综合守法率-机动车
+        resultJSON.put("illegalPerNonVehicle", "98"); // 综合守法率-非机动车
+        resultJSON.put("illegalPerPedestrian", "98"); // 综合守法率-行人
 
         // 省级挂牌治理进度
-        resultJSON.put("accidentProneSegment","46/46"); // 事故多发点段
-        resultJSON.put("importantTown","30/30"); // 重点乡镇
-        resultJSON.put("importantCompany","30/30"); // 重点企业
+        resultJSON.put("accidentProneSegment", "46/46"); // 事故多发点段
+        resultJSON.put("importantTown", "30/30"); // 重点乡镇
+        resultJSON.put("importantCompany", "30/30"); // 重点企业
 
         // 车管服务
         // 人车底数
-        resultJSON.put("peopleNum","2627.40"); // 驾驶人保有量
-        resultJSON.put("vehiclesNum","2403.11"); // 机动车保有量
+        resultJSON.put("peopleNum", "2627.40"); // 驾驶人保有量
+        resultJSON.put("vehiclesNum", "2403.11"); // 机动车保有量
 
         // 重点车三率
-        resultJSON.put("dangerousVehiclesThirdPer","95.42%,94.56%,100%"); // 危货车三率
-        resultJSON.put("passengerVehiclesThirdPer","97.01%,95.64%,100%"); // 两客车三率
-        resultJSON.put("heavyVehiclesThirdPer","95.42%,94.56%,98.95%"); // 重货车三率
-        resultJSON.put("schoolVehiclesThirdPer","99.64%,99.55%,100%"); // 校车三率
+        resultJSON.put("dangerousVehiclesThirdPer", "95.42%,94.56%,100%"); // 危货车三率
+        resultJSON.put("passengerVehiclesThirdPer", "97.01%,95.64%,100%"); // 两客车三率
+        resultJSON.put("heavyVehiclesThirdPer", "95.42%,94.56%,98.95%"); // 重货车三率
+        resultJSON.put("schoolVehiclesThirdPer", "99.64%,99.55%,100%"); // 校车三率
 
         // 警务保障
         // 安保圈层
-        resultJSON.put("provincialLaunchesNum","53"); // 省级启动数
-        resultJSON.put("cityLaunchesNum","53"); // 市级启动数
-        resultJSON.put("coreLaunchesNum","53"); // 核心级启动数
-        resultJSON.put("investigationVehiclesNum","240"); // 排查车辆总数
-        resultJSON.put("getVehiclesNum","81"); // 查货车辆总数
+        resultJSON.put("provincialLaunchesNum", "53"); // 省级启动数
+        resultJSON.put("cityLaunchesNum", "53"); // 市级启动数
+        resultJSON.put("coreLaunchesNum", "53"); // 核心级启动数
+        resultJSON.put("investigationVehiclesNum", "240"); // 排查车辆总数
+        resultJSON.put("getVehiclesNum", "81"); // 查货车辆总数
 
         // 警力信息
-        resultJSON.put("todayPoliceNum","801"); // 当日出动警力
-        resultJSON.put("allPoliceNum","1802"); // 累计出动警力
+        resultJSON.put("todayPoliceNum", "801"); // 当日出动警力
+        resultJSON.put("allPoliceNum", "1802"); // 累计出动警力
 
         System.out.println(resultJSON.toString());
     }

@@ -22,7 +22,11 @@
         </el-aside>
         <el-main>
           <div class="aside_open_close" @click="asidechange">
-            <i class="el-icon-arrow-left" :class="{ rotate180: !asideStatus }" v-if="asideOpenClose"></i>
+            <i
+              class="el-icon-arrow-left"
+              :class="{ rotate180: !asideStatus }"
+              v-if="asideOpenClose"
+            ></i>
             <i class="el-icon-arrow-right" :class="{ rotate180: asideStatus }" v-else></i>
           </div>
           <transition name="page">
@@ -35,21 +39,20 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from "vue-property-decorator"
+import { Vue, Component } from "vue-property-decorator";
 import Request from "@/utils/requestInstance";
-import defaultPageApi from "@/api/default-page"
-import { namespace } from "vuex-class"
+import defaultPageApi from "@/api/default-page";
+import { namespace } from "vuex-class";
 
-const permissionsStore = namespace('permissionsStore')
-const userStore = namespace('userStore')
+const permissionsStore = namespace("permissionsStore");
+const userStore = namespace("userStore");
 
 @Component
 export default class BaseLayout extends Vue {
-  @permissionsStore.Mutation('setPermissions') setPermissions!: Function
-  @userStore.Mutation('setToken') setToken!: Function
-  @userStore.Mutation('setRefreshToken') setRefreshToken!: Function
-  @userStore.Mutation('setUserInfo') setUserInfo!: Function
-
+  @permissionsStore.Mutation("setPermissions") setPermissions!: Function;
+  @userStore.Mutation("setToken") setToken!: Function;
+  @userStore.Mutation("setRefreshToken") setRefreshToken!: Function;
+  @userStore.Mutation("setUserInfo") setUserInfo!: Function;
 
   asideStatus: boolean = false;
   asideOpenClose: boolean = false;
@@ -63,12 +66,9 @@ export default class BaseLayout extends Vue {
     this.init("test");
   }
 
-
-
-
-  async init(params: | string) {
+  async init(params: string) {
     console.log(params, "init", this.asideStatus);
-    console.log("this.asideStatus", this.asideStatus)
+    console.log("this.asideStatus", this.asideStatus);
     try {
       const res = await Request.get(
         defaultPageApi.home.init,
@@ -77,33 +77,31 @@ export default class BaseLayout extends Vue {
         },
         { isNeedToken: true }
       );
-
     } catch (error) {
       console.error(error, "init");
     }
   }
 
   asidechange() {
-    this.asideStatus = !this.asideStatus
+    this.asideStatus = !this.asideStatus;
 
     if (this.asideStatus) {
       setTimeout(() => {
-        this.asideOpenClose = true
-      }, 500)
+        this.asideOpenClose = true;
+      }, 500);
     } else {
       setTimeout(() => {
-        this.asideOpenClose = false
-      }, 500)
+        this.asideOpenClose = false;
+      }, 500);
     }
   }
 
   quit() {
-    this.setToken('')
-    this.setRefreshToken('')
-    this.setUserInfo('')
-    this.$router.replace({ path: '/login' })
+    this.setToken("");
+    this.setRefreshToken("");
+    this.setUserInfo("");
+    this.$router.replace({ path: "/login" });
   }
-
 }
 </script>
 
@@ -164,7 +162,6 @@ export default class BaseLayout extends Vue {
 
   ul li {
     opacity: 1 !important;
-    ;
   }
 }
 
@@ -187,7 +184,7 @@ export default class BaseLayout extends Vue {
   height: 60px;
   line-height: 60px;
   color: #fff;
-  background-color: #2A333A;
+  background-color: #2a333a;
   border-radius: 0 6px 6px 0;
   font-size: 20px;
   z-index: 1000;
@@ -195,7 +192,7 @@ export default class BaseLayout extends Vue {
 }
 
 .aside_open_close:hover {
-  background-color: #FF8E2B;
+  background-color: #ff8e2b;
   color: #fff;
 }
 

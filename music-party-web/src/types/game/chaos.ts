@@ -1,13 +1,13 @@
 export interface PersonFightInfo {
     agi: number,
-    blk: number,
-    blkPer: number,
+    blk: string,
+    blkPer: string,
     buff: Array<BuffInfo>,
-    ca: number,
-    cri: number,
-    criPer: number,
-    finalAtk: number,
-    finalDef: number,
+    ca: string,
+    cri: string,
+    criPer: string,
+    finalAtk: string,
+    finalDef: string,
     hp: number,
     htl: number,
     name: string,
@@ -26,7 +26,8 @@ export interface BuffInfo {
 export interface WpInfo {
     skHolding: string,
     userName: string,
-    wpHolding: string
+    wpHolding: string,
+    wpNameHolding: string,
 }
 
 

@@ -9,3 +9,25 @@ body,
     height: 100%;
     width: 100%;
 }
+
+/* 对于屏幕宽度小于等于 768px 的设备 */
+@media screen and (max-width: 768px) {
+    body {
+        font-size: 1px;
+    }
+
+    .content {
+        width: 90%;
+    }
+}
+
+/* 对于屏幕宽度在 768px 到 1024px 之间的设备 */
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+    body {
+        font-size: 100px;
+    }
+
+    .content {
+        width: 80%;
+    }
+}

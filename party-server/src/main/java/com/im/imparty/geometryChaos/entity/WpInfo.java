@@ -15,6 +15,7 @@ public class WpInfo {
     @TableId
     private String userName;
     private String wpHolding;
+    private String wpNameHolding;
     private String skHolding;
     private String friendHolding;
     private String insHolding;

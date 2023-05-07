@@ -16,6 +16,7 @@ time, mark, audio, video {
 	border: 0;
 	font-size: 100%;
 	font: inherit;
+	font-family: 'MyFont', sans-serif;
 	vertical-align: baseline;
 }
 /* HTML5 display-role reset for older browsers */
@@ -40,4 +41,44 @@ q:before, q:after {
 table {
 	border-collapse: collapse;
 	border-spacing: 0;
+}
+
+/* 
+
+@media screen and (max-width: 768px) {
+	body {
+		font-size: 100% !important;
+	}	
+
+	.content {
+		width: 90% !important;
+	}
+}
+
+@media screen and (min-width: 768px) and (max-width: 1081px) {
+	body {
+		font-size: 120% !important;
+	}
+
+	.content {
+		width: 80% !important;
+	}
+}
+@media screen and (min-width: 1081px) and (max-width: 4000px) {
+	body {
+		font-size: 140% !important;
+	}
+
+	.content {
+		width: 80% !important;
+	}
+} 
+*/
+
+@font-face {
+	font-family: 'MyFont';
+	src: url('汉仪润圆-75W.ttf') format('truetype');
+	/* 如果是 woff2 格式的字体，可以使用以下写法：
+  src: url('fonts/myfont.woff2') format('woff2');
+  */
 }
