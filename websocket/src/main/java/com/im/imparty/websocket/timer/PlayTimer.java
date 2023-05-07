@@ -1,14 +1,12 @@
 package com.im.imparty.websocket.timer;
 
-import org.springframework.util.StopWatch;
-
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.function.Function;
 
 public class PlayTimer {
 
-    private StopWatch stopWatch;
+    private TimeWatch stopWatch;
 
     private long startTime;
 
@@ -45,7 +43,7 @@ public class PlayTimer {
     public void play(long startTime) {
         if (startTime <= totalTime) {
             this.startTime = startTime;
-            this.stopWatch = new StopWatch();
+            this.stopWatch = new TimeWatch();
             this.stopWatch.start();
             initTimer();
         }
@@ -61,9 +59,7 @@ public class PlayTimer {
     }
 
     public long getCurrentTime() {
-        stopWatch.stop();
-        stopWatch.start();
-        return startTime + (stopWatch.getTotalTimeNanos() / 1000000000);
+        return startTime + (stopWatch.getTotalTime() / 1000);
     }
 
     public boolean checkOver() {
@@ -93,6 +89,38 @@ public class PlayTimer {
                 } catch (InterruptedException e) {
                 }
             }
+        }
+    }
+
+    private class TimeWatch {
+
+        private long startTimeStamp;
+
+        private long totalTimeStamp;
+
+        public TimeWatch() {
+            this.startTimeStamp = 0;
+            this.totalTimeStamp = 0;
+        }
+
+        public synchronized void start() {
+            if (this.startTimeStamp == 0) {
+                this.startTimeStamp = System.currentTimeMillis();
+            }
+        }
+
+        public synchronized void stop() {
+            if (this.startTimeStamp > 0) {
+                this.totalTimeStamp += (System.currentTimeMillis() - startTimeStamp);
+            }
+        }
+
+        public boolean isRunning() {
+            return this.startTimeStamp > 0;
+        }
+
+        public long getTotalTime() {
+            return this.totalTimeStamp + (this.startTimeStamp > 0 ? (System.currentTimeMillis() - this.startTimeStamp) : 0);
         }
     }
 }

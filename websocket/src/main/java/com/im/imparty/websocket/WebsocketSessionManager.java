@@ -1,5 +1,7 @@
 package com.im.imparty.websocket;
 
+import com.im.imparty.common.util.SongUtils;
+import com.im.imparty.common.vo.PlaySongInfo;
 import com.im.imparty.spring.authentication.LoginJwtToken;
 import com.im.imparty.websocket.conts.MsgJSON;
 import com.im.imparty.websocket.timer.PlayTimer;
@@ -12,6 +14,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
@@ -22,6 +25,10 @@ public class WebsocketSessionManager {
     private static ConcurrentHashMap<String, ConcurrentHashMap<String, WebsocketSessionImpl>> socketStoreByRole = new ConcurrentHashMap<>();
 
     private static AtomicInteger count = new AtomicInteger();
+
+    private static final CopyOnWriteArrayList<PlaySongInfo> songList = new CopyOnWriteArrayList();
+
+    private static String currentSongId = null;
 
     // 播放计时器
     private PlayTimer playTimer;
@@ -103,27 +110,66 @@ public class WebsocketSessionManager {
         return Collections.emptyList();
     }
 
-    public PlayTimer init() {
-        this.playTimer = new PlayTimer(10, (o) -> {
+    public PlayTimer init(List<PlaySongInfo> songList) {
+        initSongList(songList);
+        PlaySongInfo playSongInfo1 = nextSong();
+        broadcastMsg(MsgJSON.nextPlay(playSongInfo1).toJSONString());
+        this.playTimer = new PlayTimer(playSongInfo1.getTotalTime() / 1000, (o) -> {
             if (o) {
-                broadcastMsg(MsgJSON.nextPlay("1", "http://baidu.com").toJSONString());
+                PlaySongInfo playSongInfo = nextSong();
+                broadcastMsg(MsgJSON.nextPlay(playSongInfo).toJSONString());
                 playTimer.play(0);
             } else {
-                broadcastMsg(MsgJSON.currentTime(getCurrentTime()).toJSONString());
+                // broadcastMsg(MsgJSON.currentTime(getCurrentTime()).toJSONString());
             }
             return null;
         });
         return playTimer;
     }
 
-    public void play(long startTime) {
+    public void play(long startTime, List<PlaySongInfo> songList) {
         if (this.playTimer == null) {
-            init();
+            init(songList);
         }
         playTimer.play(startTime);
     }
 
     public long getCurrentTime() {
         return playTimer.getCurrentTime();
+    }
+
+    public void initSongList(List<PlaySongInfo> dataList) {
+        songList.clear();
+        songList.addAll(dataList);
+    }
+
+    public void addSong(PlaySongInfo songInfo) {
+        songList.add(songInfo);
+        songList.sort(Comparator.comparingInt(PlaySongInfo::getSort));
+    }
+
+    public PlaySongInfo nextSong() {
+        if (songList.isEmpty()) {
+            PlaySongInfo playSongInfo = PlaySongInfo.defaultSong();
+            currentSongId = playSongInfo.getSongId();
+            return playSongInfo;
+        }
+        PlaySongInfo playSongInfo = null;
+        if (currentSongId == null) {
+            playSongInfo = songList.get(0);
+        }
+        Iterator<PlaySongInfo> iterator = songList.iterator();
+        while (iterator.hasNext()) {
+            PlaySongInfo next = iterator.next();
+            if (next.getSongId().equals(currentSongId)) {
+                if (iterator.hasNext()) {
+                    playSongInfo = iterator.next();
+                }
+                break;
+            }
+        }
+        currentSongId = playSongInfo.getSongId();
+        playSongInfo.setUrl(SongUtils.getUrlBySongId(playSongInfo.getSongId(), playSongInfo.getSongQuality()));
+        return playSongInfo;
     }
 }

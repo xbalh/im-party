@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Api(tags = "test")
 @RestController
-@EnableFeignClients(basePackages = {"com.im.imparty.music"})
+@EnableFeignClients(basePackages = {"com.im.imparty.api.music"})
 @EnableCaching
 @MapperScan(value = {"com.im.imparty.**.mapper"})
 @SpringBootApplication

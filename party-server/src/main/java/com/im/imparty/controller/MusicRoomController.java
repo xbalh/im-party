@@ -1,24 +1,36 @@
 package com.im.imparty.controller;
 
+import com.im.imparty.common.vo.PlaySongInfo;
+import com.im.imparty.music.playerlist.service.MusicPlayerRecordService;
 import com.im.imparty.server.WebSocketServer;
 import com.im.imparty.web.vo.BaseResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+import javax.websocket.server.PathParam;
+import java.util.Collection;
+import java.util.List;
 
 @Api("房间控制")
 @RestController
 @RequestMapping("/room")
 public class MusicRoomController {
 
+    @Resource
+    private MusicPlayerRecordService musicPlayerRecordService;
+
+    @Resource
+    private MusicPlayerRecordService playerRecordService;
+
     @ApiOperation("播放")
     @GetMapping("/play")
     public BaseResult<String> play(@RequestParam("roomId") Integer roomId) {
         if (WebSocketServer.roomMap.containsKey(roomId)) {
-            WebSocketServer.roomMap.get(roomId).play(0);
+            List<PlaySongInfo> playSongInfos = playerRecordService.selectAllByRoomId(roomId);
+            WebSocketServer.roomMap.get(roomId).play(0, playSongInfos);
         } else {
             return BaseResult.fail("房间不存在！");
         }
@@ -33,6 +45,12 @@ public class MusicRoomController {
         } else {
             return BaseResult.fail("房间不存在！");
         }
+    }
+
+    @PostMapping("/addMusic/{roomId}")
+    public BaseResult addMusic(@PathParam("roomId") Integer roomId, @RequestParam("songId") String songId) {
+        musicPlayerRecordService.addMusic(roomId, songId, SecurityContextHolder.getContext().getAuthentication().getName());
+        return BaseResult.ok();
     }
 
 }

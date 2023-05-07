@@ -1,16 +1,14 @@
 package com.im.imparty.websocket.conts;
 
 import com.alibaba.fastjson.JSONObject;
+import com.im.imparty.common.vo.PlaySongInfo;
 
 public class MsgJSON {
 
-    public static JSONObject nextPlay(String songId, String downUrl) {
+    public static JSONObject nextPlay(PlaySongInfo playSongInfo) {
         JSONObject res = new JSONObject();
         res.put("method", "/music/playControl/nextPlay");
-        JSONObject resData = new JSONObject();
-        resData.put("songId", songId);
-        resData.put("downUrl", downUrl);
-        res.put("data", resData);
+        res.put("data", playSongInfo);
         return res;
     }
 

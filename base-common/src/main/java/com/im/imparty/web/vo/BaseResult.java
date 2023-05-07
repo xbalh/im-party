@@ -21,6 +21,9 @@ public class BaseResult<T> {
 
     private T data;
 
+    public static <T> BaseResult<T> ok() {
+        return new BaseResult(200, "成功");
+    }
     public static <T> BaseResult<T> ok(String msg) {
         return new BaseResult(200, msg);
     }
