@@ -14,9 +14,8 @@
         <!-- 播放器 -->
         <div class="player" ref="player" id="drag-top">
           <!-- <MusicPlayer @currentTime="currentTime"></MusicPlayer> -->
-          <audio controls>
+          <audio controls autoplay ref="player" :src="songUrl">
             <!-- <source src="../../../../assets/music/test.mp3" /> -->
-            <source src="https://su-wsm.github.io/assets/music/test.mp3" />
           </audio>
         </div>
         <!-- 收缩栏 -->
@@ -34,7 +33,9 @@
     <div class="baseArea rightArea">
       <div class="">
         <el-tabs v-model="activeName" @tab-click="tabClickHandle" stretch>
-          <el-tab-pane label="歌曲队列" name="songList">歌曲队列</el-tab-pane>
+          <el-tab-pane label="歌曲队列" name="songList">歌曲队列
+            <el-button @click="songSearchDialogVisible = true">搜索歌曲</el-button>
+          </el-tab-pane>
           <el-tab-pane label="用户列表" name="userList">用户列表</el-tab-pane>
         </el-tabs>
       </div>
@@ -50,6 +51,25 @@
         大乱斗
       </el-button>
     </div> -->
+
+    <el-dialog title="歌曲搜索" :visible.sync="songSearchDialogVisible" width="50%">
+      <el-input v-model="songSearchInputContent" class="searchinput" placeholder="搜索歌曲名称" prefix-icon="el-icon-search">
+        <el-button slot="append" class="searchbtn" @click="searchSong">搜索</el-button>
+      </el-input>
+      <el-table ref="songSearchTable" :data="songSearchResult.songs || []" highlight-current-row style="width: 100%">
+        <el-table-column prop="name" label="歌曲名称" width="180">
+        </el-table-column>
+        <el-table-column prop="artistNames" label="作者" width="180" :formatter="artistsFormatter">
+        </el-table-column>
+        <el-table-column label="操作">
+          <template #default="itemScope">
+            <el-button size="mini" @click="onDemandSong(itemScope.$index, itemScope.row)">点歌</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <!-- <el-button @click="confirmEnemy">确定</el-button> -->
+    </el-dialog>
+
   </div>
 </template>
 
@@ -61,6 +81,7 @@ import VuexExample from "@/components/example/vuexExample.vue";
 import WorkerExample from "@/components/example/workerExample.vue";
 import MusicPlayer from "@/components/music-player/index.vue";
 import defaultPageApi from "@/api/default-page";
+import musicApi from "@/api/music";
 import Request from "@/utils/requestInstance";
 import Ws from "@/utils/ws";
 import { namespace } from "vuex-class"
@@ -97,6 +118,11 @@ export default class Home extends Vue {
 
   activeName: string = 'songList'
   dragState: any;
+  songSearchDialogVisible: boolean = false;
+  songSearchInputContent: string = '';
+  songUrl: string = '';
+  songSearchResult: any = {};
+
 
   constructor() {
     super();
@@ -213,8 +239,9 @@ export default class Home extends Vue {
     try {
       //ws连接
       this.WS = new Ws("ws://localhost:8080/musicParty/ws/" + roomInfo.roomNo, [token!], false);
-      this.WS.send("connect success");
-      this.WS.subscribe("/music/chat", this.handleChat);
+      console.log(this.WS)
+      // this.WS.send("connect success");
+      this.WS.subscribe("/music/playControl/nextPlay", this.handlePlay);
       //加载房间信息
 
     } catch (error) {
@@ -228,11 +255,11 @@ export default class Home extends Vue {
       loadingInstance.close();
     }
 
-    const count = 0;
-    this.timeId = setInterval(() => {
-      count;
-      this.WS.send(`count: ${count}`);
-    }, 10000);
+    // const count = 0;
+    // this.timeId = setInterval(() => {
+    //   count;
+    //   this.WS.send(`count: ${count}`);
+    // }, 10000);
 
     this.currentRoomInfo = roomInfo;
     this.joinSuccess = true
@@ -245,6 +272,12 @@ export default class Home extends Vue {
 
   handleChat(data: object) {
     console.log(data)
+  }
+
+  handlePlay(data: any) {
+    console.log(data)
+    this.songUrl = data.url;
+
   }
 
   setCurrentTime() {
@@ -268,6 +301,40 @@ export default class Home extends Vue {
     console.log('1')
   }
 
+  async searchSong() {
+    if (this.songSearchInputContent !== '') {
+      const res = await Request.get(musicApi.song.search, {
+        params: {
+          keywords: this.songSearchInputContent,
+          offset: 0,
+          limit: 10
+        }
+      }, {})
+      this.songSearchResult = res.data.data
+      console.log(this.songSearchResult)
+    }
+  }
+
+  artistsFormatter(row: any, column: any, cellValue: any, index: any) {
+    return row.artists && row.artists.map((artist: any) => {
+      return artist.name
+    }).join(',')
+  }
+
+  async onDemandSong(index: any, row: any){
+    const res = await Request.post(musicApi.room.addMusic + `/${this.currentRoomInfo.roomNo}`, {
+        params: {
+          songId: row.id
+        }
+      }, {})
+    if(res.data.code === 200){
+      this.$notify({
+      title: '成功',
+      message: '点歌成功！',
+      type: 'success'
+    });
+    }
+  }
 
 }
 </script>
@@ -381,6 +448,7 @@ h1 {
   50% {
     background: linear-gradient(to top, hsla(6, 90%, 68%, 50%), hsla(336, 99%, 66%, 50%));
   }
+
   100% {
     background: linear-gradient(to top, hsla(6, 90%, 68%, 100%), hsla(336, 99%, 66%, 100%));
   }
