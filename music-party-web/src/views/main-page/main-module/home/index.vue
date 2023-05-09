@@ -14,6 +14,7 @@
         <!-- 播放器 -->
         <div class="player" ref="player" id="drag-top">
           <!-- <MusicPlayer @currentTime="currentTime"></MusicPlayer> -->
+          <el-button @click="playSong">播放</el-button>
           <audio controls autoplay ref="player" :src="songUrl">
             <!-- <source src="../../../../assets/music/test.mp3" /> -->
           </audio>
@@ -23,7 +24,7 @@
       </div> -->
         <!-- 聊天区域 -->
         <div class="chatArea" ref="charArea" id="drag-down">
-          <Chat :sendMsg="sendMsgHandle" />
+          <Chat :userName="currentUserInfo.username" :sendMsg="sendMsgHandle" ref="chatRef" />
         </div>
       </div>
 
@@ -74,7 +75,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Ref } from "vue-property-decorator";
 import RequestExample from "@/components/example/requestExample.vue";
 import LangExample from "@/components/example/langExample.vue";
 import VuexExample from "@/components/example/vuexExample.vue";
@@ -89,6 +90,7 @@ import { UserInfoType } from "@/types/user"
 import { Room } from "@/types/room"
 import { Loading } from 'element-ui';
 import Chat from "@/components/chat/index.vue";
+import { Msg } from "@/types/chat";
 
 const userStore = namespace('userStore')
 
@@ -107,7 +109,7 @@ export default class Home extends Vue {
   timeId: NodeJS.Timeout | any;
   @userStore.Getter('getToken') getToken!: string
   @userStore.Mutation('setUserInfo') setUserInfo!: Function
-  currentUserInfo: any = null;
+  currentUserInfo: UserInfoType | any = {};
   roomTree: Array<any> = [];
   roomTreeProps: any;
 
@@ -122,6 +124,8 @@ export default class Home extends Vue {
   songSearchInputContent: string = '';
   songUrl: string = '';
   songSearchResult: any = {};
+
+  @Ref('chatRef') private chatRef!: Chat;
 
 
   constructor() {
@@ -166,7 +170,9 @@ export default class Home extends Vue {
         age: 24,
         sex: 0
       }
-      this.setUserInfo(userInfo)
+      this.setUserInfo(userInfo);
+      this.currentUserInfo = userInfo;
+      console.log(this.currentUserInfo.username)
     } catch (error) {
       console.error(error, '获取用户信息出错了')
     }
@@ -241,7 +247,10 @@ export default class Home extends Vue {
       this.WS = new Ws("ws://localhost:8080/musicParty/ws/" + roomInfo.roomNo, [token!], false);
       console.log(this.WS)
       // this.WS.send("connect success");
+      //订阅 下一首播放 广播
       this.WS.subscribe("/music/playControl/nextPlay", this.handlePlay);
+      //订阅 聊天 广播
+      this.WS.subscribe("/music/chat", this.handleChat);
       //加载房间信息
 
     } catch (error) {
@@ -270,8 +279,9 @@ export default class Home extends Vue {
     });
   }
 
-  handleChat(data: object) {
-    console.log(data)
+  handleChat(data: Msg) {
+    console.log(data);
+    this.chatRef.receiveMsg(data);
   }
 
   handlePlay(data: any) {
@@ -344,6 +354,21 @@ export default class Home extends Vue {
       }
     }
     this.WS.send(JSON.stringify(data));
+  }
+
+  async playSong(){
+    const res = await Request.get(musicApi.room.play, {
+      params: {
+        roomId: this.currentRoomInfo.roomNo
+      }
+    }, {})
+    if (res.data.code === 200) {
+      this.$notify({
+        title: '成功',
+        message: '开始播放',
+        type: 'success'
+      });
+    }
   }
 
 }

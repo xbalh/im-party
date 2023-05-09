@@ -8,5 +8,6 @@ export const song = {
 
 export const room = {
   //歌曲搜索
-  addMusic: '/room/addMusic'
+  addMusic: '/room/addMusic',
+  play: '/room/play'
 }

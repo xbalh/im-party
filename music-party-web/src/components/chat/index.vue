@@ -1,13 +1,13 @@
 <template>
     <div class="outer-wrapper">
-        <el-menu class="el-menu-demo" mode="horizontal" @select="handleSelect" background-color="#545c64" text-color="#fff"
+        <!-- <el-menu class="el-menu-demo" mode="horizontal" @select="handleSelect" background-color="#545c64" text-color="#fff"
             active-text-color="#ffd04b">
-            <!-- <el-submenu index="2">
+            <el-submenu index="2">
                 <template slot="title">{{ userName }}</template>
                 <el-menu-item index="2-1">设置</el-menu-item>
                 <el-menu-item index="2-2">退出登陆</el-menu-item>
-            </el-submenu> -->
-        </el-menu>
+            </el-submenu>
+        </el-menu> -->
         <div class="wrapper">
             <h3>群聊</h3>
 
@@ -17,7 +17,7 @@
 
             </div>
             <div class="input-area">
-                <textarea class="input" v-model="msg" @keyup.enter="sendMsg"></textarea>
+                <textarea class="input" v-model="msg" @keydown="onKeyDown" @keydown.enter.prevent="handleEnter"></textarea>
                 <!-- <button class="send" @click="sendMsg">发送</button> -->
                 <el-button class="send-btn" @click="sendMsgHandle">发送</el-button>
 
@@ -26,73 +26,120 @@
     </div>
 </template>
   
-<script>
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator';
 import msgBox from './msgBox.vue';
+import { Msg } from '@/types/chat';
 //   import headMenu from '../../components/head-menu.vue';
-export default {
-    name: 'Chat',
-    props: {
-        sendMsg: Function
-    },
-    data() {
-        return {
-            content: 'hahhahaha',
-            userName: '',
-            msg: '',
-            msgList: [
-                {
-                    name: '用户A',
-                    msg: 'test233',
-                    isSelf: false
-                },
-                {
-                    name: '我自己',
-                    msg: 'test666',
-                    isSelf: true
-                },
-            ],
-        }
-    },
-    components: {
-        msgBox,
-        // headMenu,
-    },
-    mounted() {
-        this.userName = this.$route.query.name;
-        // this.$socket.emit('login', {
-        //     userid: 1,
-        //     username: this.userName
-        // })
-    },
-    sockets: {
-        connect: function () {
-            console.log('socket connected')
-        },
-        message: function (data) {
-            console.log(data)
-            // this.msgList.push(`${data.name}说:${data.msg}`)
-            this.msgList.push({
-                name: data.name === this.userName ? '我' : data.name,
-                msg: data.msg,
-                isSelf: data.name === this.userName
-            })
-        }
-    },
-    methods: {
 
-        //   handleSelect(key, keyPath) {},
-        sendMsgHandle: function () {
-            // $socket is socket.io-client instance
-            const data = {
-                name: this.userName,
-                msg: this.msg
-            }
-            this.sendMsg(this.msg);
-            this.msg = '';
+@Component({
+    components: {
+        msgBox
+    }
+})
+export default class Chat extends Vue {
+    @Prop({ type: Function }) sendMsg!: Function;
+    @Prop({ type: String }) userName: string = '';
+    content: string = 'hahhahaha';
+    msg: string = '';
+    msgList: Array<any> = [];
+
+    sendMsgHandle() {
+        this.sendMsg(this.msg);
+        this.msg = '';
+    }
+    public receiveMsg(msgInfo: Msg) {
+        this.msgList.push({
+            name: msgInfo.from === this.userName ? '我' : msgInfo.from,
+            msg: msgInfo.msg,
+            isSelf: msgInfo.from === this.userName
+        })
+        console.log(this.msgList)
+    }
+
+    onKeyDown(event: any) {
+        //如果按下了ctrl+enter
+        if (event.keyCode === 13 && event.ctrlKey) {
+            // 按下了组合键，插入一个换行符
+            const textarea = event.target;
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const value = textarea.value;
+            textarea.value = value.substring(0, start) + "\n" + value.substring(end);
+            textarea.selectionStart = textarea.selectionEnd = start + 1;
+            this.msg = textarea.value
+            event.preventDefault();
+            return
         }
-    },
+    }
+
+    handleEnter(event: any) {
+        if (event.ctrlKey) return
+        event.preventDefault();
+        const reg = /^\s+$/g;
+        if (reg.test(this.msg)) return
+        this.sendMsgHandle()
+    }
 
 }
+
+
+
+// export default {
+//     name: 'Chat',
+//     props: {
+//         sendMsg: Function
+//     },
+//     data() {
+//         return {
+//             content: 'hahhahaha',
+//             userName: '',
+//             msg: '',
+//             msgList: [
+//                 {
+//                     name: '用户A',
+//                     msg: 'test233',
+//                     isSelf: false
+//                 },
+//                 {
+//                     name: '我自己',
+//                     msg: 'test666',
+//                     isSelf: true
+//                 },
+//             ],
+//         }
+//     },
+//     components: {
+//         msgBox,
+//         // headMenu,
+//     },
+//     mounted() {
+//         this.userName = this.$route.query.name;
+//         // this.$socket.emit('login', {
+//         //     userid: 1,
+//         //     username: this.userName
+//         // })
+//     },
+//     methods: {
+//         //   handleSelect(key, keyPath) {},
+//         sendMsgHandle: function () {
+//             const data = {
+//                 name: this.userName,
+//                 msg: this.msg
+//             }
+//             this.sendMsg(this.msg);
+//             this.msg = '';
+//         },
+//         receiveMsg: function (msgInfo) {
+//             this.msgList.push({
+//                 name: msgInfo.from === this.userName ? '我' : msgInfo.from,
+//                 msg: msgInfo.msg,
+//                 isSelf: msgInfo.from === this.userName
+//             })
+//         }
+//     },
+
+// }
 </script>
   
   <!-- Add "scoped" attribute to limit CSS to this component only -->
