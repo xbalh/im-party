@@ -12,14 +12,14 @@
             <h3>群聊</h3>
 
             <div class="message-panel">
-                <msg-box v-for="(item, index) of msgList" :key="index + Math.random()" :uname="item.name" :content="item.msg"
-                    :isself="item.isSelf"></msg-box>
+                <msg-box v-for="(item, index) of msgList" :key="index + Math.random()" :uname="item.name"
+                    :content="item.msg" :isself="item.isSelf"></msg-box>
 
             </div>
             <div class="input-area">
                 <textarea class="input" v-model="msg" @keyup.enter="sendMsg"></textarea>
                 <!-- <button class="send" @click="sendMsg">发送</button> -->
-                <el-button class="send-btn" @click="sendMsg">发送</el-button>
+                <el-button class="send-btn" @click="sendMsgHandle">发送</el-button>
 
             </div>
         </div>
@@ -31,9 +31,9 @@ import msgBox from './msgBox.vue';
 //   import headMenu from '../../components/head-menu.vue';
 export default {
     name: 'Chat',
-    //   props: {
-    //     msg: String
-    //   }
+    props: {
+        sendMsg: Function
+    },
     data() {
         return {
             content: 'hahhahaha',
@@ -81,13 +81,13 @@ export default {
     methods: {
 
         //   handleSelect(key, keyPath) {},
-        sendMsg: function () {
+        sendMsgHandle: function () {
             // $socket is socket.io-client instance
             const data = {
                 name: this.userName,
                 msg: this.msg
             }
-            this.$socket.emit('message', data)
+            this.sendMsg(this.msg);
             this.msg = '';
         }
     },

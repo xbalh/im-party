@@ -23,7 +23,7 @@
       </div> -->
         <!-- 聊天区域 -->
         <div class="chatArea" ref="charArea" id="drag-down">
-          <Chat></Chat>
+          <Chat :sendMsg="sendMsgHandle" />
         </div>
       </div>
 
@@ -52,7 +52,7 @@
       </el-button>
     </div> -->
 
-    <el-dialog title="歌曲搜索" :visible.sync="songSearchDialogVisible" width="50%">
+    <el-dialog title="歌曲搜索" :visible.sync="songSearchDialogVisible" width="50%" :close-on-click-modal="false">
       <el-input v-model="songSearchInputContent" class="searchinput" placeholder="搜索歌曲名称" prefix-icon="el-icon-search">
         <el-button slot="append" class="searchbtn" @click="searchSong">搜索</el-button>
       </el-input>
@@ -321,19 +321,29 @@ export default class Home extends Vue {
     }).join(',')
   }
 
-  async onDemandSong(index: any, row: any){
+  async onDemandSong(index: any, row: any) {
     const res = await Request.post(musicApi.room.addMusic + `/${this.currentRoomInfo.roomNo}`, {
-        params: {
-          songId: row.id
-        }
-      }, {})
-    if(res.data.code === 200){
+      params: {
+        songId: row.id
+      }
+    }, {})
+    if (res.data.code === 200) {
       this.$notify({
-      title: '成功',
-      message: '点歌成功！',
-      type: 'success'
-    });
+        title: '成功',
+        message: '点歌成功！',
+        type: 'success'
+      });
     }
+  }
+
+  sendMsgHandle(msg: any) {
+    const data = {
+      method: "/music/chat",
+      data: {
+        msg: msg
+      }
+    }
+    this.WS.send(JSON.stringify(data));
   }
 
 }

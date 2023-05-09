@@ -143,7 +143,7 @@ public class MusicLoginServiceImpl implements MusicLoginService, ApplicationCont
 
             @Override
             public void run() {
-                log.info("定时器时间：" + LocalDateTime.ofInstant(Instant.ofEpochMilli(scheduledExecutionTime()), ZoneId.systemDefault()));
+                //log.info("定时器时间：" + LocalDateTime.ofInstant(Instant.ofEpochMilli(scheduledExecutionTime()), ZoneId.systemDefault()));
                 if (qrKeySet.isEmpty()) {
                     try {
                         Thread.sleep(8000);
