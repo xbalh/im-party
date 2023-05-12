@@ -34,7 +34,7 @@ public class MusicPlayerRecordServiceImpl extends ServiceImpl<MusicPlayerRecordM
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void addMusic(Integer roomId, String songId, String curUsr) {
+    public MusicPlayerRecordDomain addMusic(Integer roomId, String songId, String curUsr) {
 
         JSONObject songDetail = musicApi.getSongDetail(ImmutableList.of(songId));
         JSONArray songs = songDetail.getJSONArray("songs");
@@ -70,6 +70,7 @@ public class MusicPlayerRecordServiceImpl extends ServiceImpl<MusicPlayerRecordM
         }
         data.setSongQuality(String.join(",", songQuality));
         save(data);
+        return data;
     }
 
     @Override

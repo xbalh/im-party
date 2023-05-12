@@ -17,7 +17,7 @@ import java.util.List;
  */
 public interface MusicPlayerRecordService extends IService<MusicPlayerRecordDomain> {
 
-    void addMusic(Integer roomId, String songId, String curUsr);
+    MusicPlayerRecordDomain addMusic(Integer roomId, String songId, String curUsr);
 
     List<PlaySongInfo> selectAllByRoomId(Integer roomId);
 }

@@ -1,6 +1,7 @@
 package com.im.imparty.controller;
 
 import com.im.imparty.common.vo.PlaySongInfo;
+import com.im.imparty.music.playerlist.entity.MusicPlayerRecordDomain;
 import com.im.imparty.music.playerlist.service.MusicPlayerRecordService;
 import com.im.imparty.server.WebSocketServer;
 import com.im.imparty.web.vo.BaseResult;
@@ -49,7 +50,14 @@ public class MusicRoomController {
 
     @PostMapping("/addMusic/{roomId}")
     public BaseResult addMusic(@PathParam("roomId") Integer roomId, @RequestParam("songId") String songId) {
-        musicPlayerRecordService.addMusic(roomId, songId, SecurityContextHolder.getContext().getAuthentication().getName());
+        MusicPlayerRecordDomain data = musicPlayerRecordService.addMusic(roomId, songId, SecurityContextHolder.getContext().getAuthentication().getName());
+        PlaySongInfo songInfo = new PlaySongInfo();
+        songInfo.setSongId(data.getSongId());
+        songInfo.setSongName(data.getSongName());
+        songInfo.setSongQuality(data.getSongQuality());
+        songInfo.setSinger(data.getSinger());
+        //so
+        WebSocketServer.roomMap.get(roomId).addSong(songInfo);
         return BaseResult.ok();
     }
 
