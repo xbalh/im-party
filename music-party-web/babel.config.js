@@ -4,6 +4,10 @@ module.exports = {
     "development": {
       "sourceMaps": true,
       "retainLines": true,
+    },
+    "production": {
+      "sourceMaps": true,
+      "retainLines": true,
     }
   }
 };

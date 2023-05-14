@@ -51,13 +51,13 @@ public class MusicRoomController {
     @PostMapping("/addMusic/{roomId}")
     public BaseResult addMusic(@PathParam("roomId") Integer roomId, @RequestParam("songId") String songId) {
         MusicPlayerRecordDomain data = musicPlayerRecordService.addMusic(roomId, songId, SecurityContextHolder.getContext().getAuthentication().getName());
-        PlaySongInfo songInfo = new PlaySongInfo();
-        songInfo.setSongId(data.getSongId());
-        songInfo.setSongName(data.getSongName());
-        songInfo.setSongQuality(data.getSongQuality());
-        songInfo.setSinger(data.getSinger());
-        //so
-        WebSocketServer.roomMap.get(roomId).addSong(songInfo);
+//        PlaySongInfo songInfo = new PlaySongInfo();
+//        songInfo.setSongId(data.getSongId());
+//        songInfo.setSongName(data.getSongName());
+//        songInfo.setSongQuality(data.getSongQuality());
+//        songInfo.setSinger(data.getSinger());
+//        //so
+//        WebSocketServer.roomMap.get(roomId).addSong(songInfo);
         return BaseResult.ok();
     }
 

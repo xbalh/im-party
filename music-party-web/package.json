@@ -1,11 +1,11 @@
 {
-  "name": "vue-typescript-template",
-  "version": "0.1.0",
+  "name": "imparty",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve --mode development",
     "build:stage": "vue-cli-service build --mode staging",
-    "build": "vue-cli-service build",
+    "build": "vue-cli-service build --mode production",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
     "commit": "git-cz"

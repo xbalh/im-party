@@ -6,9 +6,10 @@ const pxtoViewPort = require("postcss-px-to-viewport");
 
 module.exports = {
   runtimeCompiler: true,
-
+  parallel: false,
+  publicPath: './',
   devServer: {
-    port: 3000,
+    port: 3210,
     overlay: {
       warnings: false,
       errors: true
@@ -17,7 +18,7 @@ module.exports = {
     proxy: { // string | Object
       '/api': {
         /* 目标代理服务器地址 */
-        target: 'http://localhost:8080/',
+        target: 'http://localhost:8081/',
         /* 允许跨域 */
         changeOrigin: true,
         pathRewrite: {
@@ -39,7 +40,7 @@ module.exports = {
       filename: 'index.html',
       // 当使用 title 选项时，
       // template 中的 title 标签需要是 <title><%= htmlWebpackPlugin.options.title %></title>
-      title: 'Im Party!',
+      title: 'ImParty',
       // 在这个页面中包含的块，默认情况下会包含
       // 提取出来的通用 chunk 和 vendor chunk。
       chunks: ['chunk-vendors', 'chunk-common', 'index']

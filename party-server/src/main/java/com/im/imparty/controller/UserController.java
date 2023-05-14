@@ -1,5 +1,6 @@
 package com.im.imparty.controller;
 
+import com.im.imparty.user.dto.UserInfoDetail;
 import com.im.imparty.user.entity.UserDomain;
 import com.im.imparty.user.mapper.UserMapper;
 import com.im.imparty.web.vo.BaseResult;
@@ -20,8 +21,11 @@ public class UserController {
     private UserMapper userMapper;
 
     @GetMapping("/info")
-    public BaseResult<String> currentUserInfo() {
-        return BaseResult.ok(SecurityContextHolder.getContext().getAuthentication().getName());
+    public BaseResult<UserInfoDetail> currentUserInfo() {
+        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserInfoDetail userInfo = new UserInfoDetail();
+        userInfo.setUserName(userName);
+        return BaseResult.ok(userName, userInfo);
     }
 
     @GetMapping("/list")

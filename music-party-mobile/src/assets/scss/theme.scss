@@ -1,0 +1,22 @@
+@use "./vuetify/overrides";
+
+@font-face {
+  font-family: 'Quicksand';
+  src: url(../fonts/Quicksand-VariableFont_wght.ttf);
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.cursor-move {
+  cursor: move;
+}
+
+.v-field-flat div {
+  box-shadow: none;
+}
+
+.top-z-index {
+  z-index: 1006 !important;
+}

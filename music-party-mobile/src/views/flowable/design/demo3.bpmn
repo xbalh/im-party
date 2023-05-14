@@ -1,0 +1,113 @@
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0t9s4md" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.4.2" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.18.0">
+  <bpmn:process id="Process_custom4" isExecutable="true">
+    <bpmn:extensionElements />
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="user" label="user" type="userFormType">
+            <camunda:properties>
+              <camunda:property id="required" value="true" />
+            </camunda:properties>
+            <camunda:validation>
+              <camunda:constraint name="required" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="file" label="file" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_0kydfqm</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0kydfqm" sourceRef="StartEvent_1" targetRef="Activity_1qhokjb" />
+    <bpmn:userTask id="Activity_1qhokjb" name="submit" camunda:candidateUsers="admin" camunda:candidateGroups="camunda-admin">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="hello" label="hello" type="string">
+            <camunda:properties>
+              <camunda:property id="uu" value="22" />
+            </camunda:properties>
+          </camunda:formField>
+        </camunda:formData>
+        <camunda:properties>
+          <camunda:property name="required" value="true" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0kydfqm</bpmn:incoming>
+      <bpmn:outgoing>Flow_0krvqew</bpmn:outgoing>
+      <bpmn:outgoing>Flow_162i7sq</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_0krvqew" sourceRef="Activity_1qhokjb" targetRef="Activity_09jm422" />
+    <bpmn:userTask id="Activity_09jm422" name="review">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="review" label="review" type="boolean" defaultValue="false" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0krvqew</bpmn:incoming>
+      <bpmn:outgoing>Flow_1bhkt0w</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Activity_0u6a0eo" name="bossreview">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="opinion" label="opinion" type="boolean" defaultValue="false">
+            <camunda:properties />
+            <camunda:validation />
+          </camunda:formField>
+          <camunda:formField id="date" label="date" type="date" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_162i7sq</bpmn:incoming>
+      <bpmn:outgoing>Flow_13lqqfh</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_162i7sq" sourceRef="Activity_1qhokjb" targetRef="Activity_0u6a0eo" />
+    <bpmn:endEvent id="Event_0htpw86">
+      <bpmn:incoming>Flow_13lqqfh</bpmn:incoming>
+      <bpmn:incoming>Flow_1bhkt0w</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_13lqqfh" sourceRef="Activity_0u6a0eo" targetRef="Event_0htpw86" />
+    <bpmn:sequenceFlow id="Flow_1bhkt0w" sourceRef="Activity_09jm422" targetRef="Event_0htpw86" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_custom4">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0rt2b3u_di" bpmnElement="Activity_1qhokjb">
+        <dc:Bounds x="240" y="80" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_040yloe_di" bpmnElement="Activity_09jm422">
+        <dc:Bounds x="430" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_07aufj9_di" bpmnElement="Activity_0u6a0eo">
+        <dc:Bounds x="430" y="220" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0htpw86_di" bpmnElement="Event_0htpw86">
+        <dc:Bounds x="622" y="242" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0kydfqm_di" bpmnElement="Flow_0kydfqm">
+        <di:waypoint x="188" y="120" />
+        <di:waypoint x="240" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0krvqew_di" bpmnElement="Flow_0krvqew">
+        <di:waypoint x="340" y="120" />
+        <di:waypoint x="430" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_162i7sq_di" bpmnElement="Flow_162i7sq">
+        <di:waypoint x="290" y="160" />
+        <di:waypoint x="290" y="260" />
+        <di:waypoint x="430" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_13lqqfh_di" bpmnElement="Flow_13lqqfh">
+        <di:waypoint x="530" y="260" />
+        <di:waypoint x="622" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1bhkt0w_di" bpmnElement="Flow_1bhkt0w">
+        <di:waypoint x="530" y="120" />
+        <di:waypoint x="576" y="120" />
+        <di:waypoint x="576" y="260" />
+        <di:waypoint x="622" y="260" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

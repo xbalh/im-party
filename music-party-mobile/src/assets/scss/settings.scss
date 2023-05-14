@@ -1,0 +1,60 @@
+@use "vuetify/variables";
+@use "vuetify/settings" with (
+$spacer: variables.$spacer,
+$body-font-family: variables.$body-font-family,
+$font-size-root: variables.$font-size-root,
+$font-weights: variables.$font-weights,
+$container-padding-x: 24px,
+
+//nav
+$list-item-nav-title-font-size:0.875rem,
+$list-item-nav-title-font-weight:600,
+$list-item-nav-margin-top:0,
+
+//icon
+
+$icon-sizes: (
+    'default': 1.6em,
+),
+$button-icon-density: (
+ 'default': 1.5,
+ 'comfortable': 0,
+ 'compact': -1
+),
+
+
+//elevations
+$shadow-key-umbra-opacity:variables.$shadow-key-umbra-opacity,
+$shadow-key-penumbra-opacity:variables.$shadow-key-penumbra-opacity,
+$shadow-key-ambient-opacity:variables.$shadow-key-ambient-opacity,
+$shadow-key-umbra:variables.$shadow-key-umbra,
+$shadow-key-penumbra:variables.$shadow-key-penumbra,
+$shadow-key-ambient:variables.$shadow-key-ambient,
+
+
+//card
+$card-title-padding: variables.$spacer * 2 variables.$spacer * 2,
+$border-radius-root: 6px,
+
+
+//timeline
+$timeline-dot-size: 34px,
+
+//table
+$table-row-height: 48px,
+
+$typography: (
+    'button': (
+      'text-transform': none,
+      'weight': 700,
+
+    ),
+
+),
+$list-item-title-font-weight: 600,
+$field-font-size: 14px
+
+)
+;
+
+@forward "vuetify/settings";

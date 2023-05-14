@@ -1,0 +1,77 @@
+@use "./variables" as *;
+@use "vuetify/tools" as *;
+
+.v-application {
+  .title {
+    font-size: map-deep-get($headings, 'h6', 'size');
+    font-weight: map-deep-get($headings, 'h6', 'weight');
+    line-height: map-deep-get($headings, 'h6', 'line-height');
+    letter-spacing: map-deep-get($headings, 'h6', 'letter-spacing');
+    font-family: map-deep-get($headings, 'h6', 'font-family');
+  }
+
+}
+
+.v-application .overline {
+  font-size: 0.625rem !important;
+  font-weight: 400;
+  letter-spacing: 0.1666666667em !important;
+  line-height: 1rem;
+  text-transform: uppercase;
+}
+
+.v-navigation-drawer__content {
+  .v-list-item__prepend > .v-icon {
+    margin-inline-end: 14px;
+  }
+}
+.v-card-title {
+  display: flex;
+}
+
+.v-data-table {
+  .v-table__wrapper > table {
+
+    & > thead,
+    & > tbody, {
+      & > tr {
+        & > th {
+          font-weight: bold;
+          color: rgba(var(--v-theme-on-surface));
+        }
+
+        transition: box-shadow 0.2s, transform 0.2s;
+
+        &:not(.v-data-table__selected):hover {
+          box-shadow: 0 3px 15px -2px rgba(0, 0, 0, 0.12);
+          transform: translateY(-4px);
+        }
+        font-size: $data-table-font-size;
+        & > td {
+          border-bottom: 0 !important;
+        }
+      }
+
+      padding: 4px 4px 8px;
+
+    }
+  }
+
+}
+.v-text-field-rounded {
+  & > .v-input__control {
+    border-radius: inherit;
+
+    & > .v-field {
+      border-radius: inherit;
+    }
+
+    & div {
+      &::before, &::after {
+        display: none;
+      }
+    }
+  }
+
+  border-radius: 28px;
+}
