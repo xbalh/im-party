@@ -28,6 +28,7 @@ public class PlayTimer {
     public void initTimer() {
         if (task != null) {
             task.cancel();
+            timer.purge();
         }
         task = new PlayTask();
         timer.schedule(task, 5000, 1000);
