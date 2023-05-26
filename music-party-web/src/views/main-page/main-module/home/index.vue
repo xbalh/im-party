@@ -244,7 +244,7 @@ export default class Home extends Vue {
     if (!token) console.error("token为空");
     try {
       //ws连接
-      this.WS = new Ws("ws://localhost:8080/musicParty/ws/" + roomInfo.roomNo, [token!], false);
+      this.WS = new Ws(process.env.VUE_APP_WS_URL + "/musicParty/ws/" + roomInfo.roomNo, [token!], false);
       console.log(this.WS)
       // this.WS.send("connect success");
       //订阅 下一首播放 广播

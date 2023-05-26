@@ -5,7 +5,7 @@ spring:
     active: dev
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://117.50.183.42:3306/imparty?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&useSSL=true
+    url: jdbc:mysql://${databaseUrl}:3306/imparty?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&useSSL=true
     username: ${databaseUser} #-DdatabaseUser=xxx -DdatabasePassword=xxx
     password: ${databasePassword}
   cache:
@@ -25,4 +25,4 @@ mybatis-plus:
   type-handlers-package: com.im.imparty.handler
 
 NeteaseCloudMusicApi:
-  url: http://117.50.183.42:3000
+  url: http://${neteaseCloudMusicApiUrl}:3000
