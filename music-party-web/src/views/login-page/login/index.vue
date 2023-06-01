@@ -147,7 +147,7 @@ form {
   /*background-image: url(CSS/images/登录界面背景图.jpg);*/
   background-color: #e1e9ef;
   /*设置透明度*/
-  opacity: 70%;
+  opacity: 0.7;
   /*设置定位置*/
   text-align: center;
   padding: 120px 100px;
