@@ -6,7 +6,6 @@
     <modules>
         <module>base-common</module>
         <module>music-party</module>
-        <module>user-manager</module>
         <module>party-server</module>
         <module>websocket</module>
     </modules>
@@ -45,11 +44,6 @@
             <dependency>
                 <groupId>com.im</groupId>
                 <artifactId>music-party</artifactId>
-                <version>${im-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.im</groupId>
-                <artifactId>user-manager</artifactId>
                 <version>${im-version}</version>
             </dependency>
             <dependency>
