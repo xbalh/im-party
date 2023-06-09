@@ -9,7 +9,7 @@ declare namespace ApiCommon {
 
 declare namespace ApiAuth {
   interface Token {
-    token: string;
+    accessToken: string;
     refreshToken: string;
   }
 

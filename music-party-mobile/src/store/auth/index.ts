@@ -68,16 +68,21 @@ export const useAuthStore = defineStore('auth-store', {
     async loginByToken(backendToken: ApiAuth.Token) {
       let successFlag = false;
 
-      const {token, refreshToken} = backendToken;
-      localStg.set('token', token);
+      const {accessToken, refreshToken} = backendToken;
+      localStg.set('token', accessToken);
       localStg.set('refreshToken', refreshToken);
 
       const {data} = await fetchUserInfo();
       if (data) {
         localStg.set('userInfo', data);
 
-        this.userInfo = data;
-        this.token = token;
+        this.userInfo = {
+          userId: data.username,
+          userName: data.username,
+          userRole: 'admin'
+        };
+        
+        this.token = accessToken;
 
         successFlag = true;
       }

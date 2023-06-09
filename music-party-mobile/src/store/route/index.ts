@@ -1,6 +1,6 @@
-import {defineStore} from 'pinia';
-import {ROOT_ROUTE, constantRoutes, router, routes as staticRoutes} from '@/router';
-import {fetchUserRoutes} from '@/service';
+import { defineStore } from 'pinia';
+import { ROOT_ROUTE, constantRoutes, router, routes as staticRoutes } from '@/router';
+import { fetchUserRoutes } from '@/service';
 import {
   localStg,
   filterAuthRoutesByUserPermission,
@@ -14,7 +14,7 @@ import {
   transformRoutePathToRouteName,
   sortRoutes
 } from '@/utils';
-import {useAuthStore} from '../auth';
+import { useAuthStore } from '../auth';
 
 interface RouteState {
   authRouteMode: ImportMetaEnv['VITE_AUTH_ROUTE_MODE'];
@@ -73,20 +73,20 @@ export const useRouteStore = defineStore('route-store', {
       if (routeKey === 'root' || routeKey === 'not-found') {
         throw new Error('root or not-found should not be routeKey');
       }
-      const rootRoute: AuthRoute.Route = {...ROOT_ROUTE, redirect: transformRouteNameToRoutePath(routeKey)};
+      const rootRoute: AuthRoute.Route = { ...ROOT_ROUTE, redirect: transformRouteNameToRoutePath(routeKey) };
       const rootRouteName: AuthRoute.AllRouteKey = 'root';
       router.removeRoute(rootRouteName);
       const rootVueRoute = transformAuthRouteToVueRoute(rootRoute)[0];
       router.addRoute(rootVueRoute);
     },
     async initDynamicRoute() {
-      const {userId} = localStg.get('userInfo') || {};
+      const { username } = localStg.get('userInfo') || {};
 
-      if (!userId) {
+      if (!username) {
         throw new Error('userId is mandatory ');
       }
 
-      const {error, data} = await fetchUserRoutes(userId);
+      const { error, data } = await fetchUserRoutes(username);
 
       if (!error) {
         this.routeHomeName = data.home;
