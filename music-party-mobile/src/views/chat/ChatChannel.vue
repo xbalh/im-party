@@ -14,42 +14,20 @@
 
     <v-divider></v-divider>
     <!-- channel messages -->
-    <div class="channel-page" :class="{'channel-page-bg':!current.dark}">
+    <div class="channel-page" :class="{ 'channel-page-bg': !current.dark }">
       <div id="messages" ref="messagesRef" class="messages mx-2">
         <v-slide-y-transition group tag="div">
-          <channel-message
-            v-for="message in messages"
-            :key="message.id"
-            :message="message"
-            class="my-4 d-flex"
-          />
+          <channel-message v-for="message in messages" :key="message.id" :message="message" class="my-4 d-flex" />
         </v-slide-y-transition>
       </div>
 
       <div class="input-box pa-2">
         <div class="d-flex position-relative align-center">
-          <v-text-field
-            v-model="input"
-            variant="outlined"
-            density="comfortable"
-            ref="inputMessage"
-            autofocus
+          <v-text-field v-model="input" variant="outlined" density="comfortable" ref="inputMessage" autofocus
             class="font-weight-bold position-relative align-center"
-            :placeholder="`${$t('chat.message')} #${$route.params.id}`"
-            hide-details
-            @keyup.enter="sendMessage"
-          >
+            :placeholder="`${$t('chat.message')} #${$route.params.id}`" hide-details @keyup.enter="sendMessage">
           </v-text-field>
-          <v-btn
-            flat
-            rounded
-            icon
-            size="small"
-            color="primary"
-            class="mx-1"
-            :disabled="!input"
-            @click="sendMessage"
-          >
+          <v-btn flat rounded icon size="small" color="primary" class="mx-1" :disabled="!input" @click="sendMessage">
             <v-icon size="small">mdi-send</v-icon>
           </v-btn>
         </div>
@@ -61,15 +39,15 @@
 
 <script lang="ts" setup>
 import ChannelMessage from './ChannelMessage.vue'
-import {ref} from "vue";
-import {fetchMessage} from '@/service'
-import {useTheme} from 'vuetify'
-import {useAuthStore} from "@/store";
-import {createId} from "seemly";
+import { ref } from "vue";
+import { fetchMessage } from '@/service'
+import { useTheme } from 'vuetify'
+import { useAuthStore } from "@/store";
+import { createId } from "seemly";
 
 
-const {current} = useTheme()
-const {userInfo} = useAuthStore()
+const { current } = useTheme()
+const { userInfo } = useAuthStore()
 const messagesRef = ref<HTMLDivElement>()
 const inputMessage = ref<HTMLDivElement>()
 const messages = ref<Array<ApiChatManagement.message>>([

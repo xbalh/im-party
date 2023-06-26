@@ -1,6 +1,6 @@
 const themeConfig: ThemeConfig.Config = {
 
-  primary: '#0096c7',
+  primary: '#55BB46',
 
   followOs: true,
 
@@ -19,9 +19,9 @@ const themeConfig: ThemeConfig.Config = {
   dark: {
     dark: true,
     colors: {
-      background: '#111b27',
-      surface: '#05090c',
-      primary: '#0096c7',
+      background: '#444444',
+      surface: '#25272a',
+      primary: '#55BB46',
       secondary: '#829099',
       accent: '#82B1FF',
       error: '#FF5252',
@@ -41,7 +41,7 @@ const themeConfig: ThemeConfig.Config = {
     colors: {
       background: '#f2f5f8',
       surface: '#ffffff',
-      primary: '#0096c7',
+      primary: '#55BB46',
       secondary: '#a0b9c8',
       accent: '#048ba8',
       error: '#ef476f',
@@ -50,7 +50,7 @@ const themeConfig: ThemeConfig.Config = {
       "on-success": '#ffffff',
       warning: '#ffd166',
     }
-  }
+  },
 }
 
 export default themeConfig
