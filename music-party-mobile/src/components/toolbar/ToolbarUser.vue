@@ -49,8 +49,8 @@ import {reactive} from "vue";
 const menu = reactive(
   [
     {icon: 'mdi-account-box-outline', key: 'menu.profile', link: '/apps/manager-user/edit'},
-    {icon: 'mdi-format-list-checkbox', key: 'menu.todo', link: '/apps/todo'},
-    {icon: 'mdi-email-outline', key: 'menu.board', link: '/apps/board'},
+    // {icon: 'mdi-format-list-checkbox', key: 'menu.todo', link: '/apps/todo'},
+    // {icon: 'mdi-email-outline', key: 'menu.board', link: '/apps/board'},
     {icon: 'mdi-forum-outline', key: 'menu.chat', link: '/apps/chat-channel/'}
   ]
 )
@@ -59,8 +59,8 @@ const auth = useAuthStore();
 const {isLogin, userInfo} = storeToRefs(auth)
 const logout = () => {
   window.$dialog?.show({
-    title: 'Logo out',
-    main: 'Are you sure logo out?',
+    title: '登出',
+    main: '确定要登出吗?',
     confirm: () => {
       window.$loadingOverly?.show()
       setTimeout(() => {

@@ -252,26 +252,36 @@ export const routeModel: Record<Auth.RoleType, AuthRoute.Route[]> = {
   ],
   user: [
     {
-      name: 'dashboard',
-      path: '/dashboard',
+      name: 'apps',
+      path: '/apps',
       component: 'basic',
       children: [
         {
-          name: 'dashboard_analytics',
-          path: '/dashboard/analytics',
-          component: 'self',
+          name: "apps_chat",
+          path: "/apps/chat",
+          component: "chat",
+          children: [
+            {
+              name: 'apps_chat-channel',
+              path: '/apps/chat-channel',
+              component: 'self',
+              meta: {
+                title: 'menu.chat-channel',
+                dynamicPath: '/apps/chat-channel/:id?',
+                hide: true
+              }
+            }
+          ],
           meta: {
-            icon: 'mdi-view-dashboard-outline',
-            title: 'menu.dashboard',
-            requiresAuth: true
+            title: "menu.chat",
+            order: 1,
+            icon: "mdi-forum-outline"
           }
         }
       ],
       meta: {
-        title: 'menu.dashboard',
-        icon: 'mdi-view-dashboard-outline',
-        order: 1,
-        requiresAuth: true
+        title: 'menu.apps',
+        requiresAuth: true,
       }
     },
   ]

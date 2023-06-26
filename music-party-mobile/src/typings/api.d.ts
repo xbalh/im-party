@@ -97,3 +97,13 @@ declare namespace ApiChatManagement {
     }
   }
 }
+
+declare namespace ApiRoomManagement {
+  interface roomInfo {
+    roomNo: number,
+    roomName: string,
+    roomOwner: string,
+    roomStyle: string,
+    createTime: string,
+  }
+}

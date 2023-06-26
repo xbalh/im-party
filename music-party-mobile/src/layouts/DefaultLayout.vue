@@ -22,14 +22,14 @@
     <!-- Navigation menu footer -->
     <template v-slot:append>
       <!-- Footer navigation links -->
-      <div class="py-2 text-center">
+      <!-- <div class="py-2 text-center">
         <v-btn size="small"
                :href="'https://next.vuetifyjs.com/en/'"
                flat
         >
           {{ $t('menu.docs') }}
         </v-btn>
-      </div>
+      </div> -->
 
     </template>
   </v-navigation-drawer>

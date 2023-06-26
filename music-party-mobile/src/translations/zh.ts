@@ -31,6 +31,12 @@ export default {
     'channel': '频道|频道',
     'message': '信息'
   },
+  'room': {
+    'online': '在线用户（{count}）',
+    'createRoom': '创建房间',
+    'room': '房间|房间',
+    'message': '信息'
+  },
   'email': {
     'compose': '编写邮件',
     'send': '发送',

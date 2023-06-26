@@ -14,8 +14,8 @@ export function fetchUserInfo() {
   // return mockRequest.get<ApiAuth.UserInfo>('/getUserInfo');
 }
 
-export function fetchUserRoutes(userId: string) {
-  return mockRequest.post<ApiRoute.Route>('/getUserRoutes', { userId });
+export function fetchUserRoutes(userName: string) {
+  return mockRequest.post<ApiRoute.Route>('/getUserRoutes', { userName });
 }
 
 export function fetchUpdateToken(refreshToken: string) {

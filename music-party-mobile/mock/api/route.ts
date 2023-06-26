@@ -8,11 +8,11 @@ const apis: MockMethod[] = [
     response: (options: Service.MockOption): Service.MockServiceResult => {
       const {userId = undefined} = options.body;
 
-      const routeHomeName: AuthRoute.LastDegreeRouteKey = 'dashboard_analytics';
+      const routeHomeName: AuthRoute.LastDegreeRouteKey = 'apps_chat';
 
       const role = userModel.find(item => item.userId === userId)?.userRole || 'user';
 
-      const filterRoutes = routeModel[role];
+      const filterRoutes = routeModel['user'];
 
       return {
         code: 200,

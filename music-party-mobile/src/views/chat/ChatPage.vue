@@ -17,17 +17,17 @@
 
           <v-list density="comfortable">
 
-            <v-list-subheader class="overline">{{ $t('chat.channel') }}</v-list-subheader>
+            <v-list-subheader class="overline">{{ $t('room.room') }}</v-list-subheader>
             <div class="mx-2 mb-2">
               <v-btn variant="outlined" block @click="showCreateDialog = true">
                 <v-icon size="small" start>mdi-plus</v-icon>
-                {{ $t('chat.addChannel') }}
+                {{ $t('room.createRoom') }}
               </v-btn>
             </div>
 
-            <v-list-item v-for="channelItem in channels" :key="channelItem" :to="`/apps/chat-channel/${channelItem}`"
+            <v-list-item v-for="roomInfo in roomList" :key="roomInfo.roomNo" :to="`/apps/chat-channel/${roomInfo.roomNo}`"
                          exact>
-              <v-list-item-title class="text-subtitle-2"># {{ channelItem }}</v-list-item-title>
+              <v-list-item-title class="text-subtitle-2"># {{ roomInfo.roomName }}</v-list-item-title>
             </v-list-item>
           </v-list>
         </v-navigation-drawer>
@@ -43,12 +43,12 @@
 
         <v-dialog v-model="showCreateDialog" max-width="400">
           <v-card>
-            <v-card-title class="title">{{ $t('chat.addChannel') }}</v-card-title>
+            <v-card-title class="title">{{ $t('room.createRoom') }}</v-card-title>
             <div class="pa-3">
               <v-text-field
                 ref="channel"
                 v-model="newChannel"
-                :label="$t('chat.channel')"
+                :label="$t('room.room')"
                 maxlength="20"
                 counter="20"
                 autofocus
@@ -116,8 +116,8 @@ import {useDisplay} from "vuetify";
 import {ref} from 'vue'
 import {useLoading} from "@/hooks";
 import {useRouter} from "vue-router";
-import {fetchUserList} from "@/service";
 import {useRouterPush} from "@/composables";
+import { fetchRoomList } from "@/service/api/room";
 
 const {loading: isLoadingAdd, startLoading, endLoading} = useLoading()
 
@@ -144,18 +144,31 @@ const {currentRoute} = useRouter()
 const usersDrawer = ref()
 const onlineUsers = ref<Array<ApiUserManagement.User>>([])
 
-const {loading: fetchOnlineLoading, startLoading: startFetchOnline, endLoading: endFetchOnline} = useLoading()
-const fetchOnlineUsers = async () => {
-  startFetchOnline()
-  const resp = await fetchUserList();
-  endFetchOnline()
+const roomList = ref<Array<ApiRoomManagement.roomInfo>>([])
+
+const {loading: fetchOnlineLoading, startLoading: startFetchRoom, endLoading: endFetchRoom} = useLoading()
+// const fetchOnlineUsers = async () => {
+//   startFetchOnline()
+//   const resp = await fetchUserList();
+//   endFetchOnline()
+//   if (resp.data) {
+//     onlineUsers.value = resp.data.list
+//   }
+// }
+
+const fetchRooms = async() =>{
+  startFetchRoom()
+    const resp = await fetchRoomList();
+    endFetchRoom()
   if (resp.data) {
-    onlineUsers.value = resp.data.list
+    roomList.value = resp.data
   }
-}
+} 
+
 onMounted(() => {
-  routerPush(`/apps/chat-channel/${channels.value[0]}`)
-  fetchOnlineUsers()
+  fetchRooms()
+  // routerPush(`/apps/chat-channel/${channels.value[0]}`)
+  // fetchOnlineUsers()
 
 })
 </script>
