@@ -136,7 +136,7 @@ export const routeModel: Record<Auth.RoleType, AuthRoute.Route[]> = {
           meta: {
             title: "menu.chat",
             order: 1,
-            icon: "mdi-forum-outline"
+            icon: "mdi-music"
           }
         }
       ],
@@ -275,9 +275,32 @@ export const routeModel: Record<Auth.RoleType, AuthRoute.Route[]> = {
           meta: {
             title: "menu.chat",
             order: 1,
-            icon: "mdi-forum-outline"
+            icon: "mdi-music"
           }
-        }
+        },
+        {
+          name: 'apps_manager-user',
+          path: '/apps/manager-user',
+          component: 'blank',
+          children: [
+            {
+              name: 'apps_manager-user_edit',
+              path: '/apps/manager-user/edit',
+              component: 'self',
+              meta: {
+                title: 'menu.usersEdit',
+                dynamicPath: '/apps/manager-user/edit/:id?',
+                requiresAuth: true
+              }
+            }
+          ],
+          meta: {
+            title: 'menu.users',
+            icon: 'mdi-account-multiple-outline',
+            requiresAuth: true,
+            order: 2,
+          }
+        },
       ],
       meta: {
         title: 'menu.apps',

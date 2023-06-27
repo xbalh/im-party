@@ -48,6 +48,7 @@
     >
       <div class="d-flex flex-grow-1 align-center">
         <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+        <!-- <audio controls ></audio> -->
         <v-spacer class="d-none d-lg-block"/>
         <v-autocomplete
           :placeholder="$t('menu.search')"
