@@ -25,7 +25,8 @@
         <div class="d-flex position-relative align-center">
           <v-text-field v-model="input" variant="outlined" density="comfortable" ref="inputMessage" autofocus
             class="font-weight-bold position-relative align-center"
-            :placeholder="`${$t('chat.message')} #${$route.params.id}`" hide-details @keyup.enter="sendMessage">
+            :placeholder="`${$t('chat.message')} #${$route.params.id}`" hide-details @keyup.enter="sendMessage"
+            @blur="changeBlur">
           </v-text-field>
           <v-btn flat rounded icon size="small" color="primary" class="mx-1" :disabled="!input" @click="sendMessage">
             <v-icon size="small">mdi-send</v-icon>
@@ -111,6 +112,9 @@ onUnmounted(() => {
   clearInterval(demo.value)
 })
 
+const changeBlur = () => {
+  window.scroll(0, 0);//失焦后强制让页面归位
+}
 
 const sendMessage = () => {
   messages.value.push({

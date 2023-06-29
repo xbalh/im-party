@@ -1,27 +1,14 @@
 <template>
   <div>
-    <v-btn
-      theme="dark"
-      ref="refButton"
-      class="drawer-button"
-      color="#ee44aa"
-      @click="right = true"
-    >
+    <!-- <v-btn theme="dark" ref="refButton" class="drawer-button" color="#ee44aa" @click="right = true">
       <v-icon class="fa-spin">mdi-cog-outline</v-icon>
-    </v-btn>
+    </v-btn> -->
 
-    <v-navigation-drawer
-      v-model="right"
-      location="right"
-      floating
-      temporary
-      order="-10"
-      width="310"
-    >
+    <v-navigation-drawer v-model="openSetting" location="right" floating temporary order="-10" width="310">
       <div class="d-flex align-center pa-2">
         <div class="title">Settings</div>
         <v-spacer></v-spacer>
-        <v-btn flat icon @click="right = false">
+        <v-btn flat icon @click="openSetting = false">
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </div>
@@ -74,15 +61,22 @@
 </template>
 
 <script setup lang="ts">
-import {ComponentPublicInstance} from "vue";
-import {useThemeStore} from "@/store";
+import { ComponentPublicInstance } from "vue";
+import { useThemeStore } from "@/store";
+import Bus from "@/utils/common/Bus";
 
+
+const openSetting = ref(false)
+Bus.on('openSetting', (flag: boolean) => {
+  openSetting.value = flag
+})
+//使用父组件传递过来的值
 const themeConfig = useThemeStore()
-const right = ref(false)
+// const right = ref(false)
 let timeout: NodeJS.Timeout
 const swatches = reactive([['#0096c7', '#31944f'],
-  ['#EE4f12', '#46BBB1'],
-  ['#ee44aa', '#55BB46']])
+['#EE4f12', '#46BBB1'],
+['#ee44aa', '#55BB46']])
 const refButton = ref<ComponentPublicInstance>()
 const execAnimate = () => {
   if (timeout) {
@@ -127,6 +121,7 @@ onBeforeUnmount(() => {
     from {
       transform: rotate(0deg);
     }
+
     to {
       transform: rotate(360deg);
     }

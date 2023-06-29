@@ -2,7 +2,7 @@
   <div>
     <v-card class="text-center pa-1">
       <v-card-title class="justify-center text-h4 mb-2">{{ $t('register.title') }}</v-card-title>
-      <v-card-subtitle>Let's build amazing products</v-card-subtitle>
+      <!-- <v-card-subtitle>Let's build amazing products</v-card-subtitle> -->
 
       <!-- sign up form -->
       <v-card-text>
@@ -62,7 +62,7 @@
           <div class="caption font-weight-bold text-uppercase my-3">{{ $t('register.orsign') }}</div>
 
           <!-- external providers list -->
-          <v-btn
+          <!-- <v-btn
             v-for="provider in providers"
             :key="provider.id"
             :loading="provider.isLoading"
@@ -74,7 +74,7 @@
           >
             <v-icon small left>mdi-{{ provider.id }}</v-icon>
             {{ provider.label }}
-          </v-btn>
+          </v-btn> -->
 
           <div v-if="errorProvider" class="error--text">{{ errorProviderMessages }}</div>
 

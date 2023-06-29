@@ -32,6 +32,14 @@
         </template>
         <v-list-item-title>{{ $t(item.key) }}</v-list-item-title>
       </v-list-item>
+      <v-list-item
+      key="setting"
+      @click="openSetting">
+      <template v-slot:prepend>
+          <v-icon size="small" icon="mdi-cog"></v-icon>
+        </template>
+        <v-list-item-title>设置</v-list-item-title>
+      </v-list-item>
 
       <v-divider class="my-1"></v-divider>
 
@@ -45,6 +53,13 @@
 
 <script setup lang="ts">
 import {reactive} from "vue";
+import Bus from "@/utils/common/Bus";
+
+
+const openSetting = () =>{
+  Bus.emit('openSetting', true)
+}
+
 
 const menu = reactive(
   [
@@ -54,6 +69,8 @@ const menu = reactive(
     {icon: 'mdi-music', key: 'menu.chat', link: '/apps/chat-channel/'}
   ]
 )
+
+
 
 const auth = useAuthStore();
 const {isLogin, userInfo} = storeToRefs(auth)
