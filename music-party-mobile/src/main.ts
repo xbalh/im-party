@@ -9,6 +9,7 @@ import App from './App.vue'
 // Composables
 import "@/assets/scss/theme.scss"
 import "animate.css/animate.min.css"
+import DragDirectives from "@/utils/directives/dragDirectives"
 
 async function setupApp() {
   const app = createApp(App)
@@ -17,6 +18,8 @@ async function setupApp() {
 
   registerFilters(app)
   registerPlugins(app)
+
+  app.use(DragDirectives)
   app.mount('#app')
 }
 

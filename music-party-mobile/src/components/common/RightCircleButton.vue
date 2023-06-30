@@ -1,7 +1,7 @@
 <template>
-  <div >
-    <v-btn id="my_btn" style="position: fixed;" theme="dark" ref="refButton" icon="mdi-forum-outline" class="drawer-button" color="#55BB46"
-    draggable="true" @dragstart="dragstart($event)" @dragend="dragend($event)">
+  <div> 
+    <v-btn id="my_btn" style="position: fixed;" theme="dark" ref="refButton" icon="mdi-forum-outline"
+      class="drawer-button" color="#55BB46" v-dialogDrag="true">
       <!-- <v-badge content="66" offset-x="20" offset-y="-15">
         <v-icon class="fa-spin">mdi-forum-outline</v-icon>
       </v-badge> -->
@@ -15,8 +15,7 @@
 <script setup lang="ts">
 import Bus from "@/utils/common/Bus";
 
-const refButton = ref()
-
+const refButton = ref<import('vuetify/components').VBtn>()
 
 const openSetting = ref(false)
 Bus.on('openSetting', (flag: boolean) => {
@@ -24,19 +23,18 @@ Bus.on('openSetting', (flag: boolean) => {
 })
 
 
-// 拖拽开始事件
-const dragstart = (e: any) => {
-  // 记录拖拽元素初始位置
+// // 拖拽开始事件
+// const dragstart = (e: any) => {
+//   // 记录拖拽元素初始位置
 
-};
-// 拖拽完成事件
-const dragend = (e: any) => {
-  console.log("eeeeee", e);
-
-  let btn = document.getElementById("my_btn") as HTMLElement
-  btn!.style.left = e.clientX + 'px';
-  btn!.style.top = e.clientY + 'px';
-}
+// };
+// // 拖拽完成事件
+// const dragend = (e: any) => {
+//   console.log("eeeeee", e);
+//   let btn = document.getElementById("my_btn") as HTMLElement
+//   btn!.style.left = e.clientX + 'px';
+//   btn!.style.top = e.clientY + 'px';
+// }
 
 onMounted(() => {
   // execAnimate()
