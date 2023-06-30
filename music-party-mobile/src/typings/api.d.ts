@@ -67,33 +67,8 @@ declare namespace ApiChatManagement {
     image?: string,
     user: {
       avatar: string,
-      id: string
-    }
-  }
-}
-
-declare namespace ApiChatManagement {
-  interface message {
-    id: string,
-    text: string,
-    timestamp: string,
-    image?: string,
-    user: {
-      avatar: string,
-      id: string
-    }
-  }
-}
-
-declare namespace ApiChatManagement {
-  interface message {
-    id: string,
-    text: string,
-    timestamp: string,
-    image?: string,
-    user: {
-      avatar: string,
-      id: string
+      id: string,
+      name: string
     }
   }
 }
