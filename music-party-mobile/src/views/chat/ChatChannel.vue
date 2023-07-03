@@ -61,27 +61,6 @@ const messages = ref<Array<ApiChatManagement.message>>([
       id: '1',
       name: 'test1'
     }
-  },
-  {
-    id: '2',
-    text: "who is lulu?",
-    timestamp: "2022-12-13 15:18:10",
-    user: {
-      avatar: 'avatar3',
-      id: '2',
-      name: 'test2'
-    }
-  },
-  {
-    id: '3',
-    text: "lulu is my arrogant cat",
-    image: 'https://i.imgur.com/3e63lxL.jpg',
-    timestamp: "2022-12-13 16:13:10",
-    user: {
-      avatar: 'avatar9',
-      id: '3',
-      name: 'test3'
-    }
   }
 ])
 defineEmits(['toggle-menu', 'toggle-usersDrawer'])

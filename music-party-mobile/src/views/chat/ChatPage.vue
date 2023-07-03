@@ -3,7 +3,7 @@
     <v-layout full-height :class="{ 'position-static': !lgAndUp }">
       <div class="d-flex flex-grow-1 flex-row">
         <v-navigation-drawer v-model="channelDrawer" :permanent="lgAndUp" floating
-          class="elevation-1 rounded flex-shrink-0" :class="{ 'top-z-index': !lgAndUp }" width="240">
+          class="elevation-1 rounded flex-shrink-0" :class="{ 'top-z-index': !lgAndUp }" width="240" touchless>
           <div class="px-2 py-1">
             <div class="title font-weight-bold text-primary">音趴</div>
             <div class="overline">1.0.0</div>
@@ -64,7 +64,7 @@
       </div>
 
     </v-layout>
-    <v-navigation-drawer v-model="usersDrawer" width="180" order="-1" location="right">
+    <v-navigation-drawer v-model="usersDrawer" width="180" order="-1" location="right" touchless>
       <v-list v-if="!fetchOnlineLoading" dense>
         <v-list-item-subtitle class="mx-2 my-2 overline ">
           {{ $t('chat.online', { count: onlineUsers.length }) }}

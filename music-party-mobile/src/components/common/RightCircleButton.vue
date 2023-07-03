@@ -1,14 +1,38 @@
 <template>
-  <div> 
-    <v-btn id="my_btn" style="position: fixed;" theme="dark" ref="refButton" icon="mdi-forum-outline"
-      class="drawer-button" color="#55BB46" v-dialogDrag="true">
-      <!-- <v-badge content="66" offset-x="20" offset-y="-15">
-        <v-icon class="fa-spin">mdi-forum-outline</v-icon>
-      </v-badge> -->
+  <div>
+    <!-- 聊天室 -->
+    <!-- <div>
+      <v-btn style="position: fixed;" theme="dark" ref="refButton1" icon="mdi-forum-outline"
+      class="drawer-button" color="#55BB46" v-if="dragDotRight" @click="dragDotRight = false">
       <v-badge dot offset-x="15" offset-y="-10" color="red">
         <v-icon class="fa-spin">mdi-forum-outline</v-icon>
       </v-badge>
     </v-btn>
+    <v-btn style="position: fixed;" theme="dark" ref="refButton2" icon="mdi-forum-outline"
+      class="drawer-button1 " color="#55BB46" v-dialogDrag="true" v-if="!dragDotRight">
+      <v-badge content="99+" offset-x="-10" offset-y="-10" color="red">
+        <v-icon class="fa-spin">mdi-forum-outline</v-icon>
+      </v-badge>
+    </v-btn>
+    </div> -->
+    <!-- 音乐播放 -->
+    <div>
+      <!-- 隐藏到右侧 -->
+      <v-btn theme="dark" ref="refButton1" icon="mdi-music" class="music-button" color="#ec4444" v-if="dragDotRight"
+        @click="dragDotRight = false">
+        <v-icon class="fa-spin">mdi-music</v-icon>
+      </v-btn>
+      <!-- 完全显示 -->
+      <div class="music-button1" v-dialogDrag="true">
+        <v-progress-circular v-model="progress" class="me-2" size="60" width="3" v-if="!dragDotRight">
+          <v-btn theme="dark" ref="refButton2" icon="mdi-music" color="#ec4444"
+            v-if="!dragDotRight" @click="toMusicPage">
+            <v-icon class="fa-spin">mdi-music</v-icon>
+          </v-btn>
+        </v-progress-circular>
+      </div>
+
+    </div>
   </div>
 </template>
 
@@ -17,13 +41,18 @@ import Bus from "@/utils/common/Bus";
 
 const refButton = ref<import('vuetify/components').VBtn>()
 
-const openSetting = ref(false)
-Bus.on('openSetting', (flag: boolean) => {
-  openSetting.value = flag
+const dragDotRight = ref(false)
+Bus.on('dragDotRight', (flag: boolean) => {
+  dragDotRight.value = flag
 })
 
+const progress = ref<number>(50)
 
-// // 拖拽开始事件
+const toMusicPage = ()=>{
+  
+}
+
+// // 拖拽开始事件  
 // const dragstart = (e: any) => {
 //   // 记录拖拽元素初始位置
 
@@ -47,6 +76,7 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .drawer-button {
+  width: 60px;
   position: fixed;
   top: 340px;
   right: -20px;
@@ -56,6 +86,20 @@ onMounted(() => {
 
   .v-icon {
     margin-left: -18px;
+    font-size: 1.3rem;
+  }
+}
+
+.drawer-button1 {
+  position: fixed;
+  top: 340px;
+  right: 35px;
+  z-index: 9999;
+  box-shadow: 1px 1px 18px #55BB46;
+  // opacity: 75%;
+
+  .v-icon {
+    // margin-left: -18px;
     font-size: 1.3rem;
   }
 
@@ -72,5 +116,40 @@ onMounted(() => {
       transform: rotate(360deg);
     }
   }
+}
+
+.music-button {
+  position: fixed;
+  top: 340px;
+  right: -20px;
+  z-index: 999;
+  box-shadow: 1px 1px 18px #ec4444;
+  opacity: 75%;
+
+  .v-icon {
+    margin-left: -18px;
+    font-size: 1.3rem;
+  }
+}
+
+.music-button1 {
+  position: fixed;
+  top: 340px;
+  right: 35px;
+  z-index: 9999;
+  // border: 1px solid;
+  .v-btn{
+    box-shadow: 1px 1px 18px #ec4444;
+  }
+  .v-icon {
+    font-size: 1.3rem;
+  }
+}
+
+.progress {
+  position: fixed;
+  top: 340px;
+  right: 35px;
+  z-index: 9999;
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <v-layout class="h-100">
-    <v-navigation-drawer width="250" :permanent="true">
+    <v-navigation-drawer width="250" :permanent="true" touchless>
       <v-list>
         <v-list-item>
           <div class="text-h5 font-weight-bold">Form Component</div>
@@ -27,7 +27,7 @@
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
-    <v-navigation-drawer width="250" :permanent="true" location="right">
+    <v-navigation-drawer width="250" :permanent="true" location="right" touchless>
       <v-card elevation="0">
         <v-card-title>
           Base Attribute

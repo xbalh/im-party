@@ -7,6 +7,7 @@
         floating
         :class="{'top-z-index':!lgAndUp}"
         class="elevation-1 rounded flex-shrink-0"
+        touchless
       >
         <todo-menu class="todo-app-menu pa-2" @open-compose="openCompose"></todo-menu>
       </v-navigation-drawer>

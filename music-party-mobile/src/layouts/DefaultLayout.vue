@@ -6,6 +6,7 @@
     name="app-navigation"
     :theme="theme.menuTheme"
     class="elevation-1"
+    touchless
   >
 
     <!-- Navigation menu info -->

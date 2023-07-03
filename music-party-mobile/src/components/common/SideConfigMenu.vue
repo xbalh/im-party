@@ -4,7 +4,7 @@
       <v-icon class="fa-spin">mdi-cog-outline</v-icon>
     </v-btn> -->
 
-    <v-navigation-drawer v-model="openSetting" location="right" floating temporary order="-10" width="310">
+    <v-navigation-drawer v-model="openSetting" location="right" floating temporary order="-10" width="310" touchless>
       <div class="d-flex align-center pa-2">
         <div class="title">Settings</div>
         <v-spacer></v-spacer>
