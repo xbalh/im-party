@@ -25,7 +25,7 @@
         <div class="d-flex position-relative align-center">
           <v-text-field v-model="input" variant="outlined" density="comfortable" ref="inputMessage" autofocus
             class="font-weight-bold position-relative align-center"
-            :placeholder="`${$t('chat.message')} #${$route.params.id}`" hide-details @keyup.enter="sendMessage"
+            :placeholder="`${$t('chat.message')}`" hide-details @keyup.enter="sendMessage"
             @blur="changeBlur">
           </v-text-field>
           <v-btn flat rounded icon size="small" color="primary" class="mx-1" :disabled="!input" @click="sendMessage">
@@ -41,7 +41,6 @@
 <script lang="ts" setup>
 import ChannelMessage from './ChannelMessage.vue'
 import { ref } from "vue";
-import { fetchMessage } from '@/service'
 import { useTheme } from 'vuetify'
 import { useAuthStore } from "@/store";
 import { createId } from "seemly";

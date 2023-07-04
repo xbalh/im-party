@@ -112,7 +112,6 @@ const searchSelect = (item: AuthRoute.Route) => {
   if (item)
     push.routerPush(item)
 }
-
 </script>
 
 <style scoped>

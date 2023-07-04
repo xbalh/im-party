@@ -1,5 +1,5 @@
-ImageTag ?=v1.1.0
-ImageName ?= sunhao1256/lulu-admin-frontend:$(ImageTag)
+ImageTag ?=v0.0.1
+ImageName ?= Su-wsm/imparty-frontend:$(ImageTag)
 Platform ?=linux/amd64
 
 VERSION=$(shell git rev-parse --short HEAD)

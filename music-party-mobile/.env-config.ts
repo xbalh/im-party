@@ -7,19 +7,22 @@ const serviceEnv: ServiceEnv = {
     url: 'http://localhost:8080',
     urlPattern: '/api',
     secondUrl: 'http://localhost:8081',
-    secondUrlPattern: '/second-url-pattern'
+    secondUrlPattern: '/second-url-pattern',
+    wsUrl: 'ws://localhost:8080'
   },
   test: {
     url: 'http://localhost:8080',
     urlPattern: '/api',
     secondUrl: 'http://localhost:8081',
-    secondUrlPattern: '/second-url-pattern'
+    secondUrlPattern: '/second-url-pattern',
+    wsUrl: 'ws://localhost:8080'
   },
   prod: {
     url: 'http://localhost:8080',
     urlPattern: '/api',
     secondUrl: 'http://localhost:8081',
-    secondUrlPattern: '/second-url-pattern'
+    secondUrlPattern: '/second-url-pattern',
+    wsUrl: 'ws://localhost:8080'
   }
 };
 

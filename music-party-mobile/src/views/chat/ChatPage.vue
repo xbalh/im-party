@@ -1,5 +1,5 @@
 <template>
-  <div class="h-100">
+  <div class="h-100" v-if="!isMusicPage">
     <v-layout full-height :class="{ 'position-static': !lgAndUp }">
       <div class="d-flex flex-grow-1 flex-row">
         <v-navigation-drawer v-model="channelDrawer" :permanent="lgAndUp" floating
@@ -19,10 +19,6 @@
               </v-btn>
             </div>
 
-            <!-- <v-list-item v-for="roomInfo in roomList" :key="roomInfo.roomNo" :to="`/apps/chat-channel/${roomInfo.roomNo}`"
-                         exact>
-              <v-list-item-title class="text-subtitle-2"># {{ roomInfo.roomName }}</v-list-item-title>
-            </v-list-item> -->
             <v-list v-model:opened="open">
               <v-list-group v-for="(roomlist, roomstyle) in roomMap" :key="roomstyle" :value="roomstyle">
                 <template v-slot:activator="{ props }">
@@ -88,6 +84,10 @@
       </v-row>
     </v-navigation-drawer>
   </div>
+
+  <div class="h-100" v-if="isMusicPage">
+    <music-player />
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -98,8 +98,14 @@ import { useRouter } from "vue-router";
 import { useRouterPush } from "@/composables";
 import { fetchRoomList } from "@/service/api/room";
 import { groupByKey } from "~/src/utils";
+import Bus from "@/utils/common/Bus";
 
 const { loading: isLoadingAdd, startLoading, endLoading } = useLoading()
+
+const isMusicPage = ref(false)
+Bus.on('toMusicPage', (flag: boolean) => {
+  isMusicPage.value = flag
+})
 
 const channelDrawer = ref()
 const showCreateDialog = ref(false)

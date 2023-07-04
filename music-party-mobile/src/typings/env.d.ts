@@ -5,6 +5,7 @@ interface ServiceEnvConfig {
   urlPattern: '/api';
   secondUrl: string;
   secondUrlPattern: '/second-url-pattern';
+  wsUrl: string;
 }
 
 interface ImportMetaEnv {

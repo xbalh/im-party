@@ -1,32 +1,33 @@
 <template>
   <div>
     <!-- 聊天室 -->
-    <!-- <div>
-      <v-btn style="position: fixed;" theme="dark" ref="refButton1" icon="mdi-forum-outline"
-      class="drawer-button" color="#55BB46" v-if="dragDotRight" @click="dragDotRight = false">
-      <v-badge dot offset-x="15" offset-y="-10" color="red">
-        <v-icon class="fa-spin">mdi-forum-outline</v-icon>
-      </v-badge>
-    </v-btn>
-    <v-btn style="position: fixed;" theme="dark" ref="refButton2" icon="mdi-forum-outline"
-      class="drawer-button1 " color="#55BB46" v-dialogDrag="true" v-if="!dragDotRight">
-      <v-badge content="99+" offset-x="-10" offset-y="-10" color="red">
-        <v-icon class="fa-spin">mdi-forum-outline</v-icon>
-      </v-badge>
-    </v-btn>
-    </div> -->
+    <div>
+      <!-- 隐藏到右侧 -->
+      <v-btn theme="dark" ref="refButton1" icon="mdi-forum-outline" class="drawer-button"
+        color="#55BB46" v-if="isMusicPage && dragDotRight" @click="dragDotRight = false">
+        <v-badge dot offset-x="15" offset-y="-10" color="red">
+          <v-icon class="fa-spin">mdi-forum-outline</v-icon>
+        </v-badge>
+      </v-btn>
+      <!-- 完全显示 -->
+      <v-btn theme="dark" ref="refButton2" icon="mdi-forum-outline" class="drawer-button1 "
+        color="#55BB46" v-if="isMusicPage && !dragDotRight" v-dialogDrag::click="toChatPage">
+        <v-badge content="99+" offset-x="-10" offset-y="-10" color="red">
+          <v-icon class="fa-spin">mdi-forum-outline</v-icon>
+        </v-badge>
+      </v-btn>
+    </div>
     <!-- 音乐播放 -->
     <div>
       <!-- 隐藏到右侧 -->
-      <v-btn theme="dark" ref="refButton1" icon="mdi-music" class="music-button" color="#ec4444" v-if="dragDotRight"
-        @click="dragDotRight = false">
+      <v-btn theme="dark" ref="refButton1" icon="mdi-music" class="music-button" color="#ec4444"
+        v-if="!isMusicPage && dragDotRight" @click="dragDotRight = false">
         <v-icon class="fa-spin">mdi-music</v-icon>
       </v-btn>
       <!-- 完全显示 -->
-      <div class="music-button1" v-dialogDrag="true">
-        <v-progress-circular v-model="progress" class="me-2" size="60" width="3" v-if="!dragDotRight">
-          <v-btn theme="dark" ref="refButton2" icon="mdi-music" color="#ec4444"
-            v-if="!dragDotRight" @click="toMusicPage">
+      <div class="music-button1" v-dialogDrag::click="toMusicPage">
+        <v-progress-circular v-model="progress" class="me-2" size="60" width="3" v-if="!isMusicPage && !dragDotRight">
+          <v-btn theme="dark" ref="refButton2" icon="mdi-music" color="#ec4444" v-if="!dragDotRight">
             <v-icon class="fa-spin">mdi-music</v-icon>
           </v-btn>
         </v-progress-circular>
@@ -38,6 +39,7 @@
 
 <script setup lang="ts">
 import Bus from "@/utils/common/Bus";
+const isMusicPage = ref(false)
 
 const refButton = ref<import('vuetify/components').VBtn>()
 
@@ -48,8 +50,16 @@ Bus.on('dragDotRight', (flag: boolean) => {
 
 const progress = ref<number>(50)
 
-const toMusicPage = ()=>{
-  
+const toMusicPage = () => {
+  console.log("去音乐播放页面")
+  isMusicPage.value = true
+  Bus.emit("toMusicPage", true)
+}
+
+const toChatPage = () => {
+  console.log("去聊天页面")
+  isMusicPage.value = false
+  Bus.emit("toMusicPage", false)
 }
 
 // // 拖拽开始事件  
@@ -133,14 +143,17 @@ onMounted(() => {
 }
 
 .music-button1 {
+  width: 60px;
   position: fixed;
   top: 340px;
   right: 35px;
   z-index: 9999;
+
   // border: 1px solid;
-  .v-btn{
+  .v-btn {
     box-shadow: 1px 1px 18px #ec4444;
   }
+
   .v-icon {
     font-size: 1.3rem;
   }

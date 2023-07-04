@@ -34,6 +34,7 @@ declare namespace PageRoute {
     | 'apps_todo_label'
     | 'apps_chat'
     | 'apps_chat-channel'
+    | 'apps_music'
     | 'pages'
     | 'pages_error'
     | 'pages_error_notfound'
