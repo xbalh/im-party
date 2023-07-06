@@ -5,6 +5,10 @@ const drag = {
   beforeMount(el: any, binding: any) {
     // 自定义属性，判断是否可拖拽
     if (!binding.value) return
+    document.onmousemove = null
+    document.onmousedown = null
+    document.ontouchstart = null
+    document.ontouchmove = null
     el.style.cssText += ';cursor:move;'
     // dragDom.style.cssText += ';bottom:0px;'
 
@@ -75,8 +79,8 @@ const drag = {
 
       document.ontouchend = function (e: any) {
         const lastTime = new Date().getTime();
-        document.ontouchmove = null
         document.ontouchstart = null
+        document.ontouchmove = null
         if (!isMove) {
           console.log("这次是点击")
           binding.value()

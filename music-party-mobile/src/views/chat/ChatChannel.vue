@@ -104,7 +104,8 @@ const sendMessage = () => {
     timestamp: new Date().toLocaleString(),
     user: {
       id: userInfo.userId,
-      avatar: userInfo.userAvatar ?? ''
+      avatar: userInfo.userAvatar ?? '',
+      name: userInfo.userName
     }
   })
   input.value = ""

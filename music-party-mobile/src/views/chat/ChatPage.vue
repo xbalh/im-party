@@ -1,5 +1,5 @@
 <template>
-  <div class="h-100" v-if="!isMusicPage">
+  <v-card class="h-100" v-show="!isMusicPage">
     <v-layout full-height :class="{ 'position-static': !lgAndUp }">
       <div class="d-flex flex-grow-1 flex-row">
         <v-navigation-drawer v-model="channelDrawer" :permanent="lgAndUp" floating
@@ -83,11 +83,11 @@
         </v-col>
       </v-row>
     </v-navigation-drawer>
-  </div>
-
-  <div class="h-100" v-if="isMusicPage">
+  </v-card>
+  
+  <v-card class="h-100" v-show="isMusicPage">
     <music-player />
-  </div>
+  </v-card>
 </template>
 
 <script lang="ts" setup>
