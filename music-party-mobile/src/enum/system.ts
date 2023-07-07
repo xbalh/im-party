@@ -4,7 +4,8 @@ export enum EnumLayoutComponentName {
   auth = 'auth-layout',
   error = 'error-layout',
   todo = 'todo-layout',
-  chat = 'chat-layout'
+  chat = 'chat-layout',
+  music = 'music-layout'
 }
 
 export enum EnumThemeLayoutMode {

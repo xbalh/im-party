@@ -1,26 +1,19 @@
 <template>
-  <v-layout full-height>
-    <div class="d-flex flex-grow-1 flex-row" style="display: flex;">
-      <div class="channel-page">
-        <div style="height: 80%;">
-
-        </div>
-        <div style="height: 20%;" class="g-glossy">
-          <div>
-            <v-progress-linear model-value="30" bg-color="blue-grey" color="lime"></v-progress-linear>
-          </div>
-          <div>
-            <v-btn>
-              <v-icon size="x-large" icon="mdi-playlist-music" />
-            </v-btn>
-          </div>
-
-        </div>
+  <div class="channel-page">
+    <div style="height: 80%;">
+      <v-btn @click="">
+        <v-icon size="x-large" icon="mdi-playlist-music" />
+      </v-btn>
+    </div>
+    <div style="height: 20%;" class="g-glossy">
+      <div>
+        <v-progress-linear model-value="30" bg-color="blue-grey" color="lime"></v-progress-linear>
+      </div>
+      <div>
 
       </div>
-
     </div>
-  </v-layout>
+  </div>
 </template>
 
 <script lang="ts" setup>

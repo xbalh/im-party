@@ -1,5 +1,5 @@
 <template>
-  <v-card class="h-100" v-show="!isMusicPage">
+  <v-card key="chat" class="h-100" v-if="!isMusicPage">
     <v-layout full-height :class="{ 'position-static': !lgAndUp }">
       <div class="d-flex flex-grow-1 flex-row">
         <v-navigation-drawer v-model="channelDrawer" :permanent="lgAndUp" floating
@@ -84,9 +84,12 @@
       </v-row>
     </v-navigation-drawer>
   </v-card>
-  
-  <v-card class="h-100" v-show="isMusicPage">
-    <music-player />
+  <v-card key="music" class="h-100" v-else>
+    <v-layout full-height :class="{ 'position-static': !lgAndUp }">
+      <div class="d-flex flex-grow-1 flex-row">
+        <music-player />
+      </div>
+    </v-layout>
   </v-card>
 </template>
 
@@ -97,7 +100,7 @@ import { useLoading } from "@/hooks";
 import { useRouter } from "vue-router";
 import { useRouterPush } from "@/composables";
 import { fetchRoomList } from "@/service/api/room";
-import { groupByKey } from "~/src/utils";
+import { groupByKey } from "@/utils";
 import Bus from "@/utils/common/Bus";
 
 const { loading: isLoadingAdd, startLoading, endLoading } = useLoading()
@@ -165,4 +168,5 @@ onMounted(() => {
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+</style>

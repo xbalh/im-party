@@ -23,6 +23,7 @@ declare namespace PageRoute {
     | 'not-found'
     | 'dashboard'
     | 'dashboard_analytics'
+    | 'special'
     | 'apps'
     | 'apps_manager-user'
     | 'apps_manager-user_list'
@@ -34,7 +35,7 @@ declare namespace PageRoute {
     | 'apps_todo_label'
     | 'apps_chat'
     | 'apps_chat-channel'
-    | 'apps_music'
+    | 'special_music'
     | 'pages'
     | 'pages_error'
     | 'pages_error_notfound'
@@ -58,6 +59,7 @@ declare namespace PageRoute {
     | '403'
     | '404'
     | '500'
+    | 'special'
     | 'login'
     | 'not-found'
     | 'dashboard_analytics'
@@ -75,5 +77,6 @@ declare namespace PageRoute {
     | 'other_menu-levels-3-2'
     | 'form_list'
     | 'form_design'
+    | 'special_music'
     >;
 }

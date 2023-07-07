@@ -1,5 +1,5 @@
-import type {RouteRecordRaw} from 'vue-router';
-import {getLayoutComponent, getViewComponent} from '@/utils';
+import type { RouteRecordRaw } from 'vue-router';
+import { getLayoutComponent, getViewComponent } from '@/utils';
 import i18n from "@/plugins/vue-i18n";
 
 export function transformAuthRouteToVueRoutes(routes: AuthRoute.Route[]) {
@@ -11,14 +11,14 @@ type ComponentAction = Record<AuthRoute.RouteComponentType, () => void>;
 export function transformAuthRouteToVueRoute(item: AuthRoute.Route) {
   const resultRoute: RouteRecordRaw[] = [];
 
-  const itemRoute = {...item} as RouteRecordRaw;
+  const itemRoute = { ...item } as RouteRecordRaw;
 
   if (hasDynamicPath(item)) {
-    Object.assign(itemRoute, {path: item.meta.dynamicPath});
+    Object.assign(itemRoute, { path: item.meta.dynamicPath });
   }
 
   if (hasHref(item)) {
-    Object.assign(itemRoute, {component: getViewComponent('404')});
+    Object.assign(itemRoute, { component: getViewComponent('404') });
   }
 
   if (hasComponent(item)) {
@@ -40,6 +40,9 @@ export function transformAuthRouteToVueRoute(item: AuthRoute.Route) {
       },
       chat() {
         itemRoute.component = getLayoutComponent('chat');
+      },
+      music() {
+        itemRoute.component = getLayoutComponent('music');
       },
       self() {
         itemRoute.component = getViewComponent(item.name as AuthRoute.LastDegreeRouteKey);
@@ -93,6 +96,9 @@ export function transformAuthRouteToVueRoute(item: AuthRoute.Route) {
           break
         case 'chat':
           layout = getLayoutComponent('chat')
+          break
+        case 'music':
+          layout = getLayoutComponent('music')
           break
         default:
           layout = getLayoutComponent('blank')

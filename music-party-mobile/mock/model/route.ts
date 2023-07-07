@@ -209,46 +209,6 @@ export const routeModel: Record<Auth.RoleType, AuthRoute.Route[]> = {
 
       ]
     },
-
-
-    {
-      name: "flowable",
-      path: "/flowable",
-      component: 'basic',
-      children: [
-        {
-          name: 'flowable_design',
-          path: '/flowable/design',
-          component: 'self',
-          meta: {
-            title: 'menu.flowable-design',
-            icon: "mdi-pencil"
-          }
-        },
-
-        {
-          name: 'form_list',
-          path: '/form/list',
-          component: 'self',
-          meta: {
-            title: 'menu.form-list',
-          }
-        },
-        {
-          name: 'form_design',
-          path: '/form/design',
-          component: 'self',
-          meta: {
-            title: 'menu.form-design',
-          }
-        },
-      ],
-      meta: {
-        title: "menu.flowable",
-        icon: "mdi-waves-arrow-right"
-      }
-    },
-
   ],
   user: [
     {
@@ -278,6 +238,7 @@ export const routeModel: Record<Auth.RoleType, AuthRoute.Route[]> = {
             icon: "mdi-music"
           }
         },
+
         {
           name: 'apps_manager-user',
           path: '/apps/manager-user',
@@ -307,5 +268,25 @@ export const routeModel: Record<Auth.RoleType, AuthRoute.Route[]> = {
         requiresAuth: true,
       }
     },
+    {
+      name: 'special',
+      path: '/special',
+      component: 'blank',
+      children: [
+        {
+          name: "special_music",
+          path: "/special/music",
+          component: "music",
+          meta: {
+            title: "menu.chat",
+            hide: true
+          }
+        },
+      ],
+      meta: {
+        title: 'menu.apps',
+        requiresAuth: true,
+      }
+    }
   ]
 };

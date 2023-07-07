@@ -15,12 +15,12 @@ declare namespace AuthRoute {
 
   type RoutePath<K extends AllRouteKey = AllRouteKey> = AuthRouteUtils.GetRoutePath<K>;
 
-  type RouteComponentType = 'basic' | 'blank' | 'self' | 'auth' | 'error' | 'todo' | 'chat';
+  type RouteComponentType = 'basic' | 'blank' | 'self' | 'auth' | 'error' | 'todo' | 'chat' | 'music';
 
   interface RouteMeta<K extends AuthRoute.RoutePath> {
     title: string;
     dynamicPath?: AuthRouteUtils.GetDynamicPath<K>;
-    singleLayout?: Extract<RouteComponentType, 'basic' | 'blank' | 'auth' | 'error' | 'todo' | 'chat'>;
+    singleLayout?: Extract<RouteComponentType, 'basic' | 'blank' | 'auth' | 'error' | 'todo' | 'chat' | 'music'>;
     requiresAuth?: boolean;
     permissions?: Auth.RoleType[];
     keepAlive?: boolean;

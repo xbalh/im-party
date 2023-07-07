@@ -41,12 +41,15 @@
 
 <script setup lang="ts">
 import Bus from "@/utils/common/Bus";
+import { useRouterPush } from "@/composables";
 
 const chatBtn = ref<HTMLElement>()
 
 const musicBtn = ref<HTMLElement>()
 
 const isMusicPage = ref(false)
+
+const { routerPush } = useRouterPush(false)
 
 watch(isMusicPage, (newValue, oldValue) => {
   if (newValue) {
@@ -77,7 +80,8 @@ const progress = ref<number>(50)
 const toMusicPage = () => {
   console.log("去音乐播放页面")
   isMusicPage.value = true
-  Bus.emit("toMusicPage", true)
+  // Bus.emit("toMusicPage", true)
+  routerPush('/special/music')
 }
 
 const toChatPage = () => {
