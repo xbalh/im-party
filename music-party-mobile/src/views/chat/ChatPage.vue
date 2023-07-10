@@ -1,5 +1,5 @@
 <template>
-  <v-card key="chat" class="h-100" v-if="!isMusicPage">
+  <v-card key="chat" class="h-100">
     <v-layout full-height :class="{ 'position-static': !lgAndUp }">
       <div class="d-flex flex-grow-1 flex-row">
         <v-navigation-drawer v-model="channelDrawer" :permanent="lgAndUp" floating
@@ -84,13 +84,6 @@
       </v-row>
     </v-navigation-drawer>
   </v-card>
-  <v-card key="music" class="h-100" v-else>
-    <v-layout full-height :class="{ 'position-static': !lgAndUp }">
-      <div class="d-flex flex-grow-1 flex-row">
-        <music-player />
-      </div>
-    </v-layout>
-  </v-card>
 </template>
 
 <script lang="ts" setup>
@@ -168,5 +161,4 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

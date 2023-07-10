@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="isShow">
     <!-- 聊天室 -->
     <div>
       <!-- 隐藏到右侧 -->
@@ -48,6 +48,11 @@ const chatBtn = ref<HTMLElement>()
 const musicBtn = ref<HTMLElement>()
 
 const isMusicPage = ref(false)
+Bus.on('isMusicPage', (flag: boolean) => {
+  isMusicPage.value = flag
+})
+
+const isShow = ref(false)
 
 const { routerPush } = useRouterPush(false)
 
@@ -68,6 +73,14 @@ watch(isMusicPage, (newValue, oldValue) => {
   // console.log('值发生了变更', newValue, oldValue);
 });
 
+watch(router.currentRoute, (newValue, oldValue) =>{
+  console.log("新路由："+newValue +"旧路由："+  oldValue)
+  if(newValue.name === 'apps_chat-channel'){
+    isShow.value = true
+  }else{
+    isShow.value = false
+  }
+});
 
 
 const dragDotRight = ref(false)
@@ -80,14 +93,19 @@ const progress = ref<number>(50)
 const toMusicPage = () => {
   console.log("去音乐播放页面")
   isMusicPage.value = true
-  // Bus.emit("toMusicPage", true)
-  routerPush('/special/music')
+  Bus.emit("openMusicPage", true)
+  // routerPush('/special/music')
+  //展示
+
 }
 
 const toChatPage = () => {
   console.log("去聊天页面")
   isMusicPage.value = false
-  Bus.emit("toMusicPage", false)
+  Bus.emit("openMusicPage", false)
+  // routerPush('/apps/chat-channel/:id')
+  //隐藏
+
 }
 
 // // 拖拽开始事件  
@@ -118,7 +136,7 @@ onMounted(() => {
   position: fixed;
   top: 340px;
   right: -20px;
-  z-index: 9999;
+  z-index: 2000;
   box-shadow: 1px 1px 18px #55BB46;
   opacity: 75%;
 
@@ -133,7 +151,7 @@ onMounted(() => {
   position: fixed;
   top: 340px;
   right: 35px;
-  z-index: 9999;
+  z-index: 2000;
   // opacity: 75%;
 
   .v-btn {
@@ -164,7 +182,7 @@ onMounted(() => {
   position: fixed;
   top: 340px;
   right: -20px;
-  z-index: 999;
+  z-index: 2000;
   box-shadow: 1px 1px 18px #ec4444;
   opacity: 75%;
 
@@ -179,7 +197,7 @@ onMounted(() => {
   position: fixed;
   top: 340px;
   right: 35px;
-  z-index: 9999;
+  z-index: 2000;
 
   // border: 1px solid;
   .v-btn {

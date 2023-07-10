@@ -32,6 +32,7 @@ declare namespace AuthRoute {
     activeMenu?: RouteKey;
     multi?: boolean;
     affix?: boolean;
+    transition?: string;
   }
 
   type Route<K extends AllRouteKey = AllRouteKey> = K extends AllRouteKey

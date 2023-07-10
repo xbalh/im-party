@@ -279,7 +279,8 @@ export const routeModel: Record<Auth.RoleType, AuthRoute.Route[]> = {
           component: "music",
           meta: {
             title: "menu.chat",
-            hide: true
+            hide: true,
+            transition: 'animate__slideInLeft'
           }
         },
       ],

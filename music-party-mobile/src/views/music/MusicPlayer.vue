@@ -1,42 +1,59 @@
 <template>
-  <div class="channel-page">
-    <div style="height: 80%;">
-      <v-btn @click="">
-        <v-icon size="x-large" icon="mdi-playlist-music" />
-      </v-btn>
-    </div>
-    <div style="height: 20%;" class="g-glossy">
-      <div>
-        <v-progress-linear model-value="30" bg-color="blue-grey" color="lime"></v-progress-linear>
-      </div>
-      <div>
-
-      </div>
-    </div>
-  </div>
+  <transition leave-active-class="animate__slideOutDown">
+    <v-app class="music-page animate__animated animate__slideInUp" v-show="display">
+      <v-main>
+        <div>
+          <div style="height: 80%;">
+            <v-btn @click="closeMusicPage">
+              <v-icon size="x-large" icon="mdi-playlist-music" />
+            </v-btn>
+          </div>
+          <div style="height: 20%;" class="g-glossy">
+            <div>
+              <v-progress-linear model-value="30" bg-color="blue-grey" color="lime"></v-progress-linear>
+            </div>
+            <div>
+            </div>
+          </div>
+        </div>
+      </v-main>
+    </v-app>
+  </transition>
 </template>
 
 <script lang="ts" setup>
 import { ref } from 'vue';
+import Bus from '@/utils/common/Bus';
 
 const musicList = ref()
+const display = ref(false)
+Bus.on('openMusicPage', (flag: boolean) => {
+  display.value = flag
+})
+
+const closeMusicPage = () => {
+  display.value = false
+  Bus.emit("isMusicPage", false)
+}
+
+
 
 </script>
 
 <style lang="scss" scoped>
-.channel-page-bg {
-  background: url("/images/chat/chat-bg-2.png");
-}
-
-.channel-page {
-  position: absolute;
-  top: 0px;
-  bottom: 0;
-  left: 0;
-  right: 0;
+.music-page {
+  position: absolute !important;
   width: 100%;
-  display: flex;
-  flex-direction: column;
+  height: 100%;
+  z-index: 1999 !important;
+  // position: absolute;
+  // top: 0px;
+  // bottom: 0;
+  // left: 0;
+  // right: 0;
+  // width: 100%;
+  // display: flex;
+  // flex-direction: column;
   background-image: linear-gradient(135deg, #FEB692 10%, #EA5455 100%);
   // -webkit-filter: blur(3px);
   // -moz-filter: blur(3px);
@@ -66,5 +83,9 @@ const musicList = ref()
     filter: blur(10px);
     z-index: -1;
   }
+}
+
+.animate__animated.animate__slideInUp {
+  --animate-duration: 0.3s;
 }
 </style>

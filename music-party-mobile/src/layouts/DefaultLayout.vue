@@ -38,9 +38,6 @@
   <!-- 设置页面 -->
   <side-config-menu/>
 
-  <!-- 聊天室页面 -->
-  <right-circle-button/>
-
   <!-- 播放页面 -->
 
   <!-- Toolbar -->

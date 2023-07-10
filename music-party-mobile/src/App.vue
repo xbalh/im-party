@@ -1,14 +1,17 @@
 <template>
   <v-app>
     <vuetify-provider>
-      <router-view/>
+      <router-view />
+      <right-circle-button />
+      <music-player/>
     </vuetify-provider>
   </v-app>
 </template>
 
 <script setup lang="ts">
-import {useGlobalEvents} from "@/composables/events";
-import {subscribeStore} from '@/store';
+import { useGlobalEvents } from "@/composables/events";
+import { subscribeStore } from '@/store';
+import MusicPlayer from "./views/music/MusicPlayer.vue";
 
 
 subscribeStore()
