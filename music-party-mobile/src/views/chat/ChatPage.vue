@@ -25,7 +25,8 @@
                   <v-list-item v-bind="props" :title="roomstyle"></v-list-item>
                 </template>
                 <v-list-item v-for="roomInfo in roomlist" :key="roomInfo.roomNo"
-                  :to="`/apps/chat-channel/${roomInfo.roomNo}`" exact>
+                  :to="{ name: 'apps_chat-channel', query: { roomNo: roomInfo.roomNo, roomName: roomInfo.roomName } }"
+                  exact>
                   <v-list-item-title class="text-subtitle-2">{{ roomInfo.roomName }}</v-list-item-title>
                 </v-list-item>
               </v-list-group>

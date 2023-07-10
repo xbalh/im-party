@@ -4,7 +4,7 @@
     <v-toolbar flat height="64" color="surface">
       <v-app-bar-nav-icon class="hidden-lg-and-up" @click="$emit('toggle-menu')"></v-app-bar-nav-icon>
       <v-toolbar-title>
-        # {{ $route.params.id }}
+        {{ roomName }}
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn class="mx-1" icon @click.stop="$emit('toggle-usersDrawer')">
@@ -24,9 +24,8 @@
       <div class="input-box pa-2">
         <div class="d-flex position-relative align-center">
           <v-text-field v-model="input" variant="outlined" density="comfortable" ref="inputMessage" autofocus
-            class="font-weight-bold position-relative align-center"
-            :placeholder="`${$t('chat.message')}`" hide-details @keyup.enter="sendMessage"
-            @blur="changeBlur">
+            class="font-weight-bold position-relative align-center" :placeholder="`${$t('chat.message')}`" hide-details
+            @keyup.enter="sendMessage" @blur="changeBlur">
           </v-text-field>
           <v-btn flat rounded icon size="small" color="primary" class="mx-1" :disabled="!input" @click="sendMessage">
             <v-icon size="small">mdi-send</v-icon>
@@ -43,8 +42,12 @@ import { ref } from "vue";
 import { useTheme } from 'vuetify'
 import { useAuthStore } from "@/store";
 import { createId } from "seemly";
+import { useRouter, useRoute } from 'vue-router'
+import Ws from '@/utils/common/ws';
 
-
+const route = useRoute()
+const { roomNo, roomName } = route.query
+const ws = ref<Ws>()
 const { current } = useTheme()
 const { userInfo } = useAuthStore()
 const messagesRef = ref<HTMLDivElement>()
@@ -75,6 +78,8 @@ const input = ref('')
 const demo = ref()
 
 onBeforeMount(() => {
+  ws.value = new Ws('','')
+  // ws.value.
   // demo.value = setInterval(async () => {
   //   const resp = await fetchMessage()
   //   if (resp.data) {
