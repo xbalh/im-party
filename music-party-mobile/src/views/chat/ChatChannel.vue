@@ -44,6 +44,8 @@ import { useAuthStore } from "@/store";
 import { createId } from "seemly";
 import { useRouter, useRoute } from 'vue-router'
 import Ws from '@/utils/common/ws';
+import { getServiceEnvConfig } from '~/.env-config';
+import { localStg } from '@/utils'
 
 const route = useRoute()
 const { roomNo, roomName } = route.query
@@ -52,6 +54,7 @@ const { current } = useTheme()
 const { userInfo } = useAuthStore()
 const messagesRef = ref<HTMLDivElement>()
 const inputMessage = ref<HTMLDivElement>()
+const { wsUrl } = getServiceEnvConfig(import.meta.env);
 const messages = ref<Array<ApiChatManagement.message>>([
   {
     id: '1',
@@ -78,8 +81,9 @@ const input = ref('')
 const demo = ref()
 
 onBeforeMount(() => {
-  ws.value = new Ws('','')
-  // ws.value.
+  if (roomNo) {
+    connectWS(roomNo as string)
+  }
   // demo.value = setInterval(async () => {
   //   const resp = await fetchMessage()
   //   if (resp.data) {
@@ -88,6 +92,16 @@ onBeforeMount(() => {
   //   }
   // }, 2000)
 })
+
+watch(route.query, (newValue, oldValue) => {
+  const { roomNo, roomName } = route.query
+  connectWS(roomNo as string)
+})
+
+const connectWS = (roomNo: string) => {
+  ws.value?.destroy()
+  ws.value = new Ws(wsUrl + `/musicParty/ws/${roomNo}`, localStg.get('token') as string)
+}
 
 setTimeout(() => {
   demo.value && clearInterval(demo.value)
