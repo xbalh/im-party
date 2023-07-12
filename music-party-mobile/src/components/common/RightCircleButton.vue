@@ -41,7 +41,6 @@
 
 <script setup lang="ts">
 import Bus from "@/utils/common/Bus";
-import { useRouterPush } from "@/composables";
 
 const chatBtn = ref<HTMLElement>()
 
@@ -53,8 +52,9 @@ Bus.on('isMusicPage', (flag: boolean) => {
 })
 
 const isShow = ref(false)
-
-const { routerPush } = useRouterPush(false)
+Bus.on('rightCircleBtnHide', (flag: boolean) => {
+  isShow.value = flag
+})
 
 watch(isMusicPage, (newValue, oldValue) => {
   if (newValue) {

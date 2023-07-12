@@ -48,6 +48,7 @@ class Ws {
   // 监听成功
   onopen() {
     this.ws.onopen = () => {
+      window.$loadingOverly?.hide()
       console.log(this.ws, 'onopen')
       // 发送成功连接之前所发送失败的消息
       this.errorStack.forEach(message => {
@@ -56,6 +57,7 @@ class Ws {
       this.errorStack = []
       this.isReconnectionLoading = false
     }
+
   }
 
   // 监听错误

@@ -42,7 +42,7 @@ import { ref } from "vue";
 import { useTheme } from 'vuetify'
 import { useAuthStore } from "@/store";
 import { createId } from "seemly";
-import { useRouter, useRoute } from 'vue-router'
+import { useRoute } from 'vue-router'
 import Ws from '@/utils/common/ws';
 import { getServiceEnvConfig } from '~/.env-config';
 import { localStg } from '@/utils'
@@ -80,8 +80,9 @@ const input = ref('')
 
 const demo = ref()
 
-onBeforeMount(() => {
+onMounted(() => {
   if (roomNo) {
+    window.$loadingOverly?.show()
     connectWS(roomNo as string)
   }
   // demo.value = setInterval(async () => {
@@ -93,14 +94,26 @@ onBeforeMount(() => {
   // }, 2000)
 })
 
-watch(route.query, (newValue, oldValue) => {
-  const { roomNo, roomName } = route.query
-  connectWS(roomNo as string)
-})
+// watch(route.query, (newValue, oldValue) => {
+//   const { roomNo, roomName } = route.query
+//   connectWS(roomNo as string)
+// })
 
+/**建立WS连接，并订阅 */
 const connectWS = (roomNo: string) => {
-  ws.value?.destroy()
   ws.value = new Ws(wsUrl + `/musicParty/ws/${roomNo}`, localStg.get('token') as string)
+  ws.value.subscribe('/music/chat', chatHandle)
+  ws.value.subscribe('/music/playControl/nextPlay', nextPlayHandle)
+}
+
+/**聊天处理 */
+const chatHandle = (data: object) => {
+
+}
+
+/**切换下一首处理 */
+const nextPlayHandle = (data: object) => {
+
 }
 
 setTimeout(() => {
@@ -108,6 +121,7 @@ setTimeout(() => {
 }, 1000 * 20)
 
 onUnmounted(() => {
+  ws.value?.destroy()
   clearInterval(demo.value)
 })
 
