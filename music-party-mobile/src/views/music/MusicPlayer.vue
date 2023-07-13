@@ -7,9 +7,11 @@
             <v-btn @click="closeMusicPage">
               <v-icon size="x-large" icon="mdi-playlist-music" />
             </v-btn>
+            {{ currentSong?.songName }}/{{ currentSong?.singer }}
           </div>
           <div style="height: 20%;" class="g-glossy">
             <div>
+              <audio controls ref="player" content="never"></audio>
               <v-progress-linear model-value="30" bg-color="blue-grey" color="lime"></v-progress-linear>
             </div>
             <div>
@@ -27,6 +29,8 @@ import Bus from '@/utils/common/Bus';
 
 const musicList = ref()
 const display = ref(false)
+const player = ref<HTMLAudioElement>()
+const currentSong = ref<Music.SongInfo>()
 Bus.on('openMusicPage', (flag: boolean) => {
   display.value = flag
 })
@@ -35,6 +39,13 @@ const closeMusicPage = () => {
   display.value = false
   Bus.emit("isMusicPage", false)
 }
+
+Bus.on('changeSong', (songInfo: Music.SongInfo) => {
+  currentSong.value = songInfo
+  const currentPlayer = player.value!
+  currentPlayer.setAttribute('src', songInfo.url)
+  currentPlayer.play()
+})
 
 
 

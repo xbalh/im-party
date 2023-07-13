@@ -7,7 +7,7 @@
     <div class="mx-2">
       <v-tooltip location="bottom">
         <template v-slot:activator="{ props }">
-          <div v-if="!isOwnMessage">{{ message.user.name }}</div>
+          <div >{{ message.user.name }}</div>
           <v-card class="pa-1" :color="isOwnMessage ? 'primary-darken-1' : undefined" v-bind="props">
             <div class="font-weight-bold text-break">
               {{ message.text }}

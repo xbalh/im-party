@@ -45,20 +45,25 @@ import { createId } from "seemly";
 import { useRoute } from 'vue-router'
 import Ws from '@/utils/common/ws';
 import { getServiceEnvConfig } from '~/.env-config';
-import { localStg } from '@/utils'
+import { localStg } from '@/utils';
+import Bus from '@/utils/common/Bus';
+import { formatDate } from '@vueuse/core';
+import { random } from 'lodash-es';
+
 
 const route = useRoute()
 const { roomNo, roomName } = route.query
 const ws = ref<Ws>()
 const { current } = useTheme()
-const { userInfo } = useAuthStore()
+const auth = useAuthStore();
+const { userInfo } = storeToRefs(auth)
 const messagesRef = ref<HTMLDivElement>()
 const inputMessage = ref<HTMLDivElement>()
 const { wsUrl } = getServiceEnvConfig(import.meta.env);
 const messages = ref<Array<ApiChatManagement.message>>([
   {
     id: '1',
-    text: "hi ,i am frank silva 超长测试超长测试超长测试超长测试超长测试超长测试超长测试超长测试超长测试",
+    text: "这句话是用来测试的",
     timestamp: "2022-12-13 15:13:10",
     user: {
       avatar: 'avatar1',
@@ -69,10 +74,13 @@ const messages = ref<Array<ApiChatManagement.message>>([
 ])
 defineEmits(['toggle-menu', 'toggle-usersDrawer'])
 
+const currentHeight = ref<Number>()
+
 const scrollBottom = () => {
   nextTick(() => {
     if (messagesRef.value)
       messagesRef.value.scrollTop = messagesRef.value.scrollHeight
+    currentHeight.value = messagesRef.value!.scrollHeight
   })
 }
 
@@ -84,6 +92,7 @@ onMounted(() => {
   if (roomNo) {
     window.$loadingOverly?.show()
     connectWS(roomNo as string)
+    currentHeight.value = messagesRef.value!.scrollHeight
   }
   // demo.value = setInterval(async () => {
   //   const resp = await fetchMessage()
@@ -107,13 +116,42 @@ const connectWS = (roomNo: string) => {
 }
 
 /**聊天处理 */
-const chatHandle = (data: object) => {
+const chatHandle = (data: Chat.Msg) => {
+  if (data.from === userInfo.value.username) return
+  let msg: ApiChatManagement.message = {
+    id: String(random(1, 9999, false)),
+    text: data.msg,
+    timestamp: formatDate(new Date(data.timestamp), 'YYYY-MM-DD hh:mm:ss'),
+    user: {
+      avatar: 'avatar1',
+      id: String(random(1, 9999, false)),
+      name: data.from
+    }
+  }
+  const isBottom = checkScrollIsToBottom()
+  messages.value.push(msg)
+  if (isBottom) {
+    scrollBottom()
+  }
+}
 
+const checkScrollIsToBottom = () => {
+  // 获取距离顶部的距离
+  const scrollTop = messagesRef.value!.scrollTop;
+  // 获取可视区的高度
+  const windowHeight = messagesRef.value!.clientHeight;
+  // 获取滚动条的总高度
+  const scrollHeight = messagesRef.value!.scrollHeight;
+  if (scrollTop + windowHeight - scrollHeight <= 5) {
+    // 把距离顶部的距离加上可视区域的高度 等于或者大于滚动条的总高度就是到达底部
+    return true
+  }
+  return false
 }
 
 /**切换下一首处理 */
-const nextPlayHandle = (data: object) => {
-
+const nextPlayHandle = (data: Music.SongInfo) => {
+  Bus.emit('changeSong', data)
 }
 
 setTimeout(() => {
@@ -140,6 +178,13 @@ const sendMessage = () => {
       name: userInfo.userName
     }
   })
+  const data = {
+    method: "/music/chat",
+    data: {
+      msg: input.value
+    }
+  }
+  ws.value?.send(JSON.stringify(data))
   input.value = ""
   inputMessage.value?.focus()
   scrollBottom()

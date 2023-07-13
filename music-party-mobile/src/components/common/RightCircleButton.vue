@@ -11,8 +11,7 @@
       </v-btn>
       <!-- 完全显示 -->
       <div class="drawer-button1" ref="chatBtn" v-dialogDrag="true" v-dialogDrag::click="toChatPage">
-        <v-btn theme="dark" icon="mdi-forum-outline" color="#55BB46"
-          v-show="isMusicPage && !dragDotRight" >
+        <v-btn theme="dark" icon="mdi-forum-outline" color="#55BB46" v-show="isMusicPage && !dragDotRight">
           <v-badge content="99+" offset-x="-10" offset-y="-10" color="red">
             <v-icon class="fa-spin">mdi-forum-outline</v-icon>
           </v-badge>
@@ -73,15 +72,21 @@ watch(isMusicPage, (newValue, oldValue) => {
   // console.log('值发生了变更', newValue, oldValue);
 });
 
-watch(router.currentRoute, (newValue, oldValue) =>{
-  console.log("新路由："+newValue +"旧路由："+  oldValue)
-  if(newValue.name === 'apps_chat-channel'){
+watch(router.currentRoute, (newValue, oldValue) => {
+  console.log("新路由：" + newValue + "旧路由：" + oldValue)
+  if (newValue.name === 'apps_chat-channel') {
     isShow.value = true
-  }else{
+  } else {
     isShow.value = false
   }
 });
 
+onBeforeMount(() => {
+  if (router.currentRoute.value.name === 'apps_chat-channel') {
+    isShow.value = true
+  }
+
+})
 
 const dragDotRight = ref(false)
 Bus.on('dragDotRight', (flag: boolean) => {

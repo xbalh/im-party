@@ -1,11 +1,11 @@
-import {unref, nextTick} from 'vue';
-import {defineStore} from 'pinia';
-import {router} from '@/router';
-import {fetchLogin, fetchUserInfo} from '@/service';
-import {useRouterPush} from '@/composables';
-import {localStg} from '@/utils';
-import {useRouteStore} from '@/store';
-import {getToken, getUserInfo, clearAuthStorage} from './helpers';
+import { unref, nextTick } from 'vue';
+import { defineStore } from 'pinia';
+import { router } from '@/router';
+import { fetchLogin, fetchUserInfo } from '@/service';
+import { useRouterPush } from '@/composables';
+import { localStg } from '@/utils';
+import { useRouteStore } from '@/store';
+import { getToken, getUserInfo, clearAuthStorage } from './helpers';
 import i18n from '@/plugins/vue-i18n'
 
 interface AuthState {
@@ -27,8 +27,8 @@ export const useAuthStore = defineStore('auth-store', {
   },
   actions: {
     resetAuthStore() {
-      const {toLogin} = useRouterPush(false);
-      const {resetRouteStore} = useRouteStore();
+      const { toLogin } = useRouterPush(false);
+      const { resetRouteStore } = useRouteStore();
       const route = unref(router.currentRoute);
 
       clearAuthStorage();
@@ -46,7 +46,7 @@ export const useAuthStore = defineStore('auth-store', {
 
     async handleActionAfterLogin(backendToken: ApiAuth.Token) {
       const route = useRouteStore();
-      const {toLoginRedirect} = useRouterPush(false);
+      const { toLoginRedirect } = useRouterPush(false);
 
       const loginSuccess = await this.loginByToken(backendToken);
 
@@ -68,20 +68,21 @@ export const useAuthStore = defineStore('auth-store', {
     async loginByToken(backendToken: ApiAuth.Token) {
       let successFlag = false;
 
-      const {accessToken, refreshToken} = backendToken;
+      const { accessToken, refreshToken } = backendToken;
       localStg.set('token', accessToken);
       localStg.set('refreshToken', refreshToken);
 
-      const {data} = await fetchUserInfo();
+      const { data } = await fetchUserInfo();
       if (data) {
         localStg.set('userInfo', data);
+        data.userName = data.username
 
         this.userInfo = {
-          userId: data.username,
-          userName: data.username,
+          userId: data.userName,
+          userName: data.userName,
           userRole: 'admin'
         };
-        
+
         this.token = accessToken;
 
         successFlag = true;
@@ -92,7 +93,7 @@ export const useAuthStore = defineStore('auth-store', {
 
     async login(userName: string, password: string) {
       this.loginLoading = true;
-      const {data} = await fetchLogin(userName, password);
+      const { data } = await fetchLogin(userName, password);
       if (data) {
         await this.handleActionAfterLogin(data);
       }
@@ -100,7 +101,7 @@ export const useAuthStore = defineStore('auth-store', {
     },
 
     async updateUserRole(userRole: Auth.RoleType) {
-      const {resetRouteStore, initAuthRoute} = useRouteStore();
+      const { resetRouteStore, initAuthRoute } = useRouteStore();
 
       const accounts: Record<Auth.RoleType, { userName: string; password: string }> = {
         admin: {
@@ -112,8 +113,8 @@ export const useAuthStore = defineStore('auth-store', {
           password: 'user01123'
         }
       };
-      const {userName, password} = accounts[userRole];
-      const {data} = await fetchLogin(userName, password);
+      const { userName, password } = accounts[userRole];
+      const { data } = await fetchLogin(userName, password);
       if (data) {
         await this.loginByToken(data);
         resetRouteStore();

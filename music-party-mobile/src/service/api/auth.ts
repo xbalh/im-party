@@ -10,7 +10,7 @@ export function fetchLogin(username: string, password: string) {
 }
 
 export function fetchUserInfo() {
-  return request.get<ApiAuth.Token>('/users/info');
+  return request.get<ApiAuth.UserInfo>('/users/info');
   // return mockRequest.get<ApiAuth.UserInfo>('/getUserInfo');
 }
 
