@@ -49,7 +49,7 @@ public class JwtTokenUtils {
                 .withClaim("userName", userName)
                 .withClaim("validStr", randomStr)
                 .withClaim("userInfo", info.toJSONString())
-                .withClaim("expiredTime", LocalDateTime.now().plusMinutes(60).toInstant(ZoneOffset.UTC))
+                .withClaim("expiredTime", LocalDateTime.now().plusDays(7).toInstant(ZoneOffset.UTC))
                 .sign(JWT_SIGN);
     }
 

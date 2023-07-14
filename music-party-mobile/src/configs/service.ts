@@ -32,4 +32,4 @@ export const ERROR_STATUS = {
 
 export const NO_ERROR_MSG_CODE: (string | number)[] = [];
 
-export const REFRESH_TOKEN_CODE: (string | number)[] = [66666];
+export const REFRESH_TOKEN_CODE: (string | number)[] = [401];

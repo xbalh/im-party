@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isShow">
+  <div >
     <!-- 聊天室 -->
     <div>
       <!-- 隐藏到右侧 -->
@@ -26,14 +26,15 @@
         <v-icon class="fa-spin">mdi-music</v-icon>
       </v-btn>
       <!-- 完全显示 -->
-      <div class="music-button1" ref="musicBtn" v-dialogDrag="true" v-dialogDrag::click="toMusicPage">
-        <v-progress-circular v-model="progress" class="me-2" size="60" width="3" v-show="!isMusicPage && !dragDotRight">
-          <v-btn theme="dark" ref="refButton2" icon="mdi-music" color="#ec4444" v-show="!dragDotRight">
-            <v-icon class="fa-spin">mdi-music</v-icon>
-          </v-btn>
-        </v-progress-circular>
-      </div>
-
+      <transition leave-active-class="animate__fadeOutRight">
+        <div class="music-button1 animate__animated animate__fadeInRight" ref="musicBtn" v-dialogDrag="true" v-dialogDrag::click="showFooter" v-show="isShow">
+          <v-progress-circular v-model="progress" class="me-2" size="60" width="3" v-show="!isMusicPage && !dragDotRight">
+            <v-btn theme="dark" ref="refButton2" icon="mdi-music" color="#ec4444" v-show="!dragDotRight">
+              <v-icon class="fa-spin">mdi-music</v-icon>
+            </v-btn>
+          </v-progress-circular>
+        </div>
+      </transition>
     </div>
   </div>
 </template>
@@ -51,7 +52,7 @@ Bus.on('isMusicPage', (flag: boolean) => {
 })
 
 const isShow = ref(false)
-Bus.on('rightCircleBtnHide', (flag: boolean) => {
+Bus.on('rightCircleBtnShow', (flag: boolean) => {
   isShow.value = flag
 })
 
@@ -82,9 +83,9 @@ watch(router.currentRoute, (newValue, oldValue) => {
 });
 
 onBeforeMount(() => {
-  if (router.currentRoute.value.name === 'apps_chat-channel') {
-    isShow.value = true
-  }
+  // if (router.currentRoute.value.name === 'apps_chat-channel') {
+  //   isShow.value = true
+  // }
 
 })
 
@@ -95,22 +96,22 @@ Bus.on('dragDotRight', (flag: boolean) => {
 
 const progress = ref<number>(50)
 
-const toMusicPage = () => {
-  console.log("去音乐播放页面")
-  isMusicPage.value = true
-  Bus.emit("openMusicPage", true)
+const showFooter = () => {
+  // console.log("去音乐播放页面")
+  // isMusicPage.value = true
+  isShow.value = false
+  Bus.emit("showFooter", true)
   // routerPush('/special/music')
   //展示
 
 }
 
 const toChatPage = () => {
-  console.log("去聊天页面")
+  // console.log("去聊天页面")
   isMusicPage.value = false
   Bus.emit("openMusicPage", false)
   // routerPush('/apps/chat-channel/:id')
   //隐藏
-
 }
 
 // // 拖拽开始事件  
@@ -220,4 +221,10 @@ onMounted(() => {
   right: 35px;
   z-index: 9999;
 }
+
+.animate__animated.animate__fadeInRight,
+.animate__animated.animate__fadeOutRight {
+  --animate-duration: 0.3s;
+}
+
 </style>

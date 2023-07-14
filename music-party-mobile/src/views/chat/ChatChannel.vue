@@ -117,7 +117,7 @@ const connectWS = (roomNo: string) => {
 
 /**聊天处理 */
 const chatHandle = (data: Chat.Msg) => {
-  if (data.from === userInfo.value.username) return
+  if (data.from === userInfo.value.userName) return
   let msg: ApiChatManagement.message = {
     id: String(random(1, 9999, false)),
     text: data.msg,
@@ -173,9 +173,9 @@ const sendMessage = () => {
     text: input.value,
     timestamp: new Date().toLocaleString(),
     user: {
-      id: userInfo.userId,
-      avatar: userInfo.userAvatar ?? '',
-      name: userInfo.userName
+      id: userInfo.value.userId,
+      avatar: userInfo.value.userAvatar ?? '',
+      name: userInfo.value.userName
     }
   })
   const data = {
