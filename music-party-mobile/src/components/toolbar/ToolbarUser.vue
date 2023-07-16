@@ -70,7 +70,7 @@ const logout = () => {
       window.$loadingOverly?.show()
       setTimeout(() => {
         auth.resetAuthStore()
-        Bus.emit('rightCircleBtnHide', false)
+        Bus.emit('rightCircleBtnShow', false)
       }, 1000)
     }
 

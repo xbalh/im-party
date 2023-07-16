@@ -73,37 +73,46 @@
   <transition leave-active-class="animate__slideOutDown">
     <v-footer class="customFooter animate__animated animate__slideInUp" v-if="isShowFooter">
       <div class="bottomDiv">
-        <div class="playerBar">
-          <div @click="toMusicPage">
-            <v-avatar color="surface-variant" class="avatar"></v-avatar>
-            <v-btn variant="text" size="x-large" @click.stop="playMusic" class="playList">
-              <v-icon size="x-large">mdi-playlist-play</v-icon>
-            </v-btn>
-            <v-progress-circular v-model="progress" class="me-2 progress" size="30" width="2" style="float: right; ">
-              <v-btn icon="mdi-play" class="playBtn" @click.stop="playMusic" size="24">
-                <v-icon>mdi-play</v-icon>
+        <div class="playerBar" @click="toMusicPage">
+          <div class="avatar">
+            <v-avatar color="surface-variant" size="50">
+              <v-img class="musicImg"
+                src="http://p2.music.126.net/nuX_gG3J-e7B2uzXrALTwQ==/109951168185440037.jpg?param=130y130"></v-img>
+            </v-avatar>
+          </div>
+          <div class="musicContent">
+            <span>测试文本测试文本测试文本测试文本测试文本</span>
+          </div>
+          <div class="playbarBtnGroup">
+            <v-progress-circular v-model="currentProgress" class="me-2 progress" size="30" width="2">
+              <v-btn icon="mdi-play" class="playBtn" variant="plain" @click.stop="playOrPauseMusic" size="50">
+                <v-icon>{{ isPlay ? 'mdi-pause' : 'mdi-play' }}</v-icon>
               </v-btn>
             </v-progress-circular>
-
-
+            <v-btn variant="plain" size="x-large" @click.stop="openPlayList" class="playList">
+              <v-icon size="x-large">mdi-playlist-play</v-icon>
+            </v-btn>
           </div>
         </div>
         <v-divider />
         <div class="myselfBar">
-          <v-bottom-navigation elevation="0" grow horizontal height="47" color="primary">
-            <v-btn>
-              <v-icon>mdi-music-box-outline</v-icon>
-              <span>我的</span>
-            </v-btn>
-            <v-btn>
-              <v-icon>mdi-chat-outline</v-icon>
-              <span>聊天</span>
-            </v-btn>
-            <v-btn @click="hideFooter">
-              <v-icon>mdi-arrow-down-drop-circle-outline</v-icon>
-              <span>隐藏</span>
-            </v-btn>
-          </v-bottom-navigation>
+          <div>
+            <v-bottom-navigation v-model="navCurrent" elevation="0" grow horizontal color="primary">
+              <v-btn>
+                <v-icon>mdi-music-box-outline</v-icon>
+                <span>我的</span>
+              </v-btn>
+              <v-btn>
+                <v-icon>mdi-chat-outline</v-icon>
+                <span>聊天</span>
+              </v-btn>
+              <v-btn @click="hideFooter">
+                <v-icon>mdi-arrow-down-drop-circle-outline</v-icon>
+                <span>隐藏</span>
+              </v-btn>
+            </v-bottom-navigation>
+          </div>
+
         </div>
       </div>
     </v-footer>
@@ -128,6 +137,20 @@ const searchSelect = (item: AuthRoute.Route) => {
     push.routerPush(item)
 }
 
+const currentProgress = ref(0)
+Bus.on('music-process-update', (progress: number)=>{
+  currentProgress.value = progress
+})
+
+const navCurrent = ref(1)
+watch(navCurrent, (newValue, oldValue)=>{
+  if(newValue === 2){
+    navCurrent.value = oldValue
+  }
+})
+
+const isPlay = ref(false)
+
 const isShowFooter = ref(true)
 const hideFooter = () => {
   isShowFooter.value = false
@@ -138,14 +161,22 @@ Bus.on('showFooter', (flag: boolean) => {
   isShowFooter.value = flag
 })
 
-const progress = ref(50)
-
 const toMusicPage = () => {
   Bus.emit('openMusicPage', true)
 }
 
-const playMusic = () => {
-  console.log("开始播放")
+const playOrPauseMusic = () => {
+  if (isPlay.value) {
+    console.log("暂停播放")
+    Bus.emit('music-play', false)
+  } else {
+    console.log("开始播放")
+    Bus.emit('music-play', true)
+  }
+  isPlay.value = !isPlay.value
+}
+
+const openPlayList = () => {
 
 }
 
@@ -162,28 +193,32 @@ const playMusic = () => {
 }
 
 .avatar {
-  top: 5px;
-  left: 5%
+  /* top: 5px; */
+  margin-left: 3%;
+}
+
+.playbarBtnGroup {
+  margin-left: auto;
 }
 
 .progress {
-  top: 10px;
+  /* margin-left: auto; */
+  z-index: 777;
 }
 
 .playBtn {
-  top: 0;
-  right: -1px;
+  /* top: 0;
+  right: -1px; */
 }
 
 .playList {
-  float: right;
-  top: 1px;
-  width: 55px;
+  width: 40px;
+  /* margin-left: auto; */
 }
 
 .playList.v-btn--size-x-large {
   min-width: 30px;
-  }
+}
 
 .customFooter {
   position: absolute;
@@ -204,13 +239,28 @@ const playMusic = () => {
   height: 50%;
   overflow: hidden !important;
   width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
 .myselfBar {
   height: 50%;
   overflow: hidden !important;
   width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
+
+.musicContent {
+  width: 55%;
+  margin-left: 3%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 
 .animate__animated.animate__slideInUp,
 .animate__animated.animate__slideOutDown {

@@ -1,5 +1,5 @@
 <template>
-  <div >
+  <div>
     <!-- 聊天室 -->
     <div>
       <!-- 隐藏到右侧 -->
@@ -21,14 +21,16 @@
     <!-- 音乐播放 -->
     <div>
       <!-- 隐藏到右侧 -->
-      <v-btn theme="dark" ref="musicBtnDot" icon="mdi-music" class="music-button" color="#ec4444"
-        v-if="!isMusicPage && dragDotRight" @click="dragDotRight = false">
-        <v-icon class="fa-spin">mdi-music</v-icon>
-      </v-btn>
+      <div ref="musicBtnDot" v-show="!isMusicPage && dragDotRight" class="music-button">
+        <v-btn theme="dark" icon="mdi-music" color="#ec4444" @click="dragDotRight = false">
+          <v-icon class="fa-spin">mdi-music</v-icon>
+        </v-btn>
+      </div>
       <!-- 完全显示 -->
       <transition leave-active-class="animate__fadeOutRight">
-        <div class="music-button1 animate__animated animate__fadeInRight" ref="musicBtn" v-dialogDrag="true" v-dialogDrag::click="showFooter" v-show="isShow">
-          <v-progress-circular v-model="progress" class="me-2" size="60" width="3" v-show="!isMusicPage && !dragDotRight">
+        <div class="music-button1 animate__animated animate__fadeInRight" ref="musicBtn" v-dialogDrag="true"
+          v-dialogDrag::click="showFooter" v-show="isShow">
+          <v-progress-circular v-model="currentProgress" class="me-2" size="60" width="3" v-show="!isMusicPage && !dragDotRight">
             <v-btn theme="dark" ref="refButton2" icon="mdi-music" color="#ec4444" v-show="!dragDotRight">
               <v-icon class="fa-spin">mdi-music</v-icon>
             </v-btn>
@@ -46,6 +48,13 @@ const chatBtn = ref<HTMLElement>()
 
 const musicBtn = ref<HTMLElement>()
 
+const musicBtnDot = ref<HTMLElement>()
+
+const currentProgress = ref(0)
+Bus.on('music-process-update', (progress: number)=>{
+  currentProgress.value = progress
+})
+
 const isMusicPage = ref(false)
 Bus.on('isMusicPage', (flag: boolean) => {
   isMusicPage.value = flag
@@ -55,6 +64,8 @@ const isShow = ref(false)
 Bus.on('rightCircleBtnShow', (flag: boolean) => {
   isShow.value = flag
 })
+
+
 
 watch(isMusicPage, (newValue, oldValue) => {
   if (newValue) {
@@ -73,14 +84,14 @@ watch(isMusicPage, (newValue, oldValue) => {
   // console.log('值发生了变更', newValue, oldValue);
 });
 
-watch(router.currentRoute, (newValue, oldValue) => {
-  console.log("新路由：" + newValue + "旧路由：" + oldValue)
-  if (newValue.name === 'apps_chat-channel') {
-    isShow.value = true
-  } else {
-    isShow.value = false
-  }
-});
+// watch(router.currentRoute, (newValue, oldValue) => {
+//   console.log("新路由：" + newValue + "旧路由：" + oldValue)
+//   if (newValue.name === 'apps_chat-channel') {
+//     isShow.value = true
+//   } else {
+//     isShow.value = false
+//   }
+// });
 
 onBeforeMount(() => {
   // if (router.currentRoute.value.name === 'apps_chat-channel') {
@@ -91,10 +102,10 @@ onBeforeMount(() => {
 
 const dragDotRight = ref(false)
 Bus.on('dragDotRight', (flag: boolean) => {
+  const top = musicBtn.value!.style.top
+  musicBtnDot.value!.style.cssText += `;top:${top};`
   dragDotRight.value = flag
 })
-
-const progress = ref<number>(50)
 
 const showFooter = () => {
   // console.log("去音乐播放页面")
@@ -185,12 +196,15 @@ onMounted(() => {
 }
 
 .music-button {
-  position: fixed;
-  top: 340px;
   right: -20px;
   z-index: 2000;
-  box-shadow: 1px 1px 18px #ec4444;
-  opacity: 75%;
+  position: fixed;
+  top: 340px;
+
+  .v-btn {
+    box-shadow: 1px 1px 18px #ec4444;
+    opacity: 75%;
+  }
 
   .v-icon {
     margin-left: -18px;
@@ -226,5 +240,4 @@ onMounted(() => {
 .animate__animated.animate__fadeOutRight {
   --animate-duration: 0.3s;
 }
-
 </style>

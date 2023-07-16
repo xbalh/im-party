@@ -4,14 +4,14 @@
       <v-main>
         <div>
           <div style="height: 80%;">
-            <v-btn @click="closeMusicPage">
-              <v-icon size="x-large" icon="mdi-playlist-music" />
+            <v-btn @click="closeMusicPage" variant="plain" icon="mdi-chevron-down">
             </v-btn>
             {{ currentSong?.songName }}/{{ currentSong?.singer }}
           </div>
           <div style="height: 20%;" class="g-glossy">
             <div>
-              <audio controls ref="player" content="never"></audio>
+              <audio ref="player" content="never" @timeupdate="timeupdate"
+                src="http://m701.music.126.net/20230716135435/33fca99b7aad2303df47ecd929d4d542/jdymusic/obj/wo3DlMOGwrbDjj7DisKw/22259947907/f0fb/a2c1/e86c/9092405ea985a394a4af69d32dd32fc9.flac"></audio>
               <v-progress-linear model-value="30" bg-color="blue-grey" color="lime"></v-progress-linear>
             </div>
             <div>
@@ -33,6 +33,24 @@ const player = ref<HTMLAudioElement>()
 const currentSong = ref<Music.SongInfo>()
 Bus.on('openMusicPage', (flag: boolean) => {
   display.value = flag
+})
+
+const timeupdate = () => {
+  const currentTime = player.value!.currentTime
+  const duration = player.value!.duration
+  try {
+    const currentProgress = currentTime / duration * 100
+    Bus.emit('music-process-update', parseInt(String(currentProgress)))
+  } catch (e) { }
+
+}
+
+Bus.on('music-play', (flag: boolean) => {
+  if (flag) {
+    player.value!.play()
+  } else {
+    player.value!.pause()
+  }
 })
 
 const closeMusicPage = () => {

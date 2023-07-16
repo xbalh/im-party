@@ -5,10 +5,10 @@ const drag = {
   beforeMount(el: any, binding: any) {
     // 自定义属性，判断是否可拖拽
     if (!binding.value) return
-    document.onmousemove = null
-    document.onmousedown = null
-    document.ontouchstart = null
-    document.ontouchmove = null
+    el.onmousemove = null
+    el.onmousedown = null
+    el.ontouchstart = null
+    el.ontouchmove = null
     el.style.cssText += ';cursor:move;'
     // dragDom.style.cssText += ';bottom:0px;'
 
@@ -55,7 +55,7 @@ const drag = {
         styT = +styT.replace(/px/g, '')
       }
 
-      document.ontouchmove = function (e) {
+      el.ontouchmove = function (e) {
         isMove = true
         // 通过事件委托，计算移动的距离
         let left = e.changedTouches[0].clientX - disX
@@ -77,7 +77,7 @@ const drag = {
         el.style.cssText += `;left:${left + styL}px;top:${top + styT}px;`
       }
 
-      document.ontouchend = function (e: any) {
+      el.ontouchend = function (e: any) {
         const lastTime = new Date().getTime();
         document.ontouchstart = null
         document.ontouchmove = null
@@ -127,7 +127,7 @@ const drag = {
         styT = +styT.replace(/px/g, '')
       }
 
-      document.onmousemove = function (e) {
+      el.onmousemove = function (e) {
         isMove = true
         // 通过事件委托，计算移动的距离
         let left = e.clientX - disX
@@ -149,7 +149,7 @@ const drag = {
         el.style.cssText += `;left:${left + styL}px;top:${top + styT}px;`
       }
 
-      document.onmouseup = function (e: any) {
+      el.onmouseup = function (e: any) {
         const lastTime = new Date().getTime();
         document.onmousemove = null
         document.onmousedown = null
@@ -159,7 +159,7 @@ const drag = {
         }
         if (e.clientX >= disX && e.clientY >= disY) {
           console.log("贴住右边了")
-          Bus.emit('dragDotRight', "")
+          Bus.emit('dragDotRight', true)
         }
       }
       return false
