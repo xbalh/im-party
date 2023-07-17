@@ -86,10 +86,11 @@
     </v-navigation-drawer>
   </v-card>
   <v-card key="myself" class="h-100" v-show="currentTab === 'myself'">
-    <v-tabs v-model="topTabCurrent" fixed-tabs>
+    <v-tabs v-model="topTabCurrent" fixed-tabs color="primary">
       <v-tab :value="1">我的歌单</v-tab>
       <v-tab :value="2">收藏歌单</v-tab>
     </v-tabs>
+    <v-list :items="items"></v-list>
   </v-card>
 </template>
 
@@ -113,6 +114,22 @@ const currentTab = ref('chat')
 Bus.on('bottom-nav-change', (tabName: string) => {
   currentTab.value = tabName
 })
+
+const items = ref([
+  { type: 'subheader', title: '我的歌单(26个)' },
+  {
+    title: 'Item #1',
+    value: 1,
+  },
+  {
+    title: 'Item #2',
+    value: 2,
+  },
+  {
+    title: 'Item #3',
+    value: 3,
+  },
+])
 
 const topTabCurrent = ref(0)
 

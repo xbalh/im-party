@@ -74,14 +74,14 @@
     <v-footer class="customFooter animate__animated animate__slideInUp" v-if="isShowFooter">
       <div class="bottomDiv">
         <div class="playerBar" @click="toMusicPage">
-          <div class="avatar">
-            <v-avatar color="surface-variant" size="35" :class="isPlay ? 'avatar-spin' : ''">
+          <div class="avatar" ref="avatarDiv">
+            <v-avatar ref="avatar" color="surface-variant" :size="avatarSize" :class="isPlay ? 'avatar-spin' : ''">
               <v-img class="musicImg"
                 src="http://p2.music.126.net/nuX_gG3J-e7B2uzXrALTwQ==/109951168185440037.jpg?param=130y130"></v-img>
             </v-avatar>
           </div>
           <div class="musicContent">
-            <span>Goodbye - Vanished</span>
+            <span>阳光彩虹小白马 - 大张伟</span>
           </div>
           <div class="playbarBtnGroup">
             <v-progress-circular v-model="currentProgress" class="me-2 progress" size="30" width="2">
@@ -122,6 +122,7 @@ import LoadingProgressProvider from "@/components/provider/LoadingProgressLine";
 import { computed } from 'vue'
 import { useAppInfo, useRouterPush } from "@/composables";
 import Bus from "../utils/common/Bus";
+import { useResizeObserver } from "@vueuse/core";
 
 const theme = useThemeStore()
 const drawer = ref()
@@ -183,6 +184,24 @@ const playOrPauseMusic = () => {
 const openPlayList = () => {
 
 }
+const avatar = ref<import('vuetify/components').VAvatar>()
+const avatarDiv = ref<HTMLDivElement>()
+const avatarSize = ref(30)
+
+useResizeObserver(avatarDiv, (entries) => {
+  const entry = entries[0]
+  const { height } = entry.contentRect
+  avatarDiv.value!.style.cssText += `;width: ${height}px;`
+  avatarSize.value = height - 15
+})
+
+
+
+onMounted(() => {
+  const height = avatarDiv.value!.offsetHeight
+  avatarDiv.value!.style.cssText += `;width: ${height}px;`
+  avatarSize.value = height - 15
+})
 
 </script>
 
@@ -200,8 +219,7 @@ const openPlayList = () => {
   /* top: 5px; */
   margin-left: 3%;
   border-radius: 50%;
-  width: 13%;
-  height: 100%;
+  height: 80%;
   background-color: black;
   display: flex;
   align-items: center;
