@@ -139,11 +139,18 @@ Bus.on('music-process-update', (progress: number) => {
   currentProgress.value = progress
 })
 
+const navMenu = {
+  0: 'myself',
+  1: 'chat'
+}
+
 const navCurrent = ref(1)
 watch(navCurrent, (newValue, oldValue) => {
   if (newValue === 2) {
     navCurrent.value = oldValue
+    return
   }
+  Bus.emit('bottom-nav-change', navMenu[newValue])
 })
 
 const isPlay = ref(false)

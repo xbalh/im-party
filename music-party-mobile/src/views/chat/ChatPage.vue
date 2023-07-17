@@ -1,5 +1,5 @@
 <template>
-  <v-card key="chat" class="h-100">
+  <v-card key="chat" class="h-100" v-show="currentTab === 'chat'">
     <v-layout full-height :class="{ 'position-static': !lgAndUp }">
       <div class="d-flex flex-grow-1 flex-row">
         <v-navigation-drawer v-model="channelDrawer" :permanent="lgAndUp" floating
@@ -85,6 +85,12 @@
       </v-row>
     </v-navigation-drawer>
   </v-card>
+  <v-card key="myself" class="h-100" v-show="currentTab === 'myself'">
+    <v-tabs v-model="topTabCurrent" fixed-tabs>
+      <v-tab :value="1">我的歌单</v-tab>
+      <v-tab :value="2">收藏歌单</v-tab>
+    </v-tabs>
+  </v-card>
 </template>
 
 <script lang="ts" setup>
@@ -103,10 +109,12 @@ const isMusicPage = ref(false)
 Bus.on('toMusicPage', (flag: boolean) => {
   isMusicPage.value = flag
 })
-
-Bus.on('bottom-nav-change', (tabName: string)=>{
-
+const currentTab = ref('chat')
+Bus.on('bottom-nav-change', (tabName: string) => {
+  currentTab.value = tabName
 })
+
+const topTabCurrent = ref(0)
 
 const channelDrawer = ref()
 const showCreateDialog = ref(false)
