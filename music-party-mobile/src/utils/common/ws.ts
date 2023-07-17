@@ -102,6 +102,7 @@ class Ws {
     if (this.isReconnectionLoading) return
 
     this.isReconnectionLoading = true
+    window.$loadingOverly?.show()
     clearTimeout(this.timeId)
     this.timeId = setTimeout(() => {
       this.createWs()

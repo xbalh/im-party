@@ -104,6 +104,10 @@ Bus.on('toMusicPage', (flag: boolean) => {
   isMusicPage.value = flag
 })
 
+Bus.on('bottom-nav-change', (tabName: string)=>{
+
+})
+
 const channelDrawer = ref()
 const showCreateDialog = ref(false)
 const channels = ref(['general', 'production', 'qa', 'staging', 'random'])

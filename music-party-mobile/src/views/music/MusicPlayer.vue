@@ -10,8 +10,8 @@
           </div>
           <div style="height: 20%;" class="g-glossy">
             <div>
-              <audio ref="player" content="never" @timeupdate="timeupdate"
-                src="http://m701.music.126.net/20230716135435/33fca99b7aad2303df47ecd929d4d542/jdymusic/obj/wo3DlMOGwrbDjj7DisKw/22259947907/f0fb/a2c1/e86c/9092405ea985a394a4af69d32dd32fc9.flac"></audio>
+              {{ currentProgress }}/{{ totalProgress }}
+              <audio ref="player" content="never" @timeupdate="timeupdate" :src="testMusic"></audio>
               <v-progress-linear model-value="30" bg-color="blue-grey" color="lime"></v-progress-linear>
             </div>
             <div>
@@ -26,11 +26,15 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import Bus from '@/utils/common/Bus';
+import testMusic from '@/assets/test.mp3'
+import { formatDate } from '@vueuse/core';
 
 const musicList = ref()
 const display = ref(false)
 const player = ref<HTMLAudioElement>()
 const currentSong = ref<Music.SongInfo>()
+const currentProgress = ref('--')
+const totalProgress = ref('--')
 Bus.on('openMusicPage', (flag: boolean) => {
   display.value = flag
 })
@@ -39,10 +43,19 @@ const timeupdate = () => {
   const currentTime = player.value!.currentTime
   const duration = player.value!.duration
   try {
-    const currentProgress = currentTime / duration * 100
-    Bus.emit('music-process-update', parseInt(String(currentProgress)))
+    currentProgress.value = musicTimeformat(currentTime)
+    totalProgress.value = musicTimeformat(duration)
+    const current = currentTime / duration * 100
+    Bus.emit('music-process-update', parseInt(String(current)))
   } catch (e) { }
 
+}
+
+const musicTimeformat = (value: number) => {
+  let interval = Math.floor(value)
+  let minute = (Math.floor(interval / 60)).toString().padStart(2, '0')
+  let second = (interval % 60).toString().padStart(2, '0')
+  return `${minute}:${second}`
 }
 
 Bus.on('music-play', (flag: boolean) => {

@@ -75,13 +75,13 @@
       <div class="bottomDiv">
         <div class="playerBar" @click="toMusicPage">
           <div class="avatar">
-            <v-avatar color="surface-variant" size="50">
+            <v-avatar color="surface-variant" size="35" :class="isPlay ? 'avatar-spin' : ''">
               <v-img class="musicImg"
                 src="http://p2.music.126.net/nuX_gG3J-e7B2uzXrALTwQ==/109951168185440037.jpg?param=130y130"></v-img>
             </v-avatar>
           </div>
           <div class="musicContent">
-            <span>测试文本测试文本测试文本测试文本测试文本</span>
+            <span>Goodbye - Vanished</span>
           </div>
           <div class="playbarBtnGroup">
             <v-progress-circular v-model="currentProgress" class="me-2 progress" size="30" width="2">
@@ -96,23 +96,20 @@
         </div>
         <v-divider />
         <div class="myselfBar">
-          <div>
-            <v-bottom-navigation v-model="navCurrent" elevation="0" grow horizontal color="primary">
-              <v-btn>
-                <v-icon>mdi-music-box-outline</v-icon>
-                <span>我的</span>
-              </v-btn>
-              <v-btn>
-                <v-icon>mdi-chat-outline</v-icon>
-                <span>聊天</span>
-              </v-btn>
-              <v-btn @click="hideFooter">
-                <v-icon>mdi-arrow-down-drop-circle-outline</v-icon>
-                <span>隐藏</span>
-              </v-btn>
-            </v-bottom-navigation>
-          </div>
-
+          <v-bottom-navigation v-model="navCurrent" elevation="0" grow horizontal color="primary" class="bottomNav">
+            <v-btn>
+              <v-icon>mdi-music-box-outline</v-icon>
+              <span>我的</span>
+            </v-btn>
+            <v-btn>
+              <v-icon>mdi-chat-outline</v-icon>
+              <span>聊天</span>
+            </v-btn>
+            <v-btn @click="hideFooter">
+              <v-icon>mdi-arrow-down-drop-circle-outline</v-icon>
+              <span>隐藏</span>
+            </v-btn>
+          </v-bottom-navigation>
         </div>
       </div>
     </v-footer>
@@ -138,13 +135,13 @@ const searchSelect = (item: AuthRoute.Route) => {
 }
 
 const currentProgress = ref(0)
-Bus.on('music-process-update', (progress: number)=>{
+Bus.on('music-process-update', (progress: number) => {
   currentProgress.value = progress
 })
 
 const navCurrent = ref(1)
-watch(navCurrent, (newValue, oldValue)=>{
-  if(newValue === 2){
+watch(navCurrent, (newValue, oldValue) => {
+  if (newValue === 2) {
     navCurrent.value = oldValue
   }
 })
@@ -195,7 +192,31 @@ const openPlayList = () => {
 .avatar {
   /* top: 5px; */
   margin-left: 3%;
+  border-radius: 50%;
+  width: 13%;
+  height: 100%;
+  background-color: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
 }
+
+.avatar-spin {
+  animation: spin 10s infinite linear;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
 
 .playbarBtnGroup {
   margin-left: auto;
@@ -259,6 +280,12 @@ const openPlayList = () => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.bottomNav {
+  height: 100% !important;
+  width: 100% !important;
+  position: relative !important;
 }
 
 
