@@ -87,17 +87,25 @@
   </v-card>
   <v-card key="myself" class="h-100" v-show="currentTab === 'myself'">
     <v-tabs v-model="topTabCurrent" fixed-tabs color="primary">
-      <v-tab :value="1">我的歌单</v-tab>
-      <v-tab :value="2">收藏歌单</v-tab>
+      <v-tab value="myPlayList">我的歌单</v-tab>
+      <v-tab value="collectPlayList">收藏歌单</v-tab>
     </v-tabs>
     <div class="listArea">
       <div class="playListDiv mx-2">
-        <v-slide-y-transition group tag="div">
-          <v-list :items="items" item-props lines="two" class="playlist"></v-list>
-        </v-slide-y-transition>
+        <v-window v-model="topTabCurrent">
+          <v-window-item value="myPlayList">
+            <v-slide-y-transition key="myPlayList" group tag="div">
+              <v-list :items="myPlayList" item-props lines="two" class="playlist"></v-list>
+            </v-slide-y-transition>
+          </v-window-item>
+          <v-window-item value="collectPlayList">
+            <v-slide-y-transition key="collectPlayList" group tag="div">
+              <v-list :items="collectPlayList" item-props lines="two" class="playlist"></v-list>
+            </v-slide-y-transition>
+          </v-window-item>
+        </v-window>
       </div>
     </div>
-
   </v-card>
 </template>
 
@@ -123,9 +131,11 @@ Bus.on('bottom-nav-change', (tabName: string) => {
   currentTab.value = tabName
 })
 
-const items = ref()
+const myPlayList = ref()
+const collectPlayList = ref()
 
-const topTabCurrent = ref(0)
+
+const topTabCurrent = ref('myPlayList')
 
 const channelDrawer = ref()
 const showCreateDialog = ref(false)
@@ -190,29 +200,43 @@ const fetchRooms = async () => {
 const fetchUserPlayList = async () => {
   const resp = await fetchPlayList('125885835');
   if (resp.data) {
-    const playListCount = resp.data.length
-    const subheader = [{
+    //通过subscribed区分是我的歌单还是收藏歌单
+    //我的歌单
+    const myPlayListItemList = resp.data.filter((playList: ApiMusic.playListInfo) => !playList.subscribed)
+    const myPlayListItems = handlePlayList(myPlayListItemList)
+    const myplayListCount = myPlayListItems.length
+    const myPlayListSubheader = {
       type: 'subheader',
-      title: `我的歌单(${playListCount}个)`
-    }]
-    //TODO 通过subscribed区分是我的歌单还是收藏歌单
-    const playListItemList = resp.data.map((playList: ApiMusic.playListInfo) => {
-      return {
-        prependAvatar: playList.coverImgUrl,
-        title: playList.name,
-        subtitle: `${playList.trackCount}首`,
-      }
-    })
-    console.log(playListItemList)
-    items.value = [...subheader, ...playListItemList]
+      title: `我的歌单(${myplayListCount}个)`
+    }
+    myPlayList.value = [myPlayListSubheader, ...myPlayListItems]
+    //收藏歌单
+    const collectPlayListItemList = resp.data.filter((playList: ApiMusic.playListInfo) => playList.subscribed)
+    const collectPlayListItems = handlePlayList(collectPlayListItemList)
+    const collectPlayListCount = collectPlayListItems.length
+    const collectPlayListSubheader = {
+      type: 'subheader',
+      title: `收藏歌单(${collectPlayListCount}个)`
+    }
+    collectPlayList.value = [collectPlayListSubheader, ...collectPlayListItems]
   }
+}
+
+const handlePlayList = (playListItems: ApiMusic.playListInfo[]) => {
+  return playListItems.map((playList: ApiMusic.playListInfo) => {
+    return {
+      prependAvatar: playList.coverImgUrl,
+      title: playList.name,
+      subtitle: `${playList.trackCount}首`,
+    }
+  })
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .listArea {
   position: absolute;
-  top: 45px;
+  top: 50px;
   bottom: 0;
   left: 0;
   right: 0;
@@ -228,7 +252,5 @@ const fetchUserPlayList = async () => {
   min-height: 0;
 }
 
-.v-avatar {
-  border-radius: 30% !important;
-}
+
 </style>

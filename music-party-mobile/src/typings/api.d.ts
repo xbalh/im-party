@@ -90,5 +90,6 @@ declare namespace ApiMusic {
     name: string,
     coverImgUrl: string,
     trackCount: number,
+    subscribed: boolean
   }
 }
