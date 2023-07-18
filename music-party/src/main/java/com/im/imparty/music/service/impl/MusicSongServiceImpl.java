@@ -30,4 +30,11 @@ public class MusicSongServiceImpl implements MusicSongService {
         return result;
     }
 
+    @Override
+    public JSONArray getPlayList(String musicUserId) {
+        JSONObject search = musicApi.getPlayList(musicUserId);
+        JSONArray result = search.getJSONArray("playlist");
+        return result;
+    }
+
 }

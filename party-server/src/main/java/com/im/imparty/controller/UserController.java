@@ -5,7 +5,6 @@ import com.im.imparty.user.entity.UserDomain;
 import com.im.imparty.user.mapper.UserMapper;
 import com.im.imparty.web.vo.BaseResult;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

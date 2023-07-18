@@ -83,3 +83,12 @@ declare namespace ApiRoomManagement {
     createTime: string,
   }
 }
+
+declare namespace ApiMusic {
+  interface playListInfo {
+    id: number,
+    name: string,
+    coverImgUrl: string,
+    trackCount: number,
+  }
+}

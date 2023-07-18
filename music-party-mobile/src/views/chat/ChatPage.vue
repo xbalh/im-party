@@ -90,7 +90,14 @@
       <v-tab :value="1">我的歌单</v-tab>
       <v-tab :value="2">收藏歌单</v-tab>
     </v-tabs>
-    <v-list :items="items"></v-list>
+    <div class="listArea">
+      <div class="playListDiv mx-2">
+        <v-slide-y-transition group tag="div">
+          <v-list :items="items" item-props lines="two" class="playlist"></v-list>
+        </v-slide-y-transition>
+      </div>
+    </div>
+
   </v-card>
 </template>
 
@@ -101,6 +108,7 @@ import { useLoading } from "@/hooks";
 import { useRouter } from "vue-router";
 import { useRouterPush } from "@/composables";
 import { fetchRoomList } from "@/service/api/room";
+import { fetchPlayList } from "@/service/api/music";
 import { groupByKey } from "@/utils";
 import Bus from "@/utils/common/Bus";
 
@@ -115,21 +123,7 @@ Bus.on('bottom-nav-change', (tabName: string) => {
   currentTab.value = tabName
 })
 
-const items = ref([
-  { type: 'subheader', title: '我的歌单(26个)' },
-  {
-    title: 'Item #1',
-    value: 1,
-  },
-  {
-    title: 'Item #2',
-    value: 2,
-  },
-  {
-    title: 'Item #3',
-    value: 3,
-  },
-])
+const items = ref()
 
 const topTabCurrent = ref(0)
 
@@ -172,6 +166,16 @@ const { loading: fetchOnlineLoading, startLoading: startFetchRoom, endLoading: e
 //   }
 // }
 
+
+
+onMounted(() => {
+  fetchRooms()
+  // routerPush(`/apps/chat-channel/${channels.value[0]}`)
+  // fetchOnlineUsers()
+  fetchUserPlayList()
+
+})
+
 const fetchRooms = async () => {
   startFetchRoom()
   const resp = await fetchRoomList();
@@ -183,12 +187,48 @@ const fetchRooms = async () => {
   }
 }
 
-onMounted(() => {
-  fetchRooms()
-  // routerPush(`/apps/chat-channel/${channels.value[0]}`)
-  // fetchOnlineUsers()
-
-})
+const fetchUserPlayList = async () => {
+  const resp = await fetchPlayList('125885835');
+  if (resp.data) {
+    const playListCount = resp.data.length
+    const subheader = [{
+      type: 'subheader',
+      title: `我的歌单(${playListCount}个)`
+    }]
+    //TODO 通过subscribed区分是我的歌单还是收藏歌单
+    const playListItemList = resp.data.map((playList: ApiMusic.playListInfo) => {
+      return {
+        prependAvatar: playList.coverImgUrl,
+        title: playList.name,
+        subtitle: `${playList.trackCount}首`,
+      }
+    })
+    console.log(playListItemList)
+    items.value = [...subheader, ...playListItemList]
+  }
+}
 </script>
 
-<style scoped></style>
+<style lang="scss" scoped>
+.listArea {
+  position: absolute;
+  top: 45px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.playListDiv {
+  flex-grow: 1;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+  min-height: 0;
+}
+
+.v-avatar {
+  border-radius: 30% !important;
+}
+</style>
