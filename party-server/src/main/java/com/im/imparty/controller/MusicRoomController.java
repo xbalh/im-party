@@ -11,8 +11,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.websocket.server.PathParam;
-import java.util.Collection;
 import java.util.List;
 
 @Api("房间控制")
@@ -30,7 +28,7 @@ public class MusicRoomController {
     @GetMapping("/play")
     public BaseResult<String> play(@RequestParam("roomId") Integer roomId) {
         if (WebSocketServer.roomMap.containsKey(roomId)) {
-            List<PlaySongInfo> playSongInfos = playerRecordService.selectAllByRoomId(roomId);
+            List<PlaySongInfo> playSongInfos = playerRecordService.selectAllUnPlayMusicByRoomId(roomId);
             WebSocketServer.roomMap.get(roomId).play(0, playSongInfos);
         } else {
             return BaseResult.fail("房间不存在！");
@@ -48,6 +46,7 @@ public class MusicRoomController {
         }
     }
 
+    @ApiOperation("点歌")
     @PostMapping("/addMusic/{roomId}")
     public BaseResult addMusic(@PathVariable("roomId") Integer roomId, @RequestParam("songId") String songId) {
         MusicPlayerRecordDomain data = musicPlayerRecordService.addMusic(roomId, songId, SecurityContextHolder.getContext().getAuthentication().getName());

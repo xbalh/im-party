@@ -2,15 +2,17 @@ package com.im.imparty.websocket;
 
 import com.im.imparty.common.util.SongUtils;
 import com.im.imparty.common.vo.PlaySongInfo;
+import com.im.imparty.music.playerlist.service.MusicPlayerRecordService;
 import com.im.imparty.spring.authentication.LoginJwtToken;
 import com.im.imparty.websocket.conts.MsgJSON;
 import com.im.imparty.websocket.timer.PlayTimer;
 import com.im.imparty.websocket.util.SessionUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.GrantedAuthority;
 
+import javax.annotation.Resource;
 import javax.websocket.Session;
-import java.io.IOException;
 import java.security.Principal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,6 +34,10 @@ public class WebsocketSessionManager {
 
     // 播放计时器
     private PlayTimer playTimer;
+
+    @Lazy
+    @Resource
+    private MusicPlayerRecordService musicPlayerRecordService;
 
     public boolean addUser(Session session) {
         Principal userPrincipal = session.getUserPrincipal();
@@ -67,7 +73,7 @@ public class WebsocketSessionManager {
         return close(sessionImpl);
     }
 
-    public boolean close(WebsocketSessionImpl sessionImpl){
+    public boolean close(WebsocketSessionImpl sessionImpl) {
         Session session = sessionImpl.getSession();
         String userName = SessionUtils.getUserName(session);
         if (socketStore.remove(userName) != null) {
@@ -113,12 +119,20 @@ public class WebsocketSessionManager {
     public PlayTimer init(List<PlaySongInfo> songList) {
         initSongList(songList);
         PlaySongInfo playSongInfo1 = nextSong();
+        if (playSongInfo1 == null) {
+            playTimer.stop();
+        }
         broadcastMsg(MsgJSON.nextPlay(playSongInfo1).toJSONString());
+//        musicPlayerRecordService.updateMusicPlayStatus(playSongInfo1.getSongId(), )
         this.playTimer = new PlayTimer(playSongInfo1.getTotalTime() / 1000, (o) -> {
             if (o) {
                 PlaySongInfo playSongInfo = nextSong();
+                if (playSongInfo == null) {
+                    playTimer.stop();
+                }
                 broadcastMsg(MsgJSON.nextPlay(playSongInfo).toJSONString());
                 playTimer.play(0);
+
             } else {
                 // broadcastMsg(MsgJSON.currentTime(getCurrentTime()).toJSONString());
             }
@@ -150,9 +164,10 @@ public class WebsocketSessionManager {
 
     public PlaySongInfo nextSong() {
         if (songList.isEmpty()) {
-            PlaySongInfo playSongInfo = PlaySongInfo.defaultSong();
-            currentSongId = playSongInfo.getSongId();
-            return playSongInfo;
+//            PlaySongInfo playSongInfo = PlaySongInfo.defaultSong();
+//            currentSongId = playSongInfo.getSongId();
+//            return playSongInfo;
+            return null;
         }
         PlaySongInfo playSongInfo = null;
         if (currentSongId == null) {

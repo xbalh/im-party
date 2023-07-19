@@ -4,7 +4,6 @@ import com.im.imparty.common.vo.PlaySongInfo;
 import com.im.imparty.music.playerlist.entity.MusicPlayerRecordDomain;
 import com.baomidou.mybatisplus.extension.service.IService;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -19,5 +18,5 @@ public interface MusicPlayerRecordService extends IService<MusicPlayerRecordDoma
 
     MusicPlayerRecordDomain addMusic(Integer roomId, String songId, String curUsr);
 
-    List<PlaySongInfo> selectAllByRoomId(Integer roomId);
+    List<PlaySongInfo> selectAllUnPlayMusicByRoomId(Integer roomId);
 }

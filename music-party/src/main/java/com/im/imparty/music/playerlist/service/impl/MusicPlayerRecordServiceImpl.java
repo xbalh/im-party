@@ -2,15 +2,15 @@ package com.im.imparty.music.playerlist.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.ImmutableList;
+import com.im.imparty.api.music.MusicApi;
 import com.im.imparty.common.enums.SongQualityEnum;
 import com.im.imparty.common.exception.CustomException;
-import com.im.imparty.api.music.MusicApi;
 import com.im.imparty.common.vo.PlaySongInfo;
 import com.im.imparty.music.playerlist.entity.MusicPlayerRecordDomain;
 import com.im.imparty.music.playerlist.mapper.MusicPlayerRecordMapper;
 import com.im.imparty.music.playerlist.service.MusicPlayerRecordService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 /**
  * <p>
- *  服务实现类
+ * 服务实现类
  * </p>
  *
  * @author 2
@@ -35,7 +35,11 @@ public class MusicPlayerRecordServiceImpl extends ServiceImpl<MusicPlayerRecordM
     @Transactional(rollbackFor = Exception.class)
     @Override
     public MusicPlayerRecordDomain addMusic(Integer roomId, String songId, String curUsr) {
-
+        boolean isRepeat = count(lambdaQuery().eq(MusicPlayerRecordDomain::getSongId, songId)
+                .eq(MusicPlayerRecordDomain::isPlayed, false)) > 0;
+        if (isRepeat) {
+            throw new CustomException("当前歌曲已经在排队了哦");
+        }
         JSONObject songDetail = musicApi.getSongDetail(ImmutableList.of(songId));
         JSONArray songs = songDetail.getJSONArray("songs");
         if (songs == null || songs.size() == 0) {
@@ -49,7 +53,7 @@ public class MusicPlayerRecordServiceImpl extends ServiceImpl<MusicPlayerRecordM
         data.setSongId(songId);
         JSONArray singerList = song.getJSONArray("ar");
         if (singerList != null && singerList.size() > 0) {
-            data.setSinger(singerList.stream().map(item -> (String)((LinkedHashMap) item).get("name")).collect(Collectors.joining(",")));
+            data.setSinger(singerList.stream().map(item -> (String) ((LinkedHashMap) item).get("name")).collect(Collectors.joining(",")));
         }
         data.setSongName(song.getString("name"));
         data.setTotalTime(song.getInteger("dt"));
@@ -69,13 +73,17 @@ public class MusicPlayerRecordServiceImpl extends ServiceImpl<MusicPlayerRecordM
             songQuality.add(SongQualityEnum.STANDARD.getCode());
         }
         data.setSongQuality(String.join(",", songQuality));
+        data.setPlayed(false);
         save(data);
         return data;
     }
 
     @Override
-    public List<PlaySongInfo> selectAllByRoomId(Integer roomId) {
-        Collection<MusicPlayerRecordDomain> list = lambdaQuery().eq(MusicPlayerRecordDomain::getRoomId, roomId).list();
+    public List<PlaySongInfo> selectAllUnPlayMusicByRoomId(Integer roomId) {
+        Collection<MusicPlayerRecordDomain> list = lambdaQuery()
+                .eq(MusicPlayerRecordDomain::getRoomId, roomId)
+                .eq(MusicPlayerRecordDomain::isPlayed, false)
+                .orderByAsc(MusicPlayerRecordDomain::getCrtTim).list();
         return list.stream().map(item -> {
             PlaySongInfo res = new PlaySongInfo();
             res.setSort(item.getSort());
