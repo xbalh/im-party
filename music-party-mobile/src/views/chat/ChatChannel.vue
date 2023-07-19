@@ -190,6 +190,13 @@ const sendMessage = () => {
   scrollBottom()
 }
 
+Bus.on('onDemandMusic', (musicInfo: ApiMusic.playListMusicInfo)=>{
+  if(!ws){
+    window.$snackBar?.error('请先进入一个房间')
+  }
+  window.$snackBar?.success('点歌成功')
+})
+
 
 </script>
 

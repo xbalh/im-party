@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.im.imparty.api.music.MusicApi;
 import com.im.imparty.music.service.MusicSongService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -32,8 +33,16 @@ public class MusicSongServiceImpl implements MusicSongService {
 
     @Override
     public JSONArray getPlayList(String musicUserId) {
-        JSONObject search = musicApi.getPlayList(musicUserId);
+        JSONObject search = musicApi.getPlayList(musicUserId, "999");
         JSONArray result = search.getJSONArray("playlist");
+        return result;
+    }
+
+    @Cacheable(cacheNames = "trackMusicList", key = "T(String).valueOf(#id).concat('-').concat(#limit).concat('-').concat(#offset)", unless = "#result=null")
+    @Override
+    public JSONArray getPlayListAllMusic(String id, Integer limit, Integer offset) {
+        JSONObject search = musicApi.getPlayListAllMusic(id, limit, offset);
+        JSONArray result = search.getJSONArray("songs");
         return result;
     }
 

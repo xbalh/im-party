@@ -13,3 +13,14 @@ export function fetchPlayList(uid: string) {
     }
   });
 }
+
+//获取用户歌单
+export function fetchPlayListAllMusic(id: string, limit: number, offset: number) {
+  return request.get<ApiMusic.playListMusicInfo[]>("/music/playlist/track/all", {
+    params: {
+      id: id,
+      limit: limit,
+      offset: offset
+    }
+  });
+}

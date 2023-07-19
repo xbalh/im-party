@@ -68,4 +68,13 @@
            overflowToDisk="true"
            memoryStoreEvictionPolicy="LRU" />
 
+    <cache name="trackMusicList"
+           maxElementsInMemory="10000"
+           eternal="true"
+           timeToIdleSeconds="6000"
+           timeToLiveSeconds="6000"
+           maxElementsOnDisk="10000000"
+           overflowToDisk="true"
+           memoryStoreEvictionPolicy="LRU" />
+
 </ehcache>

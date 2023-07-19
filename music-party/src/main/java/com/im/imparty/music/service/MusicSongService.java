@@ -12,4 +12,6 @@ public interface MusicSongService {
     JSONArray getSong(List<String> songIds, String level);
 
     JSONArray getPlayList(String musicUserId);
+
+    JSONArray getPlayListAllMusic(String id, Integer limit, Integer offset);
 }

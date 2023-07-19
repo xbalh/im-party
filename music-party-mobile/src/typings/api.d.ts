@@ -92,4 +92,27 @@ declare namespace ApiMusic {
     trackCount: number,
     subscribed: boolean
   }
+
+  interface playListMusicInfo {
+    id: number,
+    name: string,
+    //作者
+    ar: artistInfo[],
+    //专辑
+    al: albumInfo
+  }
+
+  interface artistInfo {
+    id: number,
+    name: string,
+    tns: string,
+    alias: string
+  }
+
+  interface albumInfo {
+    id: number,
+    name: string,
+    picUrl: string
+  }
+
 }

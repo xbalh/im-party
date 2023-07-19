@@ -147,7 +147,7 @@ const navMenu = {
 
 const navCurrent = ref(1)
 watch(navCurrent, (newValue, oldValue) => {
-  if (newValue === 2) {
+  if (newValue === 2 || newValue === undefined) {
     navCurrent.value = oldValue
     return
   }

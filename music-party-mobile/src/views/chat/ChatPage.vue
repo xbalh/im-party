@@ -86,26 +86,79 @@
     </v-navigation-drawer>
   </v-card>
   <v-card key="myself" class="h-100" v-show="currentTab === 'myself'">
-    <v-tabs v-model="topTabCurrent" fixed-tabs color="primary">
-      <v-tab value="myPlayList">我的歌单</v-tab>
-      <v-tab value="collectPlayList">收藏歌单</v-tab>
-    </v-tabs>
-    <div class="listArea">
-      <div class="playListDiv mx-2">
-        <v-window v-model="topTabCurrent">
-          <v-window-item value="myPlayList">
-            <v-slide-y-transition key="myPlayList" group tag="div">
-              <v-list :items="myPlayList" item-props lines="two" class="playlist"></v-list>
-            </v-slide-y-transition>
-          </v-window-item>
-          <v-window-item value="collectPlayList">
-            <v-slide-y-transition key="collectPlayList" group tag="div">
-              <v-list :items="collectPlayList" item-props lines="two" class="playlist"></v-list>
-            </v-slide-y-transition>
-          </v-window-item>
-        </v-window>
+    <div v-show="!isPlayListDetailPage">
+      <v-tabs v-model="topTabCurrent" fixed-tabs color="primary">
+        <v-tab value="myPlayList">我的歌单</v-tab>
+        <v-tab value="collectPlayList">收藏歌单</v-tab>
+      </v-tabs>
+      <div class="listArea">
+        <div class="playListDiv mx-2">
+          <v-window v-model="topTabCurrent">
+            <v-window-item value="myPlayList">
+              <v-slide-y-transition key="myPlayList" group tag="div">
+                <v-list class="playlist">
+                  <v-list-item lines="one" :title="mySubheaderTitle" class="subheader"></v-list-item>
+                  <v-list-item v-for="item in myPlayList" lines="two" :type="item.type" item-props :key="item.title"
+                    :title="item.title" :subtitle="item.subtitle" :prepend-avatar="item.prependAvatar" class="item"
+                    @click="enterPlayList(item)"></v-list-item>
+                </v-list>
+              </v-slide-y-transition>
+            </v-window-item>
+            <v-window-item value="collectPlayList">
+              <v-slide-y-transition key="collectPlayList" group tag="div">
+                <v-list lines="two" class="playlist">
+                  <v-list-item lines="one" :title="collectSubheaderTitle" class="subheader"></v-list-item>
+                  <v-list-item v-for="item in collectPlayList" lines="two" :type="item.type" item-props :key="item.title"
+                    :title="item.title" :subtitle="item.subtitle" :prepend-avatar="item.prependAvatar" class="item"
+                    @click="enterPlayList(item)"></v-list-item>
+                </v-list>
+              </v-slide-y-transition>
+            </v-window-item>
+          </v-window>
+        </div>
       </div>
     </div>
+    <div v-show="isPlayListDetailPage">
+      <v-toolbar color="surface">
+        <v-btn icon class="hidden-xs-only" @click="isPlayListDetailPage = false">
+          <v-icon>mdi-arrow-left</v-icon>
+        </v-btn>
+        <v-toolbar-title>{{ currentPlayList?.title }}</v-toolbar-title>
+      </v-toolbar>
+      <div class="listArea">
+        <div class="playListDiv mx-2">
+          <v-slide-y-transition key="myPlayList" group tag="div">
+            <v-list class="musicList">
+              <v-list-item lines="two" v-for="(musicInfo, index) in currentPlayListAllMusic" :title="musicInfo.name"
+                :subtitle="handleMusicSubtitle(musicInfo)" @click="onDemandMusic(musicInfo)">
+                <template v-slot:prepend>
+                  <span>{{ index + 1 }}</span>
+                </template>
+              </v-list-item>
+            </v-list>
+          </v-slide-y-transition>
+        </div>
+      </div>
+    </div>
+
+    <v-dialog v-model="dialog" width="auto">
+      <v-card>
+        <v-card-title class="text-h5">
+          确定要点这首歌吗？
+        </v-card-title>
+        <v-card-text>{{ currentWishOnDemandMusic?.name }}</v-card-text>
+        <v-card-text>{{ currentWishOnDemandMusic && handleMusicSubtitle(currentWishOnDemandMusic) }}</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="green-darken-1" variant="text" @click="dialog = false">
+            取消
+          </v-btn>
+          <v-btn color="green-darken-1" variant="text" @click="confirmOndemandMusic">
+            确定
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 
@@ -116,7 +169,7 @@ import { useLoading } from "@/hooks";
 import { useRouter } from "vue-router";
 import { useRouterPush } from "@/composables";
 import { fetchRoomList } from "@/service/api/room";
-import { fetchPlayList } from "@/service/api/music";
+import { fetchPlayList, fetchPlayListAllMusic } from "@/service/api/music";
 import { groupByKey } from "@/utils";
 import Bus from "@/utils/common/Bus";
 
@@ -131,9 +184,14 @@ Bus.on('bottom-nav-change', (tabName: string) => {
   currentTab.value = tabName
 })
 
+const mySubheaderTitle = ref()
 const myPlayList = ref()
+const collectSubheaderTitle = ref()
 const collectPlayList = ref()
-
+const isPlayListDetailPage = ref(false)
+const currentPlayListAllMusic = ref<Array<ApiMusic.playListMusicInfo>>()
+const currentWishOnDemandMusic = ref<ApiMusic.playListMusicInfo>()
+const dialog = ref(false)
 
 const topTabCurrent = ref('myPlayList')
 
@@ -165,6 +223,8 @@ const roomList = ref<Array<ApiRoomManagement.roomInfo>>([])
 const roomMap = ref()
 
 const open = ref<Array<string>>([])
+
+const currentPlayList = ref()
 
 const { loading: fetchOnlineLoading, startLoading: startFetchRoom, endLoading: endFetchRoom } = useLoading()
 // const fetchOnlineUsers = async () => {
@@ -198,42 +258,73 @@ const fetchRooms = async () => {
 }
 
 const fetchUserPlayList = async () => {
+  window.$loadingOverly?.show()
   const resp = await fetchPlayList('125885835');
+  window.$loadingOverly?.hide()
   if (resp.data) {
     //通过subscribed区分是我的歌单还是收藏歌单
     //我的歌单
     const myPlayListItemList = resp.data.filter((playList: ApiMusic.playListInfo) => !playList.subscribed)
     const myPlayListItems = handlePlayList(myPlayListItemList)
     const myplayListCount = myPlayListItems.length
-    const myPlayListSubheader = {
-      type: 'subheader',
-      title: `我的歌单(${myplayListCount}个)`
-    }
-    myPlayList.value = [myPlayListSubheader, ...myPlayListItems]
+    const myPlayListSubheaderTitle = `我的歌单(${myplayListCount}个)`
+    mySubheaderTitle.value = myPlayListSubheaderTitle
+    myPlayList.value = myPlayListItems
     //收藏歌单
     const collectPlayListItemList = resp.data.filter((playList: ApiMusic.playListInfo) => playList.subscribed)
     const collectPlayListItems = handlePlayList(collectPlayListItemList)
     const collectPlayListCount = collectPlayListItems.length
-    const collectPlayListSubheader = {
-      type: 'subheader',
-      title: `收藏歌单(${collectPlayListCount}个)`
-    }
-    collectPlayList.value = [collectPlayListSubheader, ...collectPlayListItems]
+    const collectPlayListSubheaderTitle = `收藏歌单(${collectPlayListCount}个)`
+    collectSubheaderTitle.value = collectPlayListSubheaderTitle
+    collectPlayList.value = collectPlayListItems
   }
 }
 
 const handlePlayList = (playListItems: ApiMusic.playListInfo[]) => {
   return playListItems.map((playList: ApiMusic.playListInfo) => {
     return {
+      id: playList.id,
       prependAvatar: playList.coverImgUrl,
       title: playList.name,
       subtitle: `${playList.trackCount}首`,
     }
   })
 }
+
+const enterPlayList = async (item) => {
+  // console.log(el)
+  console.log("进入歌单：" + item.id)
+  currentPlayList.value = item
+  window.$loadingOverly?.show()
+  const resp = await fetchPlayListAllMusic(item.id, 1000, 0);
+  window.$loadingOverly?.hide()
+  if (resp.data) {
+    currentPlayListAllMusic.value = new Array()
+    currentPlayListAllMusic.value = resp.data
+    isPlayListDetailPage.value = true
+  }
+}
+
+const handleMusicSubtitle = (musicInfo: ApiMusic.playListMusicInfo) => {
+  //处理作者
+  const artistNameStr = musicInfo.ar.map((artistInfo: ApiMusic.artistInfo) => artistInfo.name).join('/');
+  return artistNameStr + ' - ' + musicInfo.al.name
+}
+
+const onDemandMusic = (musicInfo: ApiMusic.playListMusicInfo) => {
+  currentWishOnDemandMusic.value = musicInfo
+  dialog.value = true
+}
+
+const confirmOndemandMusic = () => {
+  if (!currentWishOnDemandMusic) return
+  Bus.emit('onDemandMusic', currentWishOnDemandMusic)
+  dialog.value = false
+}
+
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .listArea {
   position: absolute;
   top: 50px;
@@ -252,5 +343,36 @@ const handlePlayList = (playListItems: ApiMusic.playListInfo[]) => {
   min-height: 0;
 }
 
+.playlist :deep(.v-avatar) {
+  border-radius: 20%;
+}
 
+.playlist :deep(.v-avatar.v-avatar--size-default) {
+  --v-avatar-height: 50px;
+}
+
+.musicList {
+  left: -15px;
+}
+
+.musicList :deep(.v-list-item__prepend) {
+  margin-right: 15px;
+  font-size: 20px;
+}
+
+.musicList :deep(.v-list-item-subtitle) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block
+}
+
+.subheader :deep(.v-list-item--density-default.v-list-item--one-line) {
+  min-height: 24px;
+
+  .v-list-item-title {
+    font-size: small;
+    opacity: var(--v-medium-emphasis-opacity)
+  }
+}
 </style>
