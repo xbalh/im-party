@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.im.imparty.common.BaseDomain;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import io.swagger.models.auth.In;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -43,7 +44,7 @@ public class MusicPlayerRecordDomain extends BaseDomain {
 
     private String songQuality;
 
-    private boolean isPlayed;
+    private Integer isPlayed;
 
     private Date crtTim;
 

@@ -29,7 +29,7 @@ public class MusicRoomController {
     public BaseResult<String> play(@RequestParam("roomId") Integer roomId) {
         if (WebSocketServer.roomMap.containsKey(roomId)) {
             List<PlaySongInfo> playSongInfos = playerRecordService.selectAllUnPlayMusicByRoomId(roomId);
-            WebSocketServer.roomMap.get(roomId).play(0, playSongInfos);
+            WebSocketServer.roomMap.get(roomId).play(0, playSongInfos, roomId);
         } else {
             return BaseResult.fail("房间不存在！");
         }

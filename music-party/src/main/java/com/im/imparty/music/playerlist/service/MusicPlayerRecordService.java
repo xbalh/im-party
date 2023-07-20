@@ -19,4 +19,6 @@ public interface MusicPlayerRecordService extends IService<MusicPlayerRecordDoma
     MusicPlayerRecordDomain addMusic(Integer roomId, String songId, String curUsr);
 
     List<PlaySongInfo> selectAllUnPlayMusicByRoomId(Integer roomId);
+
+    void updateMusicPlayStatus(String songId, Integer roomId);
 }

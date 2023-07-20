@@ -21,7 +21,7 @@ export default class CustomAxiosInstance {
     backendConfig: Service.BackendResultConfig = {
       codeKey: 'code',
       dataKey: 'data',
-      msgKey: 'message',
+      msgKey: 'msg',
       successCode: 200
     }
   ) {

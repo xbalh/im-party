@@ -1,5 +1,6 @@
 package com.im.imparty.common.vo;
 
+import com.alibaba.fastjson.JSONObject;
 import com.im.imparty.common.util.SongUtils;
 import lombok.Data;
 
@@ -20,6 +21,10 @@ public class PlaySongInfo {
     private String singer;
 
     private String songQuality;
+
+    private JSONObject songDetailInfo;
+
+
 
     public static PlaySongInfo defaultSong() {
         PlaySongInfo res = new PlaySongInfo();

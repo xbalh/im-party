@@ -1,4 +1,4 @@
-import {mockRequest, request} from '../request';
+import { mockRequest, request } from '../request';
 
 //搜索歌曲
 export function fetchRoomList() {
@@ -6,6 +6,6 @@ export function fetchRoomList() {
 }
 
 //点歌
-export function addMusic() {
-  return request.post<ApiChatManagement.message>("/room/addMusic");
+export function addMusic(roomId: number, songId: string) {
+  return request.post(`/room/addMusic/${roomId}?songId=${songId}`);
 }

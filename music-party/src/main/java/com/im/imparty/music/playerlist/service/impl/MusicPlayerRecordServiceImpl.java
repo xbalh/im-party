@@ -36,9 +36,9 @@ public class MusicPlayerRecordServiceImpl extends ServiceImpl<MusicPlayerRecordM
     @Override
     public MusicPlayerRecordDomain addMusic(Integer roomId, String songId, String curUsr) {
         boolean isRepeat = count(lambdaQuery().eq(MusicPlayerRecordDomain::getSongId, songId)
-                .eq(MusicPlayerRecordDomain::isPlayed, false)) > 0;
+                .eq(MusicPlayerRecordDomain::getIsPlayed, 0).getWrapper()) > 0;
         if (isRepeat) {
-            throw new CustomException("当前歌曲已经在排队了哦");
+            throw new CustomException("当前歌曲已经在排队了哦~");
         }
         JSONObject songDetail = musicApi.getSongDetail(ImmutableList.of(songId));
         JSONArray songs = songDetail.getJSONArray("songs");
@@ -73,7 +73,8 @@ public class MusicPlayerRecordServiceImpl extends ServiceImpl<MusicPlayerRecordM
             songQuality.add(SongQualityEnum.STANDARD.getCode());
         }
         data.setSongQuality(String.join(",", songQuality));
-        data.setPlayed(false);
+        data.setIsPlayed(0);
+        data.setCrtTim(new Date());
         save(data);
         return data;
     }
@@ -82,7 +83,7 @@ public class MusicPlayerRecordServiceImpl extends ServiceImpl<MusicPlayerRecordM
     public List<PlaySongInfo> selectAllUnPlayMusicByRoomId(Integer roomId) {
         Collection<MusicPlayerRecordDomain> list = lambdaQuery()
                 .eq(MusicPlayerRecordDomain::getRoomId, roomId)
-                .eq(MusicPlayerRecordDomain::isPlayed, false)
+                .eq(MusicPlayerRecordDomain::getIsPlayed, 0)
                 .orderByAsc(MusicPlayerRecordDomain::getCrtTim).list();
         return list.stream().map(item -> {
             PlaySongInfo res = new PlaySongInfo();
@@ -93,5 +94,12 @@ public class MusicPlayerRecordServiceImpl extends ServiceImpl<MusicPlayerRecordM
             res.setSongQuality(item.getSongQuality());
             return res;
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateMusicPlayStatus(String songId, Integer roomId) {
+        lambdaUpdate().eq(MusicPlayerRecordDomain::getRoomId, roomId)
+                .eq(MusicPlayerRecordDomain::getSongId, songId)
+                .set(MusicPlayerRecordDomain::getIsPlayed, 1).update();
     }
 }

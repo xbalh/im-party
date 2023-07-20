@@ -49,6 +49,7 @@ import { localStg } from '@/utils';
 import Bus from '@/utils/common/Bus';
 import { formatDate } from '@vueuse/core';
 import { random } from 'lodash-es';
+import { addMusic } from "@/service/api/room";
 
 
 const route = useRoute()
@@ -190,12 +191,22 @@ const sendMessage = () => {
   scrollBottom()
 }
 
-Bus.on('onDemandMusic', (musicInfo: ApiMusic.playListMusicInfo)=>{
-  if(!ws){
-    window.$snackBar?.error('请先进入一个房间')
+const onDemandMusic = async (musicInfo: ApiMusic.playListMusicInfo) => {
+  const resp = await addMusic(parseInt(roomNo as string), String(musicInfo.id));
+  if (resp.error?.code) {
+    window.$snackBar?.error('点歌失败，' + resp.error.msg)
+    return
   }
   window.$snackBar?.success('点歌成功')
+}
+
+Bus.on('onDemandMusic', (musicInfo: ApiMusic.playListMusicInfo) => {
+  if (!ws) {
+    window.$snackBar?.error('请先进入一个房间')
+  }
+  onDemandMusic(musicInfo)
 })
+
 
 
 </script>

@@ -1,17 +1,22 @@
 package com.im.imparty.websocket;
 
+import cn.hutool.core.bean.BeanUtil;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.ImmutableList;
+import com.im.imparty.api.music.MusicApi;
+import com.im.imparty.common.exception.CustomException;
 import com.im.imparty.common.util.SongUtils;
 import com.im.imparty.common.vo.PlaySongInfo;
 import com.im.imparty.music.playerlist.service.MusicPlayerRecordService;
 import com.im.imparty.spring.authentication.LoginJwtToken;
+import com.im.imparty.spring.util.SpringFactoryUtils;
 import com.im.imparty.websocket.conts.MsgJSON;
 import com.im.imparty.websocket.timer.PlayTimer;
 import com.im.imparty.websocket.util.SessionUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.GrantedAuthority;
 
-import javax.annotation.Resource;
 import javax.websocket.Session;
 import java.security.Principal;
 import java.util.*;
@@ -35,9 +40,7 @@ public class WebsocketSessionManager {
     // 播放计时器
     private PlayTimer playTimer;
 
-    @Lazy
-    @Resource
-    private MusicPlayerRecordService musicPlayerRecordService;
+    private Integer roomId;
 
     public boolean addUser(Session session) {
         Principal userPrincipal = session.getUserPrincipal();
@@ -120,16 +123,29 @@ public class WebsocketSessionManager {
         initSongList(songList);
         PlaySongInfo playSongInfo1 = nextSong();
         if (playSongInfo1 == null) {
-            playTimer.stop();
+            throw new CustomException("当前房间的播放队列为空，请先点歌");
         }
+        MusicApi musicApi = SpringFactoryUtils.getBean(MusicApi.class);
+        JSONObject songDetail = musicApi.getSongDetail(ImmutableList.of(playSongInfo1.getSongId()));
+        JSONArray songs = songDetail.getJSONArray("songs");
+        JSONObject song = songs.getJSONObject(0);
+        playSongInfo1.setSongDetailInfo(song);
         broadcastMsg(MsgJSON.nextPlay(playSongInfo1).toJSONString());
-//        musicPlayerRecordService.updateMusicPlayStatus(playSongInfo1.getSongId(), )
+
+        MusicPlayerRecordService musicPlayerRecordService = SpringFactoryUtils.getBean(MusicPlayerRecordService.class);
         this.playTimer = new PlayTimer(playSongInfo1.getTotalTime() / 1000, (o) -> {
             if (o) {
+                if (currentSongId != null) {
+                    musicPlayerRecordService.updateMusicPlayStatus(currentSongId, this.roomId);
+                }
                 PlaySongInfo playSongInfo = nextSong();
                 if (playSongInfo == null) {
                     playTimer.stop();
                 }
+                JSONObject songDetail1 = musicApi.getSongDetail(ImmutableList.of(playSongInfo.getSongId()));
+                JSONArray songs1 = songDetail1.getJSONArray("songs");
+                JSONObject song1 = songs1.getJSONObject(0);
+                playSongInfo.setSongDetailInfo(song1);
                 broadcastMsg(MsgJSON.nextPlay(playSongInfo).toJSONString());
                 playTimer.play(0);
 
@@ -138,10 +154,12 @@ public class WebsocketSessionManager {
             }
             return null;
         });
+        musicPlayerRecordService.updateMusicPlayStatus(playSongInfo1.getSongId(), this.roomId);
         return playTimer;
     }
 
-    public void play(long startTime, List<PlaySongInfo> songList) {
+    public void play(long startTime, List<PlaySongInfo> songList, Integer roomId) {
+        this.roomId = roomId;
         if (this.playTimer == null) {
             init(songList);
         }
@@ -160,6 +178,9 @@ public class WebsocketSessionManager {
     public void addSong(PlaySongInfo songInfo) {
         songList.add(songInfo);
         songList.sort(Comparator.comparingInt(PlaySongInfo::getSort));
+        if (playTimer == null) {
+            play(0, BeanUtil.copyToList(songList, PlaySongInfo.class), roomId);
+        }
     }
 
     public PlaySongInfo nextSong() {

@@ -76,12 +76,17 @@
         <div class="playerBar" @click="toMusicPage">
           <div class="avatar" ref="avatarDiv">
             <v-avatar ref="avatar" color="surface-variant" :size="avatarSize" :class="isPlay ? 'avatar-spin' : ''">
-              <v-img class="musicImg"
-                src="http://p2.music.126.net/nuX_gG3J-e7B2uzXrALTwQ==/109951168185440037.jpg?param=130y130"></v-img>
+              <v-img class="musicImg" :src="currentPlayMusicInfo?.songDetailInfo?.al.picUrl"></v-img>
             </v-avatar>
           </div>
           <div class="musicContent">
-            <span>阳光彩虹小白马 - 大张伟</span>
+            <span>{{ currentPlayMusicInfo?.songName }}</span>
+            <span>
+              {{ currentPlayMusicInfo && ' - ' }}
+            </span>
+            <span>
+              {{ currentPlayMusicInfo && handleArtistName(currentPlayMusicInfo) }}
+            </span>
           </div>
           <div class="playbarBtnGroup">
             <v-progress-circular v-model="currentProgress" class="me-2 progress" size="30" width="2">
@@ -135,6 +140,8 @@ const searchSelect = (item: AuthRoute.Route) => {
     push.routerPush(item)
 }
 
+const currentPlayMusicInfo = ref<Music.SongInfo>()
+
 const currentProgress = ref(0)
 Bus.on('music-process-update', (progress: number) => {
   currentProgress.value = progress
@@ -173,13 +180,14 @@ const toMusicPage = () => {
 const playOrPauseMusic = () => {
   if (isPlay.value) {
     console.log("暂停播放")
-    Bus.emit('music-play', false)
+    Bus.emit('request-music-play', false)
   } else {
     console.log("开始播放")
-    Bus.emit('music-play', true)
+    Bus.emit('request-music-play', true)
   }
-  isPlay.value = !isPlay.value
 }
+
+
 
 const openPlayList = () => {
 
@@ -201,6 +209,18 @@ onMounted(() => {
   const height = avatarDiv.value!.offsetHeight
   avatarDiv.value!.style.cssText += `;width: ${height}px;`
   avatarSize.value = height - 15
+})
+
+Bus.on('changeSong', (songInfo: Music.SongInfo) => {
+  currentPlayMusicInfo.value = songInfo
+})
+
+const handleArtistName = (songInfo: Music.SongInfo) => {
+  return songInfo.songDetailInfo?.ar.map((artistInfo: ApiMusic.artistInfo) => artistInfo.name).join('/');
+}
+
+Bus.on('music-play', (flag: boolean) => {
+  isPlay.value = flag
 })
 
 </script>

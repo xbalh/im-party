@@ -172,6 +172,7 @@ import { fetchRoomList } from "@/service/api/room";
 import { fetchPlayList, fetchPlayListAllMusic } from "@/service/api/music";
 import { groupByKey } from "@/utils";
 import Bus from "@/utils/common/Bus";
+import { Ref } from "vue";
 
 const { loading: isLoadingAdd, startLoading, endLoading } = useLoading()
 
@@ -312,13 +313,14 @@ const handleMusicSubtitle = (musicInfo: ApiMusic.playListMusicInfo) => {
 }
 
 const onDemandMusic = (musicInfo: ApiMusic.playListMusicInfo) => {
+  console.log(musicInfo.id)
   currentWishOnDemandMusic.value = musicInfo
   dialog.value = true
 }
 
 const confirmOndemandMusic = () => {
   if (!currentWishOnDemandMusic) return
-  Bus.emit('onDemandMusic', currentWishOnDemandMusic)
+  Bus.emit('onDemandMusic', currentWishOnDemandMusic.value)
   dialog.value = false
 }
 

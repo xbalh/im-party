@@ -11,10 +11,13 @@
           <div style="height: 20%;" class="g-glossy">
             <div>
               {{ currentProgress }}/{{ totalProgress }}
-              <audio ref="player" content="never" @timeupdate="timeupdate" :src="testMusic"></audio>
+              <audio ref="player" content="never" @timeupdate="timeupdate"></audio>
               <v-progress-linear v-model="progress" bg-color="blue-grey" color="lime"></v-progress-linear>
             </div>
             <div>
+              <v-btn icon="mdi-play" variant="plain" @click="playOrPauseMusic" size="x-large">
+                <v-icon>{{ isPlay ? 'mdi-pause' : 'mdi-play' }}</v-icon>
+              </v-btn>
             </div>
           </div>
         </div>
@@ -26,23 +29,34 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import Bus from '@/utils/common/Bus';
-import testMusic from '@/assets/test.mp3'
 
 const musicList = ref()
 const display = ref(false)
 const player = ref<HTMLAudioElement>()
-const currentSong = ref<Music.SongInfo>({
-  songName : '阳光彩虹小白马',
-  songId: '',
-  songQuality: '',
-  singer: '大张伟'
-})
+const currentSong = ref<Music.SongInfo>()
 const progress = ref(0)
 const currentProgress = ref('--')
 const totalProgress = ref('--')
 Bus.on('openMusicPage', (flag: boolean) => {
   display.value = flag
 })
+
+const isPlay = ref(false)
+const playOrPauseMusic = () => {
+  if (isPlay.value) {
+    console.log("暂停播放")
+    player.value!.pause()
+    Bus.emit('music-play', false)
+  } else {
+    console.log("开始播放")
+    if (!player.value?.src) {
+      return
+    }
+    player.value!.play()
+    Bus.emit('music-play', true)
+  }
+  isPlay.value = !isPlay.value
+}
 
 const timeupdate = () => {
   const currentTime = player.value!.currentTime
@@ -64,11 +78,18 @@ const musicTimeformat = (value: number) => {
   return `${minute}:${second}`
 }
 
-Bus.on('music-play', (flag: boolean) => {
+Bus.on('request-music-play', (flag: boolean) => {
   if (flag) {
+    if (!player || !player.value!.src) {
+      return
+    }
     player.value!.play()
+    Bus.emit('music-play', true)
+    isPlay.value = true
   } else {
     player.value!.pause()
+    Bus.emit('music-play', false)
+    isPlay.value = false
   }
 })
 
@@ -80,8 +101,12 @@ const closeMusicPage = () => {
 Bus.on('changeSong', (songInfo: Music.SongInfo) => {
   currentSong.value = songInfo
   const currentPlayer = player.value!
-  currentPlayer.setAttribute('src', songInfo.url)
-  currentPlayer.play()
+  currentPlayer.setAttribute('src', songInfo.url!)
+  if (isPlay.value) {
+    currentPlayer.play()
+    Bus.emit('music-play', true)
+  }
+
 })
 
 
