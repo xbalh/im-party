@@ -42,7 +42,8 @@
 <script setup lang="ts">
 import { reactive } from "vue";
 import Bus from "@/utils/common/Bus";
-
+const auth = useAuthStore();
+const { isLogin, userInfo } = storeToRefs(auth)
 
 const openSetting = () => {
   Bus.emit('openSetting', true)
@@ -51,7 +52,7 @@ const openSetting = () => {
 
 const menu = reactive(
   [
-    { icon: 'mdi-account-box-outline', key: 'menu.profile', link: '/apps/manager-user/edit' },
+    { icon: 'mdi-account-box-outline', key: 'menu.profile', link: `/apps/manager-user/edit/${userInfo.value.userId}` },
     // {icon: 'mdi-format-list-checkbox', key: 'menu.todo', link: '/apps/todo'},
     // {icon: 'mdi-email-outline', key: 'menu.board', link: '/apps/board'},
     { icon: 'mdi-music', key: 'menu.chat', link: '/apps/chat-channel/' }
@@ -60,8 +61,7 @@ const menu = reactive(
 
 
 
-const auth = useAuthStore();
-const { isLogin, userInfo } = storeToRefs(auth)
+
 const logout = () => {
   window.$dialog?.show({
     title: '登出',

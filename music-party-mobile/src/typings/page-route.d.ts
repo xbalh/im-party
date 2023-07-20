@@ -21,12 +21,8 @@ declare namespace PageRoute {
     | '500'
     | 'login'
     | 'not-found'
-    | 'dashboard'
-    | 'dashboard_analytics'
     | 'special'
     | 'apps'
-    | 'apps_manager-user'
-    | 'apps_manager-user_list'
     | 'apps_manager-user_edit'
     | 'apps_board'
     | 'apps_todo'
@@ -42,14 +38,6 @@ declare namespace PageRoute {
     | 'pages_error_unexpected'
     | 'other'
     | 'blank-page'
-    | 'other_menu-levels'
-    | 'other_menu-levels-2-1'
-    | 'other_menu-levels-2-2'
-    | 'other_menu-levels-3-1'
-    | 'other_menu-levels-3-2'
-    | 'form'
-    | 'form_list'
-    | 'form_design'
     ;
   /**
    * last degree route key, which has the page file
@@ -62,8 +50,6 @@ declare namespace PageRoute {
     | 'special'
     | 'login'
     | 'not-found'
-    | 'dashboard_analytics'
-    | 'apps_manager-user_list'
     | 'apps_manager-user_edit'
     | 'apps_board'
     | 'apps_todo_tasks'
@@ -72,11 +58,5 @@ declare namespace PageRoute {
     | 'apps_chat-channel'
     | 'pages_error_notfound'
     | 'pages_error_unexpected'
-    | 'other_menu-levels-2-1'
-    | 'other_menu-levels-3-1'
-    | 'other_menu-levels-3-2'
-    | 'form_list'
-    | 'form_design'
-    | 'special_music'
     >;
 }

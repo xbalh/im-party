@@ -3,20 +3,27 @@
     <!-- 聊天室 -->
     <div>
       <!-- 隐藏到右侧 -->
+
       <v-btn theme="dark" ref="chatBtnDot" icon="mdi-forum-outline" class="drawer-button" color="#55BB46"
         v-show="isMusicPage && dragDotRight" @click="dragDotRight = false">
-        <v-badge dot offset-x="15" offset-y="-10" color="red">
+        <v-badge dot offset-x="15" offset-y="-10" color="red" v-show="currentUnReadCount > 0">
           <v-icon class="fa-spin">mdi-forum-outline</v-icon>
         </v-badge>
+        <v-icon class="fa-spin">mdi-forum-outline</v-icon>
       </v-btn>
       <!-- 完全显示 -->
-      <div class="drawer-button1" ref="chatBtn" v-dialogDrag="true" v-dialogDrag::click="toChatPage">
-        <v-btn theme="dark" icon="mdi-forum-outline" color="#55BB46" v-show="isMusicPage && !dragDotRight">
-          <v-badge content="99+" offset-x="-10" offset-y="-10" color="red">
+      <transition leave-active-class="animate__fadeOutRight">
+        <div class="drawer-button1 animate__animated animate__fadeInRight" ref="chatBtn" v-dialogDrag="true"
+          v-dialogDrag::click="toChatPage">
+          <v-btn theme="dark" icon="mdi-forum-outline" color="#55BB46" v-show="isMusicPage && !dragDotRight">
+            <v-badge :content="handleBadge(currentUnReadCount)" offset-x="-10" offset-y="-10" color="red"
+              v-show="currentUnReadCount > 0">
+              <v-icon class="fa-spin">mdi-forum-outline</v-icon>
+            </v-badge>
             <v-icon class="fa-spin">mdi-forum-outline</v-icon>
-          </v-badge>
-        </v-btn>
-      </div>
+          </v-btn>
+        </div>
+      </transition>
     </div>
     <!-- 音乐播放 -->
     <div>
@@ -30,7 +37,8 @@
       <transition leave-active-class="animate__fadeOutRight">
         <div class="music-button1 animate__animated animate__fadeInRight" ref="musicBtn" v-dialogDrag="true"
           v-dialogDrag::click="showFooter" v-show="isShow">
-          <v-progress-circular v-model="currentProgress" class="me-2" size="60" width="3" v-show="!isMusicPage && !dragDotRight">
+          <v-progress-circular v-model="currentProgress" class="me-2" size="60" width="3"
+            v-show="!isMusicPage && !dragDotRight">
             <v-btn theme="dark" ref="refButton2" icon="mdi-music" color="#ec4444" v-show="!dragDotRight">
               <v-icon class="fa-spin">mdi-music</v-icon>
             </v-btn>
@@ -44,14 +52,16 @@
 <script setup lang="ts">
 import Bus from "@/utils/common/Bus";
 
-const chatBtn = ref<HTMLElement>()
+const chatBtn = ref<HTMLButtonElement>()
 
-const musicBtn = ref<HTMLElement>()
+const chatBtnDot = ref<HTMLButtonElement>()
 
-const musicBtnDot = ref<HTMLElement>()
+const musicBtn = ref<HTMLButtonElement>()
 
-const currentProgress = ref(0)
-Bus.on('music-process-update', (progress: number)=>{
+const musicBtnDot = ref<HTMLButtonElement>()
+
+const currentProgress = ref(99)
+Bus.on('music-process-update', (progress: number) => {
   currentProgress.value = progress
 })
 
@@ -64,6 +74,25 @@ const isShow = ref(false)
 Bus.on('rightCircleBtnShow', (flag: boolean) => {
   isShow.value = flag
 })
+
+Bus.on('openMusicPage', (flag: boolean) => {
+  isMusicPage.value = true
+})
+const currentUnReadCount = ref(0)
+Bus.on('unread-add', () => {
+  currentUnReadCount.value++
+})
+
+const handleBadge = (count: number) => {
+  if (count > 0) {
+    if (count < 99) {
+      return String(count)
+    } else {
+      return '99+'
+    }
+  }
+  return ''
+}
 
 
 
@@ -140,6 +169,8 @@ const toChatPage = () => {
 
 onMounted(() => {
   // execAnimate()
+  // const dotHeight = chatBtnDot.value!.offsetHeight
+  // chatBtnDot.value!.style.cssText += `;width:${dotHeight}px;` 
 })
 // onBeforeUnmount(() => {
 //   if (timeout) clearTimeout(timeout)
