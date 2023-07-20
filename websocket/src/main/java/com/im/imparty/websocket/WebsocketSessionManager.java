@@ -35,7 +35,7 @@ public class WebsocketSessionManager {
 
     private static final CopyOnWriteArrayList<PlaySongInfo> songList = new CopyOnWriteArrayList();
 
-    private static String currentSongId = null;
+    private static PlaySongInfo currentSongInfo = null;
 
     // 播放计时器
     private PlayTimer playTimer;
@@ -125,6 +125,7 @@ public class WebsocketSessionManager {
         if (playSongInfo1 == null) {
             throw new CustomException("当前房间的播放队列为空，请先点歌");
         }
+        currentSongInfo = playSongInfo1;
         MusicApi musicApi = SpringFactoryUtils.getBean(MusicApi.class);
         JSONObject songDetail = musicApi.getSongDetail(ImmutableList.of(playSongInfo1.getSongId()));
         JSONArray songs = songDetail.getJSONArray("songs");
@@ -135,13 +136,15 @@ public class WebsocketSessionManager {
         MusicPlayerRecordService musicPlayerRecordService = SpringFactoryUtils.getBean(MusicPlayerRecordService.class);
         this.playTimer = new PlayTimer(playSongInfo1.getTotalTime() / 1000, (o) -> {
             if (o) {
-                if (currentSongId != null) {
-                    musicPlayerRecordService.updateMusicPlayStatus(currentSongId, this.roomId);
+                if (currentSongInfo != null) {
+                    musicPlayerRecordService.updateMusicPlayStatus(currentSongInfo.getSongId(), this.roomId);
                 }
                 PlaySongInfo playSongInfo = nextSong();
                 if (playSongInfo == null) {
-                    playTimer.stop();
+                    currentSongInfo = null;
+                    return null;
                 }
+                currentSongInfo = playSongInfo;
                 JSONObject songDetail1 = musicApi.getSongDetail(ImmutableList.of(playSongInfo.getSongId()));
                 JSONArray songs1 = songDetail1.getJSONArray("songs");
                 JSONObject song1 = songs1.getJSONObject(0);
@@ -178,7 +181,7 @@ public class WebsocketSessionManager {
     public void addSong(PlaySongInfo songInfo) {
         songList.add(songInfo);
         songList.sort(Comparator.comparingInt(PlaySongInfo::getSort));
-        if (playTimer == null) {
+        if (currentSongInfo == null) {
             play(0, BeanUtil.copyToList(songList, PlaySongInfo.class), roomId);
         }
     }
@@ -191,20 +194,19 @@ public class WebsocketSessionManager {
             return null;
         }
         PlaySongInfo playSongInfo = null;
-        if (currentSongId == null) {
+        if (currentSongInfo == null) {
             playSongInfo = songList.get(0);
         }
         Iterator<PlaySongInfo> iterator = songList.iterator();
         while (iterator.hasNext()) {
             PlaySongInfo next = iterator.next();
-            if (next.getSongId().equals(currentSongId)) {
+            if (next.getSongId().equals(currentSongInfo)) {
                 if (iterator.hasNext()) {
                     playSongInfo = iterator.next();
                 }
                 break;
             }
         }
-        currentSongId = playSongInfo.getSongId();
         playSongInfo.setUrl(SongUtils.getUrlBySongId(playSongInfo.getSongId(), playSongInfo.getSongQuality()));
         return playSongInfo;
     }

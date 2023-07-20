@@ -18,6 +18,10 @@ public class PlayTimer {
 
     private TimerTask task = null;
 
+    public boolean isRunning(){
+        return stopWatch.isRunning();
+    }
+
     public PlayTimer(long totalTime, Function<Boolean, Void> callback) {
         this.totalTime = totalTime;
         this.startTime = 0;
@@ -113,6 +117,7 @@ public class PlayTimer {
         public synchronized void stop() {
             if (this.startTimeStamp > 0) {
                 this.totalTimeStamp += (System.currentTimeMillis() - startTimeStamp);
+                this.startTimeStamp = 0;
             }
         }
 
