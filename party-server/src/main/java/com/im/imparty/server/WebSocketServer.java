@@ -43,10 +43,10 @@ public class WebSocketServer implements ApplicationContextAware {
     public void onOpen(Session session, @PathParam("roomId") Integer roomId) {
         this.roomId = roomId;
         if (roomMap.containsKey(roomId)) {
-            roomMap.get(roomId).addUser(session);
+            roomMap.get(roomId).addUser(session, roomId);
         } else {
             WebsocketSessionManager websocketSessionManager = new WebsocketSessionManager();
-            websocketSessionManager.addUser(session);
+            websocketSessionManager.addUser(session, roomId);
             roomMap.put(roomId, websocketSessionManager);
         }//加入set中
 

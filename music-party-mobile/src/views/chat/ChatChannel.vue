@@ -114,6 +114,18 @@ const connectWS = (roomNo: string) => {
   ws.value = new Ws(wsUrl + `/musicParty/ws/${roomNo}`, localStg.get('token') as string)
   ws.value.subscribe('/music/chat', chatHandle)
   ws.value.subscribe('/music/playControl/nextPlay', nextPlayHandle)
+  ws.value.subscribe(`/music/room/user-join/${roomNo}`, userJoinHandle)
+  ws.value.subscribe(`/music/room/user-leave/${roomNo}`, userLeaveHandle)
+}
+
+/* 用户加入房间处理 */
+const userJoinHandle = (userName: object) => {
+  console.log("用户：" + String(userName) + "加入了")
+}
+
+/* 用户离开房间处理 */
+const userLeaveHandle = (userName: object) => {
+  console.log("用户：" + String(userName) + "离开了")
 }
 
 /**聊天处理 */
@@ -194,15 +206,16 @@ const sendMessage = () => {
 const onDemandMusic = async (musicInfo: ApiMusic.playListMusicInfo) => {
   const resp = await addMusic(parseInt(roomNo as string), String(musicInfo.id));
   if (resp.error?.code) {
-    window.$snackBar?.error('点歌失败，' + resp.error.msg)
+    window.$snackBar?.error(resp.error.msg)
     return
   }
   window.$snackBar?.success('点歌成功')
 }
 
 Bus.on('onDemandMusic', (musicInfo: ApiMusic.playListMusicInfo) => {
-  if (!ws) {
-    window.$snackBar?.error('请先进入一个房间')
+  if (!ws || !roomNo) {
+    window.$snackBar?.error('请先进入一个房间~');
+    return;
   }
   onDemandMusic(musicInfo)
 })
