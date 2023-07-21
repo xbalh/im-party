@@ -89,14 +89,32 @@
             </span>
           </div>
           <div class="playbarBtnGroup">
+            <!-- 播放按钮 -->
             <v-progress-circular v-model="currentProgress" class="me-2 progress" size="30" width="2">
               <v-btn icon="mdi-play" class="playBtn" variant="plain" @click.stop="playOrPauseMusic" size="50">
                 <v-icon>{{ isPlay ? 'mdi-pause' : 'mdi-play' }}</v-icon>
               </v-btn>
             </v-progress-circular>
-            <v-btn variant="plain" size="x-large" @click.stop="openPlayList" class="playList">
-              <v-icon size="x-large">mdi-playlist-play</v-icon>
-            </v-btn>
+            <!-- 展示播放列表按钮 -->
+            <v-menu transition="fab-transition">
+              <template v-slot:activator="{ props }">
+                <v-btn variant="plain" size="x-large" class="playList" v-bind="props">
+                  <v-icon size="x-large">mdi-playlist-play</v-icon>
+                </v-btn>
+              </template>
+              <v-slide-y-transition key="playList" group tag="div">
+                <v-list v-model="playList" width="350" class="playlist" max-height="400">
+                  <v-list-subheader>当前歌曲列表({{ playList ? playList.length : 0 }})</v-list-subheader>
+                  <v-list-item v-for="(songInfo, index) in playList" :key="songInfo.songId" lines="two"
+                    :title="`${songInfo.songName} - ${songInfo.singer}`" :subtitle="`点歌人：${songInfo.from}`">
+                    <template v-slot:prepend>
+                      <span>{{ index + 1 }}</span>
+                    </template>
+                  </v-list-item>
+                </v-list>
+              </v-slide-y-transition>
+            </v-menu>
+
           </div>
         </div>
         <v-divider />
@@ -188,10 +206,11 @@ const playOrPauseMusic = () => {
 }
 
 
+const playList = ref<Music.SongInfo[]>()
+Bus.on('playlist-change', (songList: Music.SongInfo[]) => {
+  playList.value = songList
+})
 
-const openPlayList = () => {
-
-}
 const avatar = ref<import('vuetify/components').VAvatar>()
 const avatarDiv = ref<HTMLDivElement>()
 const avatarSize = ref(30)
@@ -331,6 +350,11 @@ Bus.on('music-play', (flag: boolean) => {
   height: 100% !important;
   width: 100% !important;
   position: relative !important;
+}
+
+.playlist :deep(.v-list-item__prepend) {
+  margin-right: 15px;
+  font-size: 20px;
 }
 
 

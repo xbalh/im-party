@@ -70,6 +70,7 @@ public class WebsocketSessionManager {
 
         socketStore.put(name, websocketSession);
         count.incrementAndGet();
+        websocketSession.sendMessage(MsgJSON.songListChange(songList, this.roomId).toJSONString());
         broadcastMsg(MsgJSON.userJoin(name, this.roomId).toJSONString());
         return true;
     }
@@ -143,7 +144,9 @@ public class WebsocketSessionManager {
         this.playTimer = new PlayTimer(playSongInfo1.getTotalTime() / 1000, (o) -> {
             if (o) {
                 if (currentSongInfo != null) {
-                    musicPlayerRecordService.updateMusicPlayStatus(currentSongInfo.getSongId(), this.roomId);
+                    songList.remove(currentSongInfo);
+                    musicPlayerRecordService.updateMusicPlayStatus(ImmutableList.of(currentSongInfo.getSongId()), this.roomId);
+                    broadcastMsg(MsgJSON.songListChange(songList, roomId).toJSONString());
                 }
                 PlaySongInfo playSongInfo = nextSong();
                 if (playSongInfo == null) {
@@ -163,7 +166,7 @@ public class WebsocketSessionManager {
             }
             return null;
         });
-        musicPlayerRecordService.updateMusicPlayStatus(playSongInfo1.getSongId(), this.roomId);
+        musicPlayerRecordService.updateMusicPlayStatus(ImmutableList.of(playSongInfo1.getSongId()), this.roomId);
         return playTimer;
     }
 
@@ -199,6 +202,7 @@ public class WebsocketSessionManager {
     public void addSong(PlaySongInfo songInfo) {
         songList.add(songInfo);
         songList.sort(Comparator.comparingInt(PlaySongInfo::getSort));
+        broadcastMsg(MsgJSON.songListChange(songList, roomId).toJSONString());
         if (currentSongInfo == null) {
             play(0, BeanUtil.copyToList(songList, PlaySongInfo.class), roomId);
         }
@@ -227,5 +231,12 @@ public class WebsocketSessionManager {
         }
         playSongInfo.setUrl(SongUtils.getUrlBySongId(playSongInfo.getSongId(), playSongInfo.getSongQuality()));
         return playSongInfo;
+    }
+
+    public void skipSong(List<String> songIds) {
+        if(!songList.isEmpty()){
+            songList.removeIf(song-> songIds.contains(song.getSongId()));
+            init(BeanUtil.copyToList(songList, PlaySongInfo.class));
+        }
     }
 }

@@ -99,9 +99,9 @@ public class MusicPlayerRecordServiceImpl extends ServiceImpl<MusicPlayerRecordM
     }
 
     @Override
-    public void updateMusicPlayStatus(String songId, Integer roomId) {
+    public void updateMusicPlayStatus(List<String> songIds, Integer roomId) {
         lambdaUpdate().eq(MusicPlayerRecordDomain::getRoomId, roomId)
-                .eq(MusicPlayerRecordDomain::getSongId, songId)
+                .in(MusicPlayerRecordDomain::getSongId, songIds)
                 .set(MusicPlayerRecordDomain::getIsPlayed, 1).update();
     }
 }

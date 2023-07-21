@@ -20,5 +20,5 @@ public interface MusicPlayerRecordService extends IService<MusicPlayerRecordDoma
 
     List<PlaySongInfo> selectAllUnPlayMusicByRoomId(Integer roomId);
 
-    void updateMusicPlayStatus(String songId, Integer roomId);
+    void updateMusicPlayStatus(List<String> songIds, Integer roomId);
 }

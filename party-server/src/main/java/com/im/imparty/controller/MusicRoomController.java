@@ -59,7 +59,18 @@ public class MusicRoomController {
             songInfo.setSinger(data.getSinger());
             songInfo.setSort(data.getSort());
             songInfo.setTotalTime(data.getTotalTime());
+            songInfo.setFrom(data.getCrtUsr());
             WebSocketServer.roomMap.get(roomId).addSong(songInfo);
+        }
+        return BaseResult.ok();
+    }
+
+    @ApiOperation("切歌")
+    @PostMapping("/skipMusic/{roomId}")
+    public BaseResult skipMusic(@PathVariable("roomId") Integer roomId, @RequestParam("songIds") List<String> songIds) {
+        musicPlayerRecordService.updateMusicPlayStatus(songIds, roomId);
+        if (WebSocketServer.roomMap.get(roomId) != null) {
+            WebSocketServer.roomMap.get(roomId).skipSong(songIds);
         }
         return BaseResult.ok();
     }

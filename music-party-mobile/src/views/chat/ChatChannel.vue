@@ -116,6 +116,7 @@ const connectWS = (roomNo: string) => {
   ws.value.subscribe('/music/playControl/nextPlay', nextPlayHandle)
   ws.value.subscribe(`/music/room/user-join/${roomNo}`, userJoinHandle)
   ws.value.subscribe(`/music/room/user-leave/${roomNo}`, userLeaveHandle)
+  ws.value.subscribe(`/music/room/playlist-change/${roomNo}`, playlistChangeHandle)
 }
 
 /* 用户加入房间处理 */
@@ -126,6 +127,11 @@ const userJoinHandle = (userName: object) => {
 /* 用户离开房间处理 */
 const userLeaveHandle = (userName: object) => {
   console.log("用户：" + String(userName) + "离开了")
+}
+
+/** 歌曲列表变动处理 */
+const playlistChangeHandle = (songList: Music.SongInfo[]) =>{
+  Bus.emit('playlist-change', songList);
 }
 
 /**聊天处理 */
@@ -213,7 +219,7 @@ const onDemandMusic = async (musicInfo: ApiMusic.playListMusicInfo) => {
 }
 
 Bus.on('onDemandMusic', (musicInfo: ApiMusic.playListMusicInfo) => {
-  if (!ws || !roomNo) {
+  if (!roomNo) {
     window.$snackBar?.error('请先进入一个房间~');
     return;
   }

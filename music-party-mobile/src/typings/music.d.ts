@@ -8,6 +8,7 @@ declare namespace Music {
     sort?: number;
     totalTime?: number;
     url?: string;
+    from?: string;
     songDetailInfo?: ApiMusic.playListMusicInfo
   }
 }
