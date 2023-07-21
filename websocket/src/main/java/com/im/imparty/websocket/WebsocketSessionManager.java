@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.ImmutableList;
 import com.im.imparty.api.music.MusicApi;
 import com.im.imparty.common.exception.CustomException;
+import com.im.imparty.common.exception.ServiceException;
 import com.im.imparty.common.util.SongUtils;
 import com.im.imparty.common.vo.PlaySongInfo;
 import com.im.imparty.music.playerlist.service.MusicPlayerRecordService;
@@ -35,7 +36,7 @@ public class WebsocketSessionManager {
 
     private static final CopyOnWriteArrayList<PlaySongInfo> songList = new CopyOnWriteArrayList();
 
-    private static PlaySongInfo currentSongInfo = null;
+    private PlaySongInfo currentSongInfo = null;
 
     // 播放计时器
     private PlayTimer playTimer;
@@ -167,6 +168,18 @@ public class WebsocketSessionManager {
             init(songList);
         }
         playTimer.play(startTime);
+    }
+
+    public void play(String songId, Integer roomId) {
+        this.roomId = roomId;
+        if (this.playTimer == null) {
+            init(songList);
+        }
+        PlaySongInfo playSongInfo = songList.stream().filter(item -> songId.equals(item.getSongId())).findFirst().orElseThrow(
+                () -> new ServiceException("歌曲不存在！")
+        );
+        playTimer.playSong(playSongInfo.getTotalTime() / 1000);
+        this.currentSongInfo = playSongInfo;
     }
 
     public long getCurrentTime() {

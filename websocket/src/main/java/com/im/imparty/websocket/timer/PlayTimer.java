@@ -54,6 +54,11 @@ public class PlayTimer {
         }
     }
 
+    public void playSong(long totalTime) {
+        initTimer();
+        this.totalTime = totalTime;
+    }
+
     public void stop() {
         if (stopWatch.isRunning()) {
             stopWatch.stop();

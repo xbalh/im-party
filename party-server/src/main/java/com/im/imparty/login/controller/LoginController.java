@@ -26,4 +26,10 @@ public class LoginController {
         return BaseResult.ok("登录成功！", loginService.login(param));
     }
 
+    @ApiOperation("续期")
+    @PostMapping("/renewal")
+    public BaseResult<LoginInfoVO> renewal() {
+        return null;
+    }
+
 }
