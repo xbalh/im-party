@@ -53,7 +53,7 @@ public class MusicPlayerRecordServiceImpl extends ServiceImpl<MusicPlayerRecordM
         data.setSongId(songId);
         JSONArray singerList = song.getJSONArray("ar");
         if (singerList != null && singerList.size() > 0) {
-            data.setSinger(singerList.stream().map(item -> (String) ((LinkedHashMap) item).get("name")).collect(Collectors.joining(",")));
+            data.setSinger(singerList.stream().map(item -> (String) ((LinkedHashMap) item).get("name")).collect(Collectors.joining("/")));
         }
         data.setSongName(song.getString("name"));
         data.setTotalTime(song.getInteger("dt"));
@@ -92,6 +92,8 @@ public class MusicPlayerRecordServiceImpl extends ServiceImpl<MusicPlayerRecordM
             res.setTotalTime(item.getTotalTime());
             res.setSongId(item.getSongId());
             res.setSongQuality(item.getSongQuality());
+            res.setSinger(item.getSinger());
+            res.setFrom(item.getCrtUsr());
             return res;
         }).collect(Collectors.toList());
     }

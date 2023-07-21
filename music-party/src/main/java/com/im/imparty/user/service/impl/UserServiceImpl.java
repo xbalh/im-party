@@ -1,6 +1,7 @@
 package com.im.imparty.user.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.im.imparty.user.dto.UserInfo;
 import com.im.imparty.user.dto.UserInfoDetail;
 import com.im.imparty.user.entity.UserDomain;
 import com.im.imparty.user.mapper.UserMapper;
@@ -24,6 +25,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDomain> impleme
         log.info("获取用户:{}的缓存", userName);
         UserInfoDetail detail = getBaseMapper().getDetail(userName);
         return detail;
+    }
+
+    @Override
+    public UserInfo getUserInfo(String userName) {
+        UserInfoDetail detail = getBaseMapper().getDetail(userName);
+        UserInfo userInfo = new UserInfo();
+        userInfo.setUserName(detail.getUsername());
+        userInfo.setNickName(detail.getNickName());
+        return userInfo;
     }
 
     @Transactional(rollbackFor = Exception.class)

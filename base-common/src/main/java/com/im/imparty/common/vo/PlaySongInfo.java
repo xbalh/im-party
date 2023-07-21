@@ -22,6 +22,8 @@ public class PlaySongInfo {
 
     private String songQuality;
 
+    private String from;
+
     private JSONObject songDetailInfo;
 
 

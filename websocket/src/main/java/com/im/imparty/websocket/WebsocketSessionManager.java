@@ -43,7 +43,8 @@ public class WebsocketSessionManager {
 
     private Integer roomId;
 
-    public boolean addUser(Session session) {
+    public boolean addUser(Session session, Integer roomId) {
+        this.roomId = roomId;
         Principal userPrincipal = session.getUserPrincipal();
         String name = userPrincipal.getName();
         if (name == null || name == "") {
@@ -69,6 +70,7 @@ public class WebsocketSessionManager {
 
         socketStore.put(name, websocketSession);
         count.incrementAndGet();
+        broadcastMsg(MsgJSON.userJoin(name, this.roomId).toJSONString());
         return true;
     }
 
@@ -88,18 +90,21 @@ public class WebsocketSessionManager {
             }
             sessionImpl.close();
             count.decrementAndGet();
+            broadcastMsg(MsgJSON.userLeave(userName, roomId).toJSONString());
             return true;
         }
         return false;
     }
 
     public int count() {
-        return count.get();
+        return socketStore.size();
     }
 
     public void broadcastMsg(String msg) {
         for (WebsocketSessionImpl value : socketStore.values()) {
-            value.sendMessage(msg);
+            if (value.getSession().isOpen()) {
+                value.sendMessage(msg);
+            }
         }
     }
 

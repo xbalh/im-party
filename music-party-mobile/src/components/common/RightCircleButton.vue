@@ -3,24 +3,25 @@
     <!-- 聊天室 -->
     <div>
       <!-- 隐藏到右侧 -->
+      <div class="drawer-button" ref="chatBtnDot" v-show="isMusicPage && dragDotRight">
+        <v-btn theme="dark" icon="mdi-forum-outline" color="#55BB46" @click="dragDotRight = false">
+          <v-badge dot offset-x="15" offset-y="-10" color="red" v-show="currentUnReadCount > 0">
+            <v-icon class="fa-spin">mdi-forum-outline</v-icon>
+          </v-badge>
+          <v-icon class="fa-spin" v-if="currentUnReadCount === 0">mdi-forum-outline</v-icon>
+        </v-btn>
+      </div>
 
-      <v-btn theme="dark" ref="chatBtnDot" icon="mdi-forum-outline" class="drawer-button" color="#55BB46"
-        v-show="isMusicPage && dragDotRight" @click="dragDotRight = false">
-        <v-badge dot offset-x="15" offset-y="-10" color="red" v-show="currentUnReadCount > 0">
-          <v-icon class="fa-spin">mdi-forum-outline</v-icon>
-        </v-badge>
-        <v-icon class="fa-spin">mdi-forum-outline</v-icon>
-      </v-btn>
       <!-- 完全显示 -->
       <transition leave-active-class="animate__fadeOutRight">
-        <div class="drawer-button1 animate__animated animate__fadeInRight" ref="chatBtn" v-dialogDrag="true"
-          v-dialogDrag::click="toChatPage">
-          <v-btn theme="dark" icon="mdi-forum-outline" color="#55BB46" v-show="isMusicPage && !dragDotRight">
+        <div class="drawer-button1 animate__animated animate__fadeInRight" v-show="isMusicPage && !dragDotRight"
+          ref="chatBtn" v-dialogDrag="true" v-dialogDrag::click="toChatPage">
+          <v-btn theme="dark" icon="mdi-forum-outline" color="#55BB46">
             <v-badge :content="handleBadge(currentUnReadCount)" offset-x="-10" offset-y="-10" color="red"
               v-show="currentUnReadCount > 0">
               <v-icon class="fa-spin">mdi-forum-outline</v-icon>
             </v-badge>
-            <v-icon class="fa-spin">mdi-forum-outline</v-icon>
+            <v-icon class="fa-spin" v-if="currentUnReadCount === 0">mdi-forum-outline</v-icon>
           </v-btn>
         </div>
       </transition>
@@ -29,7 +30,7 @@
     <div>
       <!-- 隐藏到右侧 -->
       <div ref="musicBtnDot" v-show="!isMusicPage && dragDotRight" class="music-button">
-        <v-btn theme="dark" icon="mdi-music" color="#ec4444" @click="dragDotRight = false">
+        <v-btn theme="dark" icon="mdi-music" color="#ec4444" @click="dragDotRight = false, isShow = true">
           <v-icon class="fa-spin">mdi-music</v-icon>
         </v-btn>
       </div>
@@ -54,13 +55,13 @@ import Bus from "@/utils/common/Bus";
 
 const chatBtn = ref<HTMLButtonElement>()
 
-const chatBtnDot = ref<HTMLButtonElement>()
+const chatBtnDot = ref<HTMLDivElement>()
 
 const musicBtn = ref<HTMLButtonElement>()
 
-const musicBtnDot = ref<HTMLButtonElement>()
+const musicBtnDot = ref<HTMLDivElement>()
 
-const currentProgress = ref(99)
+const currentProgress = ref(0)
 Bus.on('music-process-update', (progress: number) => {
   currentProgress.value = progress
 })
@@ -76,16 +77,16 @@ Bus.on('rightCircleBtnShow', (flag: boolean) => {
 })
 
 Bus.on('openMusicPage', (flag: boolean) => {
-  isMusicPage.value = true
+  isMusicPage.value = flag
 })
-const currentUnReadCount = ref(0)
+const currentUnReadCount = ref(99)
 Bus.on('unread-add', () => {
   currentUnReadCount.value++
 })
 
 const handleBadge = (count: number) => {
   if (count > 0) {
-    if (count < 99) {
+    if (count <= 99) {
       return String(count)
     } else {
       return '99+'
@@ -131,8 +132,10 @@ onBeforeMount(() => {
 
 const dragDotRight = ref(false)
 Bus.on('dragDotRight', (flag: boolean) => {
-  const top = musicBtn.value!.style.top
-  musicBtnDot.value!.style.cssText += `;top:${top};`
+  const musicBtnTop = musicBtn.value!.style.top
+  musicBtnDot.value!.style.cssText += `;top:${musicBtnTop};`
+  const chatBtnTop = chatBtn.value!.style.top
+  chatBtnDot.value!.style.cssText += `;top:${chatBtnTop};`
   dragDotRight.value = flag
 })
 
@@ -170,7 +173,7 @@ const toChatPage = () => {
 onMounted(() => {
   // execAnimate()
   // const dotHeight = chatBtnDot.value!.offsetHeight
-  // chatBtnDot.value!.style.cssText += `;width:${dotHeight}px;` 
+  // chatBtnDot.value!.style.cssText += `;width:${dotHeight}px;`
 })
 // onBeforeUnmount(() => {
 //   if (timeout) clearTimeout(timeout)
@@ -180,13 +183,15 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .drawer-button {
-  width: 60px;
-  position: fixed;
-  top: 340px;
   right: -20px;
   z-index: 2000;
-  box-shadow: 1px 1px 18px #55BB46;
-  opacity: 75%;
+  position: fixed;
+  top: 340px;
+
+  .v-btn {
+    box-shadow: 1px 1px 18px #55BB46;
+    opacity: 75%;
+  }
 
   .v-icon {
     margin-left: -18px;
@@ -200,29 +205,14 @@ onMounted(() => {
   top: 340px;
   right: 35px;
   z-index: 2000;
-  // opacity: 75%;
 
+  // border: 1px solid;
   .v-btn {
-    box-shadow: 1px 1px 18px #55BB46;
+    box-shadow: 1px 1px 18px #55bb46;
   }
 
   .v-icon {
-    // margin-left: -18px;
     font-size: 1.3rem;
-  }
-
-  .fa-spin {
-    // animation: spin 2s infinite linear;
-  }
-
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
-    }
-
-    to {
-      transform: rotate(360deg);
-    }
   }
 }
 
