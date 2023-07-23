@@ -1,8 +1,10 @@
 package com.im.imparty.controller;
 
+import com.im.imparty.user.dto.UserInfo;
 import com.im.imparty.user.dto.UserInfoDetail;
 import com.im.imparty.user.entity.UserDomain;
 import com.im.imparty.user.mapper.UserMapper;
+import com.im.imparty.user.service.UserService;
 import com.im.imparty.web.vo.BaseResult;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,12 +21,14 @@ public class UserController {
     @Resource
     private UserMapper userMapper;
 
+    @Resource
+    private UserService userService;
+
     @GetMapping("/info")
-    public BaseResult<UserInfoDetail> currentUserInfo() {
+    public BaseResult<UserInfo> currentUserInfo() {
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
-        UserInfoDetail userInfo = new UserInfoDetail();
-        userInfo.setUserName(userName);
-        return BaseResult.ok(userName, userInfo);
+        UserInfo userInfo = userService.getUserInfo(userName);
+        return BaseResult.ok(userInfo);
     }
 
     @GetMapping("/list")

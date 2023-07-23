@@ -26,6 +26,8 @@ public class UserInfoDetail implements Serializable, UserDetails {
 
     private LocalDateTime saltExpiresTime;
 
+    private String wyyUserId;
+
     private List<RoleInfo> roleList;
 
     private Collection<GrantedAuthority> authorities;

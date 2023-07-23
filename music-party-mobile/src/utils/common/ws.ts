@@ -1,3 +1,4 @@
+import Bus from "./Bus"
 import EventCenter from "./eventCenter"
 
 type CbType = (data: object) => any
@@ -49,6 +50,7 @@ class Ws {
   onopen() {
     this.ws.onopen = () => {
       window.$loadingOverly?.hide()
+      Bus.emit('join-room-success', true)
       console.log(this.ws, 'onopen')
       // 发送成功连接之前所发送失败的消息
       this.errorStack.forEach(message => {
@@ -75,7 +77,7 @@ class Ws {
   onclose() {
     this.ws.onclose = () => {
       console.log('onclose')
-
+      Bus.emit('join-room-success', false)
       // 用户手动关闭的不重连
       if (this.isCustomClose) return
 

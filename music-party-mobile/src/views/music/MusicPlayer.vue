@@ -32,11 +32,14 @@ import Bus from '@/utils/common/Bus';
 
 const musicList = ref()
 const display = ref(false)
+const disablePlay = ref(true)
 const player = ref<HTMLAudioElement>()
 const currentSong = ref<Music.SongInfo>()
 const progress = ref(0)
 const currentProgress = ref('--')
 const totalProgress = ref('--')
+//TODO 从本地存储获取设置：是否自动开始播放
+const isAutoPlay = ref(true)
 Bus.on('openMusicPage', (flag: boolean) => {
   display.value = flag
 })
@@ -67,6 +70,17 @@ const timeupdate = () => {
     const current = currentTime / duration * 100
     progress.value = parseInt(String(current))
     Bus.emit('music-process-update', parseInt(String(current)))
+    if(progress.value === 100){
+      isPlay.value = false
+      Bus.emit('music-play', false)
+      disablePlay.value = true
+      setTimeout(function(){
+        if(progress.value === 100){
+          currentSong.value = {}
+          Bus.emit('clear-currentMusicInfo', true)
+        }
+      }, 1000)
+    }
   } catch (e) { }
 
 }
@@ -80,7 +94,7 @@ const musicTimeformat = (value: number) => {
 
 Bus.on('request-music-play', (flag: boolean) => {
   if (flag) {
-    if (!player || !player.value!.src) {
+    if (disablePlay || !player || !player.value!.src) {
       return
     }
     player.value!.play()
@@ -102,10 +116,15 @@ Bus.on('changeSong', (songInfo: Music.SongInfo) => {
   currentSong.value = songInfo
   const currentPlayer = player.value!
   currentPlayer.setAttribute('src', songInfo.url!)
-  if (isPlay.value) {
+  if (isAutoPlay) {
+    currentPlayer.play()
+    isPlay.value = true
+    Bus.emit('music-play', true)
+  } else if (isPlay.value) {
     currentPlayer.play()
     Bus.emit('music-play', true)
   }
+
 
 })
 

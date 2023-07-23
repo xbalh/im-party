@@ -80,6 +80,7 @@ export const useAuthStore = defineStore('auth-store', {
         this.userInfo = {
           userId: data.userName,
           userName: data.userName,
+          wyyUserId: data.wyyUserId,
           userRole: 'admin'
         };
 

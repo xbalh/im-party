@@ -11,12 +11,14 @@ import java.util.Collection;
 import java.util.List;
 
 @Data
-public class UserInfo implements Serializable {
+public class  UserInfo implements Serializable {
 
 
     private String userName;
 
     private String nickName;
+
+    private String wyyUserId;
 
 
 }

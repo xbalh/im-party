@@ -159,6 +159,9 @@ const searchSelect = (item: AuthRoute.Route) => {
 }
 
 const currentPlayMusicInfo = ref<Music.SongInfo>()
+Bus.on('clear-currentMusicInfo', (flag: boolean) => {
+  currentPlayMusicInfo.value = {}
+})
 
 const currentProgress = ref(0)
 Bus.on('music-process-update', (progress: number) => {

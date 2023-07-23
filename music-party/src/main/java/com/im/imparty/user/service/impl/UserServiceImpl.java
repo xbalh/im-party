@@ -33,6 +33,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDomain> impleme
         UserInfo userInfo = new UserInfo();
         userInfo.setUserName(detail.getUsername());
         userInfo.setNickName(detail.getNickName());
+        userInfo.setWyyUserId(detail.getWyyUserId());
         return userInfo;
     }
 

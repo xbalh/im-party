@@ -109,6 +109,11 @@ onMounted(() => {
 //   connectWS(roomNo as string)
 // })
 
+const joinedRoom = ref(false)
+Bus.on('join-room-success', (flag: boolean) => {
+  joinedRoom.value = flag
+})
+
 /**建立WS连接，并订阅 */
 const connectWS = (roomNo: string) => {
   ws.value = new Ws(wsUrl + `/musicParty/ws/${roomNo}`, localStg.get('token') as string)
@@ -130,7 +135,7 @@ const userLeaveHandle = (userName: object) => {
 }
 
 /** 歌曲列表变动处理 */
-const playlistChangeHandle = (songList: Music.SongInfo[]) =>{
+const playlistChangeHandle = (songList: Music.SongInfo[]) => {
   Bus.emit('playlist-change', songList);
 }
 
@@ -210,6 +215,7 @@ const sendMessage = () => {
 }
 
 const onDemandMusic = async (musicInfo: ApiMusic.playListMusicInfo) => {
+  if (!musicInfo || !musicInfo.id) return
   const resp = await addMusic(parseInt(roomNo as string), String(musicInfo.id));
   if (resp.error?.code) {
     window.$snackBar?.error(resp.error.msg)
@@ -219,11 +225,12 @@ const onDemandMusic = async (musicInfo: ApiMusic.playListMusicInfo) => {
 }
 
 Bus.on('onDemandMusic', (musicInfo: ApiMusic.playListMusicInfo) => {
-  if (!roomNo) {
+  if (!joinedRoom.value) {
     window.$snackBar?.error('请先进入一个房间~');
-    return;
+  } else {
+    onDemandMusic(musicInfo)
   }
-  onDemandMusic(musicInfo)
+
 })
 
 

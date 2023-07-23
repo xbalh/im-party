@@ -27,7 +27,7 @@
       </transition>
     </div>
     <!-- 音乐播放 -->
-    <div>
+    <div v-show="!footerShow">
       <!-- 隐藏到右侧 -->
       <div ref="musicBtnDot" v-show="!isMusicPage && dragDotRight" class="music-button">
         <v-btn theme="dark" icon="mdi-music" color="#ec4444" @click="dragDotRight = false, isShow = true">
@@ -72,8 +72,10 @@ Bus.on('isMusicPage', (flag: boolean) => {
 })
 
 const isShow = ref(false)
+const footerHide =ref(false)
 Bus.on('rightCircleBtnShow', (flag: boolean) => {
   isShow.value = flag
+  footerHide.value = flag
 })
 
 Bus.on('openMusicPage', (flag: boolean) => {
