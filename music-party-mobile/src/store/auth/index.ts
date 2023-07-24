@@ -75,7 +75,6 @@ export const useAuthStore = defineStore('auth-store', {
       const { data } = await fetchUserInfo();
       if (data) {
         localStg.set('userInfo', data);
-        data.userName = data.username
 
         this.userInfo = {
           userId: data.userName,

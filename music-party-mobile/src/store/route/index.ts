@@ -80,13 +80,13 @@ export const useRouteStore = defineStore('route-store', {
       router.addRoute(rootVueRoute);
     },
     async initDynamicRoute() {
-      const { username } = localStg.get('userInfo') || {};
+      const { userName } = localStg.get('userInfo') || {};
 
-      if (!username) {
+      if (!userName) {
         throw new Error('userId is mandatory ');
       }
 
-      const { error, data } = await fetchUserRoutes(username);
+      const { error, data } = await fetchUserRoutes(userName);
 
       if (!error) {
         this.routeHomeName = data.home;

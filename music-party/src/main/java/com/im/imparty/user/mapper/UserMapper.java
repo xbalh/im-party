@@ -19,8 +19,8 @@ public interface UserMapper extends BaseMapper<UserDomain> {
     @Select(
             "select u.username userName, u.password password, " +
                     "u.valid_sts validSts, u.salt, u.salt_expires_time saltExpiresTime, " +
-                    "u.nick_name nickName " +
-                    "u.wyy_user_id wyyUserId" +
+                    "u.nick_name nickName, " +
+                    "u.wyy_user_id wyyUserId " +
                     "from user u " +
                     "where u.username = #{userName}"
     )
