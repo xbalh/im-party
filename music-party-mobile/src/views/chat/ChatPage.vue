@@ -342,7 +342,7 @@ const onDemandMusic = (musicInfo: ApiMusic.playListMusicInfo) => {
 
 const confirmOndemandMusic = () => {
   if (!currentWishOnDemandMusic) return
-  Bus.emit('onDemandMusic', currentWishOnDemandMusic.value)
+  Bus.emit('on-demand-music', currentWishOnDemandMusic.value)
   dialog.value = false
 }
 

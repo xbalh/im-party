@@ -63,6 +63,7 @@ const playOrPauseMusic = () => {
 
 const timeupdate = () => {
   const currentTime = player.value!.currentTime
+  console.log(currentTime)
   const duration = player.value!.duration
   try {
     currentProgress.value = musicTimeformat(currentTime)
@@ -112,11 +113,12 @@ const closeMusicPage = () => {
   Bus.emit("isMusicPage", false)
 }
 
-Bus.on('changeSong', (songInfo: Music.SongInfo) => {
+Bus.on('change-song', (songInfo: Music.SongInfo) => {
   currentSong.value = songInfo
   const currentPlayer = player.value!
   currentPlayer.setAttribute('src', songInfo.url!)
   if (isAutoPlay) {
+    currentPlayer.currentTime = songInfo.nowTime || 0
     currentPlayer.play()
     isPlay.value = true
     Bus.emit('music-play', true)

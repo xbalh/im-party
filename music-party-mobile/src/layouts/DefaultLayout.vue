@@ -233,7 +233,7 @@ onMounted(() => {
   avatarSize.value = height - 15
 })
 
-Bus.on('changeSong', (songInfo: Music.SongInfo) => {
+Bus.on('change-song', (songInfo: Music.SongInfo) => {
   currentPlayMusicInfo.value = songInfo
 })
 
