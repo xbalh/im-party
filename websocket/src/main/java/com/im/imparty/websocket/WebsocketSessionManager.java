@@ -144,7 +144,7 @@ public class WebsocketSessionManager {
         broadcastMsg(MsgJSON.nextPlay(playSongInfo1).toJSONString());
 
         MusicPlayerRecordService musicPlayerRecordService = SpringFactoryUtils.getBean(MusicPlayerRecordService.class);
-        this.playTimer = new PlayTimer(playSongInfo1.getTotalTime() / 1000, (o) -> {
+        this.playTimer = new PlayTimer(playSongInfo1.getTotalTime(), (o) -> {
             if (o) {
                 if (currentSongInfo != null) {
                     songList.remove(currentSongInfo);
@@ -154,6 +154,7 @@ public class WebsocketSessionManager {
                 PlaySongInfo playSongInfo = nextSong();
                 if (playSongInfo == null) {
                     currentSongInfo = null;
+                    playTimer.over();
                     return null;
                 }
                 currentSongInfo = playSongInfo;
@@ -165,6 +166,7 @@ public class WebsocketSessionManager {
                 playTimer.playSong(playSongInfo.getTotalTime());
 
             } else {
+                log.info("房间号：{}，当前播放信息：{},播放时间：{}, 总共时间：{}", roomId, currentSongInfo.getSongName(), playTimer.getCurrentTime(), playTimer.getTotalTime());
                 // broadcastMsg(MsgJSON.currentTime(getCurrentTime()).toJSONString());
             }
             return null;
@@ -189,7 +191,7 @@ public class WebsocketSessionManager {
         PlaySongInfo playSongInfo = songList.stream().filter(item -> songId.equals(item.getSongId())).findFirst().orElseThrow(
                 () -> new ServiceException("歌曲不存在！")
         );
-        playTimer.playSong(playSongInfo.getTotalTime() / 1000);
+        playTimer.playSong(playSongInfo.getTotalTime());
         this.currentSongInfo = playSongInfo;
     }
 
