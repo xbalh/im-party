@@ -45,6 +45,7 @@ public class WebSocketServer implements ApplicationContextAware {
         if (roomMap.containsKey(roomId)) {
             roomMap.get(roomId).addUser(session, roomId);
         } else {
+            // TODO 判断房间是否存在
             WebsocketSessionManager websocketSessionManager = new WebsocketSessionManager();
             websocketSessionManager.addUser(session, roomId);
             roomMap.put(roomId, websocketSessionManager);

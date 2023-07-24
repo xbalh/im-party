@@ -69,9 +69,12 @@ public class WebsocketSessionManager {
         }
 
         socketStore.put(name, websocketSession);
-        count.incrementAndGet();
+        // count.incrementAndGet();
         websocketSession.sendMessage(MsgJSON.songListChange(songList, this.roomId).toJSONString());
         broadcastMsg(MsgJSON.userJoin(name, this.roomId).toJSONString());
+        if (currentSongInfo != null && playTimer.isRunning()) {
+            websocketSession.sendMessage(MsgJSON.play(currentSongInfo, playTimer.getCurrentTime()).toJSONString());
+        }
         return true;
     }
 

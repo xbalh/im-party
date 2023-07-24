@@ -26,6 +26,8 @@ public class PlaySongInfo {
 
     private JSONObject songDetailInfo;
 
+    private Long nowTime;
+
 
 
     public static PlaySongInfo defaultSong() {
