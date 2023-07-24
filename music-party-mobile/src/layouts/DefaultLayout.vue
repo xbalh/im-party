@@ -82,7 +82,7 @@
           <div class="musicContent">
             <span>{{ currentPlayMusicInfo?.songName }}</span>
             <span>
-              {{ currentPlayMusicInfo && ' - ' }}
+              {{ currentPlayMusicInfo && '' }}
             </span>
             <span>
               {{ currentPlayMusicInfo && handleArtistName(currentPlayMusicInfo) }}
@@ -161,6 +161,8 @@ const searchSelect = (item: AuthRoute.Route) => {
 const currentPlayMusicInfo = ref<Music.SongInfo>()
 Bus.on('clear-currentMusicInfo', (flag: boolean) => {
   currentPlayMusicInfo.value = {}
+  currentProgress.value = 0
+  isPlay.value = false
 })
 
 const currentProgress = ref(0)

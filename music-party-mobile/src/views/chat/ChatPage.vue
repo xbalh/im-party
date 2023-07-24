@@ -142,7 +142,22 @@
       </div>
     </div>
     <div v-else>
-      请先绑定网易云账号
+
+      <v-card>
+        <v-card-title> 请先绑定网易云账号 </v-card-title>
+        <v-card-item>
+          <v-spacer></v-spacer>
+          <v-text-field v-model="searchInput" append-icon="mdi-magnify" label="通过用户名搜索网易云用户" single-line hide-details
+            @click:append="searchWyyUserHandle"></v-text-field>
+        </v-card-item>
+        <v-card-item>
+          <v-list>
+            <v-list-item v-for="item in searchWyyUserItems" lines="one" :title="item.nickname" :prepend-avatar="item.avatarUrl"
+              @click="bindUser(item)">
+            </v-list-item>
+          </v-list>
+        </v-card-item>
+      </v-card>
     </div>
 
     <v-dialog v-model="dialog" width="auto">
@@ -173,11 +188,10 @@ import { useLoading } from "@/hooks";
 import { useRouter } from "vue-router";
 import { useRouterPush } from "@/composables";
 import { fetchRoomList } from "@/service/api/room";
-import { fetchPlayList, fetchPlayListAllMusic } from "@/service/api/music";
+import { fetchPlayList, fetchPlayListAllMusic, searchWyyUser } from "@/service/api/music";
 import { groupByKey } from "@/utils";
 import Bus from "@/utils/common/Bus";
-
-import { onBeforeRouteLeave } from 'vue-router'
+import { trim } from "lodash-es";
 
 const { loading: isLoadingAdd, startLoading, endLoading } = useLoading()
 
@@ -242,7 +256,28 @@ const { loading: fetchOnlineLoading, startLoading: startFetchRoom, endLoading: e
 //   }
 // }
 
+const searchInput = ref('')
+const searchWyyUserItems = ref()
+const searchWyyUserHandle = async () => {
+  if (!searchInput || trim(searchInput.value) === '') return
+  const resp = await searchWyyUser(searchInput.value)
+  if (resp.data) {
+    searchWyyUserItems.value = resp.data.userprofiles
+  }
+}
 
+const bindUser = (userInfo) => {
+  const bindDialog = window.$dialog?.show({
+    main: `确定要将用户【${userInfo.nickname}】绑定至当前账号么`,
+    title: '提醒',
+    confirmText: '确定',
+    cancelText: '取消',
+    confirm: () => {
+      console.log("确认绑定")
+      bindDialog?.close()
+    }
+  })
+}
 
 onMounted(() => {
   fetchRooms()
@@ -253,7 +288,6 @@ onMounted(() => {
 })
 
 const enterRoom = (roomInfo: ApiRoomManagement.roomInfo) => {
-  Bus.emit('change-room', roomInfo)
   return { name: 'apps_chat-channel', query: { roomNo: roomInfo.roomNo, roomName: roomInfo.roomName } }
 }
 
