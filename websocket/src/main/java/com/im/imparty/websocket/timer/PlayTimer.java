@@ -56,6 +56,8 @@ public class PlayTimer {
 
     public void playSong(long totalTime) {
         initTimer();
+        this.stopWatch.init();
+        this.stopWatch.start();
         this.totalTime = totalTime;
     }
 
@@ -68,8 +70,18 @@ public class PlayTimer {
         }
     }
 
+    public void over() {
+        if (task != null) {
+            task.cancel();
+            timer.purge();
+        }
+        this.totalTime = 0;
+        this.startTime = 0;
+        this.stopWatch = null;
+    }
+
     public long getCurrentTime() {
-        return startTime + (stopWatch.getTotalTime() / 1000);
+        return startTime + stopWatch.getTotalTime();
     }
 
     public boolean checkOver() {
@@ -78,6 +90,10 @@ public class PlayTimer {
 
     public long remainTime() {
         return checkOver() ? 0 : totalTime - getCurrentTime();
+    }
+
+    public long getTotalTime() {
+        return totalTime;
     }
 
     @Override
@@ -109,6 +125,11 @@ public class PlayTimer {
         private long totalTimeStamp;
 
         public TimeWatch() {
+            this.startTimeStamp = 0;
+            this.totalTimeStamp = 0;
+        }
+
+        public synchronized void init() {
             this.startTimeStamp = 0;
             this.totalTimeStamp = 0;
         }
