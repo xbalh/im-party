@@ -57,6 +57,7 @@ public class PlayTimer {
     public void playSong(long totalTime) {
         initTimer();
         this.stopWatch.init();
+        this.stopWatch.start();
         this.totalTime = totalTime;
     }
 
