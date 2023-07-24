@@ -71,12 +71,12 @@ const timeupdate = () => {
     const current = currentTime / duration * 100
     progress.value = parseInt(String(current))
     Bus.emit('music-process-update', parseInt(String(current)))
-    if(progress.value === 100){
+    if (progress.value === 100) {
       isPlay.value = false
       Bus.emit('music-play', false)
       disablePlay.value = true
-      setTimeout(function(){
-        if(progress.value === 100){
+      setTimeout(function () {
+        if (progress.value === 100) {
           currentSong.value = {}
           Bus.emit('clear-currentMusicInfo', true)
         }
@@ -118,7 +118,8 @@ Bus.on('change-song', (songInfo: Music.SongInfo) => {
   const currentPlayer = player.value!
   currentPlayer.setAttribute('src', songInfo.url!)
   if (isAutoPlay) {
-    currentPlayer.currentTime = songInfo.nowTime || 0
+    
+    currentPlayer.currentTime = songInfo.type === 'next-play'? 0 : songInfo.nowTime! / 1000
     currentPlayer.play()
     isPlay.value = true
     Bus.emit('music-play', true)

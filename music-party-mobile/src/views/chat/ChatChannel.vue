@@ -119,7 +119,7 @@ const connectWS = (roomNo: string) => {
   ws.value = new Ws(wsUrl + `/musicParty/ws/${roomNo}`, localStg.get('token') as string)
   ws.value.subscribe('/music/chat', chatHandle)
   ws.value.subscribe('/music/playControl/nextPlay', nextPlayHandle)
-  ws.value.subscribe('/music/playControl/play', nextPlayHandle)
+  ws.value.subscribe('/music/playControl/play', playHandle)
   ws.value.subscribe(`/music/room/user-join/${roomNo}`, userJoinHandle)
   ws.value.subscribe(`/music/room/user-leave/${roomNo}`, userLeaveHandle)
   ws.value.subscribe(`/music/room/playlist-change/${roomNo}`, playlistChangeHandle)
@@ -176,6 +176,13 @@ const checkScrollIsToBottom = () => {
 
 /**切换下一首处理 */
 const nextPlayHandle = (data: Music.SongInfo) => {
+  data.type = 'next-play'
+  Bus.emit('change-song', data)
+}
+
+/**切换下一首处理 */
+const playHandle = (data: Music.SongInfo) => {
+  data.type = 'play'
   Bus.emit('change-song', data)
 }
 
