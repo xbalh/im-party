@@ -24,9 +24,7 @@
                 <template v-slot:activator="{ props }">
                   <v-list-item v-bind="props" :title="roomstyle"></v-list-item>
                 </template>
-                <v-list-item v-for="roomInfo in roomlist" :key="roomInfo.roomNo"
-                  :to="{ name: 'apps_chat-channel', query: { roomNo: roomInfo.roomNo, roomName: roomInfo.roomName } }"
-                  exact>
+                <v-list-item v-for="roomInfo in roomlist" :key="roomInfo.roomNo" :to="enterRoom(roomInfo)" exact>
                   <v-list-item-title class="text-subtitle-2">{{ roomInfo.roomName }}</v-list-item-title>
                 </v-list-item>
               </v-list-group>
@@ -179,6 +177,8 @@ import { fetchPlayList, fetchPlayListAllMusic } from "@/service/api/music";
 import { groupByKey } from "@/utils";
 import Bus from "@/utils/common/Bus";
 
+import { onBeforeRouteLeave } from 'vue-router'
+
 const { loading: isLoadingAdd, startLoading, endLoading } = useLoading()
 
 const isMusicPage = ref(false)
@@ -252,6 +252,11 @@ onMounted(() => {
 
 })
 
+const enterRoom = (roomInfo: ApiRoomManagement.roomInfo) => {
+  Bus.emit('change-room', roomInfo)
+  return { name: 'apps_chat-channel', query: { roomNo: roomInfo.roomNo, roomName: roomInfo.roomName } }
+}
+
 const fetchRooms = async () => {
   startFetchRoom()
   const resp = await fetchRoomList();
@@ -264,7 +269,7 @@ const fetchRooms = async () => {
 }
 
 const fetchUserPlayList = async () => {
-  if(!userInfo.value.wyyUserId) return
+  if (!userInfo.value.wyyUserId) return
   window.$loadingOverly?.show()
   const resp = await fetchPlayList(userInfo.value.wyyUserId);
   window.$loadingOverly?.hide()
@@ -366,6 +371,19 @@ const closePlayListDetailPage = () => {
   isPlayListDetailPage.value = false
   hasMore.value = true
 }
+
+onBeforeRouteLeave((to, from, next) => {
+  //离开当前的组件，触发
+  console.log("离开了房间")
+  const { roomName } = to.query
+  window.$dialog?.show({
+    main: `你确定要离开当前房间【${roomName}】么`,
+    title: '提醒',
+    confirmText: '确定',
+    cancelText: '取消'
+  })
+
+});
 
 </script>
 
