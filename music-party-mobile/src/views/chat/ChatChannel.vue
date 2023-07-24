@@ -119,6 +119,7 @@ const connectWS = (roomNo: string) => {
   ws.value = new Ws(wsUrl + `/musicParty/ws/${roomNo}`, localStg.get('token') as string)
   ws.value.subscribe('/music/chat', chatHandle)
   ws.value.subscribe('/music/playControl/nextPlay', nextPlayHandle)
+  ws.value.subscribe('/music/playControl/play', nextPlayHandle)
   ws.value.subscribe(`/music/room/user-join/${roomNo}`, userJoinHandle)
   ws.value.subscribe(`/music/room/user-leave/${roomNo}`, userLeaveHandle)
   ws.value.subscribe(`/music/room/playlist-change/${roomNo}`, playlistChangeHandle)
@@ -141,7 +142,7 @@ const playlistChangeHandle = (songList: Music.SongInfo[]) => {
 
 /**聊天处理 */
 const chatHandle = (data: Chat.Msg) => {
-  if (data.from === userInfo.value.username) return
+  if (data.from === userInfo.value.userName) return
   let msg: ApiChatManagement.message = {
     id: String(random(1, 9999, false)),
     text: data.msg,
@@ -175,7 +176,7 @@ const checkScrollIsToBottom = () => {
 
 /**切换下一首处理 */
 const nextPlayHandle = (data: Music.SongInfo) => {
-  Bus.emit('changeSong', data)
+  Bus.emit('change-song', data)
 }
 
 setTimeout(() => {
@@ -224,7 +225,8 @@ const onDemandMusic = async (musicInfo: ApiMusic.playListMusicInfo) => {
   window.$snackBar?.success('点歌成功')
 }
 
-Bus.on('onDemandMusic', (musicInfo: ApiMusic.playListMusicInfo) => {
+Bus.on('on-demand-music', (musicInfo: ApiMusic.playListMusicInfo) => {
+  console.log("点歌了")
   if (!joinedRoom.value) {
     window.$snackBar?.error('请先进入一个房间~');
   } else {

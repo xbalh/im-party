@@ -9,7 +9,8 @@ declare namespace Music {
     totalTime?: number;
     url?: string;
     from?: string;
-    songDetailInfo?: ApiMusic.playListMusicInfo
+    songDetailInfo?: ApiMusic.playListMusicInfo;
+    nowTime?: number
   }
 }
 
