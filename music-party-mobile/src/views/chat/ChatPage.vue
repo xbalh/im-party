@@ -86,7 +86,7 @@
     </v-navigation-drawer>
   </v-card>
   <v-card key="myself" class="h-100" v-show="currentTab === 'myself'">
-    <div>
+    <div v-if="isUserBindWyy">
       <div v-show="!isPlayListDetailPage">
         <v-tabs v-model="topTabCurrent" fixed-tabs color="primary">
           <v-tab value="myPlayList">我的歌单</v-tab>
@@ -120,29 +120,31 @@
         </div>
       </div>
       <div v-show="isPlayListDetailPage">
-      </div>
-
-      <v-toolbar color="surface">
-        <v-btn icon class="hidden-xs-only" @click="closePlayListDetailPage">
-          <v-icon>mdi-arrow-left</v-icon>
-        </v-btn>
-        <v-toolbar-title>{{ currentPlayList?.title }}</v-toolbar-title>
-      </v-toolbar>
-      <div class="listArea">
-        <div class="playListDiv mx-2">
-          <v-infinite-scroll :items="currentPlayListAllMusic" height="100%" class="musicList" item-height="48"
-            @load="musicListScrollBottmHandle">
-            <template v-for="(musicInfo, index) in currentPlayListAllMusic" :key="item">
-              <v-list-item lines="two" :title="musicInfo.name" :subtitle="handleMusicSubtitle(musicInfo)"
-                @click="onDemandMusic(musicInfo)">
-                <template v-slot:prepend>
-                  <span>{{ index + 1 }}</span>
-                </template>
-              </v-list-item>
-            </template>
-          </v-infinite-scroll>
+        <v-toolbar color="surface">
+          <v-btn icon class="hidden-xs-only" @click="closePlayListDetailPage">
+            <v-icon>mdi-arrow-left</v-icon>
+          </v-btn>
+          <v-toolbar-title>{{ currentPlayList?.title }}</v-toolbar-title>
+        </v-toolbar>
+        <div class="listArea">
+          <div class="playListDiv mx-2">
+            <v-infinite-scroll :items="currentPlayListAllMusic" height="100%" class="musicList" item-height="48"
+              @load="musicListScrollBottmHandle">
+              <template v-for="(musicInfo, index) in currentPlayListAllMusic" :key="item">
+                <v-list-item lines="two" :title="musicInfo.name" :subtitle="handleMusicSubtitle(musicInfo)"
+                  @click="onDemandMusic(musicInfo)">
+                  <template v-slot:prepend>
+                    <span>{{ index + 1 }}</span>
+                  </template>
+                </v-list-item>
+              </template>
+            </v-infinite-scroll>
+          </div>
         </div>
       </div>
+    </div>
+    <div v-else>
+      请先绑定网易云账号
     </div>
 
     <v-dialog v-model="dialog" width="auto">
@@ -187,7 +189,7 @@ const currentTab = ref('chat')
 Bus.on('bottom-nav-change', (tabName: string) => {
   currentTab.value = tabName
 })
-
+const isUserBindWyy = ref(false)
 const mySubheaderTitle = ref()
 const myPlayList = ref()
 const collectSubheaderTitle = ref()
@@ -262,8 +264,9 @@ const fetchRooms = async () => {
 }
 
 const fetchUserPlayList = async () => {
+  if(!userInfo.value.wyyUserId) return
   window.$loadingOverly?.show()
-  const resp = await fetchPlayList('125885835');
+  const resp = await fetchPlayList(userInfo.value.wyyUserId);
   window.$loadingOverly?.hide()
   if (resp.data) {
     //通过subscribed区分是我的歌单还是收藏歌单
@@ -281,6 +284,7 @@ const fetchUserPlayList = async () => {
     const collectPlayListSubheaderTitle = `收藏歌单(${collectPlayListCount}个)`
     collectSubheaderTitle.value = collectPlayListSubheaderTitle
     collectPlayList.value = collectPlayListItems
+    isUserBindWyy.value = true
   }
 }
 
@@ -345,6 +349,7 @@ const confirmOndemandMusic = () => {
 const musicListScrollBottmHandle = async ({ done }) => {
   if (!currentPlayList.value) {
     console.log('触底了')
+    done('ok')
     return
   }
   if (hasMore.value) {
