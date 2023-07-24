@@ -162,7 +162,7 @@ public class WebsocketSessionManager {
                 JSONObject song1 = songs1.getJSONObject(0);
                 playSongInfo.setSongDetailInfo(song1);
                 broadcastMsg(MsgJSON.nextPlay(playSongInfo).toJSONString());
-                playTimer.playSong(playSongInfo.getTotalTime() / 1000);
+                playTimer.playSong(playSongInfo.getTotalTime());
 
             } else {
                 // broadcastMsg(MsgJSON.currentTime(getCurrentTime()).toJSONString());
