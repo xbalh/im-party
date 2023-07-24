@@ -287,6 +287,12 @@ Bus.on('music-play', (flag: boolean) => {
 
 .playbarBtnGroup {
   margin-left: auto;
+  height: 100%;
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
 }
 
 .progress {
