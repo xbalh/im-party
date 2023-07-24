@@ -63,7 +63,7 @@ const playOrPauseMusic = () => {
 
 const timeupdate = () => {
   const currentTime = player.value!.currentTime
-  console.log(currentTime)
+  // console.log(currentTime)
   const duration = player.value!.duration
   try {
     currentProgress.value = musicTimeformat(currentTime)
@@ -118,7 +118,6 @@ Bus.on('change-song', (songInfo: Music.SongInfo) => {
   const currentPlayer = player.value!
   currentPlayer.setAttribute('src', songInfo.url!)
   if (isAutoPlay) {
-    
     currentPlayer.currentTime = songInfo.type === 'next-play'? 0 : songInfo.nowTime! / 1000
     currentPlayer.play()
     isPlay.value = true
@@ -129,6 +128,12 @@ Bus.on('change-song', (songInfo: Music.SongInfo) => {
   }
 
 
+})
+
+Bus.on('change-room', (roomInfo: ApiRoomManagement.roomInfo)=>{
+  progress.value = 0
+  currentSong.value = {}
+  isPlay.value = false
 })
 
 

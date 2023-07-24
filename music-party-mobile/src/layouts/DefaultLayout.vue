@@ -209,6 +209,13 @@ const playOrPauseMusic = () => {
 }
 
 
+Bus.on('change-room', (roomInfo: ApiRoomManagement.roomInfo)=>{
+  playList.value = []
+  currentProgress.value = 0
+  isPlay.value = false
+  currentPlayMusicInfo.value = {}
+})
+
 const playList = ref<Music.SongInfo[]>()
 Bus.on('playlist-change', (songList: Music.SongInfo[]) => {
   playList.value = songList

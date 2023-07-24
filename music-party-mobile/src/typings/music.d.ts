@@ -11,7 +11,7 @@ declare namespace Music {
     from?: string;
     songDetailInfo?: ApiMusic.playListMusicInfo;
     nowTime?: number;
-    type: string;
+    type?: string;
   }
 }
 

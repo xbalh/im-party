@@ -50,6 +50,7 @@ import Bus from '@/utils/common/Bus';
 import { formatDate } from '@vueuse/core';
 import { random } from 'lodash-es';
 import { addMusic } from "@/service/api/room";
+import { onBeforeRouteUpdate } from 'vue-router' 
 
 
 const route = useRoute()
@@ -240,6 +241,14 @@ Bus.on('on-demand-music', (musicInfo: ApiMusic.playListMusicInfo) => {
     onDemandMusic(musicInfo)
   }
 
+})
+
+onBeforeRouteUpdate((to, from, next)=>{
+  //TODO
+  if(from.name === 'apps_chat-channel'){
+    from.meta.keepAlive = false;
+  }
+  next()
 })
 
 
