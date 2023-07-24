@@ -60,13 +60,13 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
                 refreshMap = JwtTokenUtils.decryptJwt(refreshToken);
             } catch (Exception e) {
                 log.error("refreshToken错误！");
-                CookieUtils.remove(response, "Authentication");
-                CookieUtils.remove(response, "refreshToken");
+                // CookieUtils.remove(response, "Authentication");
+                // CookieUtils.remove(response, "refreshToken");
                 throw new JwtExpiredException("cookie已经过期");
             }
             if (refreshMap.get("expiredTime").asInstant().isBefore(LocalDateTime.now().toInstant(ZoneOffset.UTC))) {
-                CookieUtils.remove(response, "Authentication");
-                CookieUtils.remove(response, "refreshToken");
+                // CookieUtils.remove(response, "Authentication");
+                // CookieUtils.remove(response, "refreshToken");
                 throw new JwtExpiredException("cookie已经过期");
             }
             String randomStr = refreshMap.get("validStr").asString();
@@ -75,12 +75,12 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
                 JSONObject userInfo = JSONObject.parseObject(refreshMap.get("userInfo").asString());
                 String userName = refreshMap.get("userName").asString();
                 String newJwt = JwtTokenUtils.encryptTokenJwt(userInfo, userName, randomStr);
-                response.setHeader("Authentication", String.format("Bearer %s", newJwt));
-                response.addCookie(new Cookie("Authentication", newJwt));
+                // response.setHeader("Authentication", String.format("Bearer %s", newJwt));
+                // response.addCookie(new Cookie("Authentication", newJwt));
             } else {
                 // 清除cookie
-                CookieUtils.remove(response, "Authentication");
-                CookieUtils.remove(response, "refreshToken");
+                // CookieUtils.remove(response, "Authentication");
+                // CookieUtils.remove(response, "refreshToken");
                 throw new JwtValidException("cookie有问题！");
             }
         }

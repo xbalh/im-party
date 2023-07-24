@@ -219,14 +219,16 @@ public class WebsocketSessionManager {
         if (currentSongInfo == null) {
             playSongInfo = songList.get(0);
         }
-        Iterator<PlaySongInfo> iterator = songList.iterator();
-        while (iterator.hasNext()) {
-            PlaySongInfo next = iterator.next();
-            if (next.getSongId().equals(currentSongInfo)) {
-                if (iterator.hasNext()) {
-                    playSongInfo = iterator.next();
+        if (playSongInfo == null) {
+            Iterator<PlaySongInfo> iterator = songList.iterator();
+            while (iterator.hasNext()) {
+                PlaySongInfo next = iterator.next();
+                if (next.getSongId().equals(currentSongInfo.getSongId())) {
+                    if (iterator.hasNext()) {
+                        playSongInfo = iterator.next();
+                    }
+                    break;
                 }
-                break;
             }
         }
         playSongInfo.setUrl(SongUtils.getUrlBySongId(playSongInfo.getSongId(), playSongInfo.getSongQuality()));

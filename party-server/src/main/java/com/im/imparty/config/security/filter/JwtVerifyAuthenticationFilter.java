@@ -47,10 +47,10 @@ public class JwtVerifyAuthenticationFilter extends BasicAuthenticationFilter {
             response.setHeader("Sec-WebSocket-Protocol", jwtStr);
         } else {
             Cookie[] cookies = Optional.ofNullable(request.getCookies()).orElse(new Cookie[0]);
-            Cookie cookie = Arrays.stream(cookies).filter(item -> "Authentication".equals(item.getName())).findAny().orElse(null);
+            Cookie cookie = Arrays.stream(cookies).filter(item -> "Authorization".equals(item.getName())).findAny().orElse(null);
             Cookie refreshToken = Arrays.stream(cookies).filter(item -> "refreshToken".equals(item.getName())).findAny().orElse(null);
 
-            String authentication = request.getHeader("Authentication");
+            String authentication = request.getHeader("Authorization");
             String refreshTokenHead = request.getHeader("refreshToken");
             if (cookie != null || authentication != null) {
                 //System.out.println("request.getHeader(\"Token\")" + authentication);
@@ -59,8 +59,8 @@ public class JwtVerifyAuthenticationFilter extends BasicAuthenticationFilter {
                 try {
                     JwtTokenUtils.decryptJwt(jwtStr);
                 } catch (Exception e) {
-                    CookieUtils.remove(response, "Authentication");
-                    CookieUtils.remove(response, "refreshToken");
+                    // CookieUtils.remove(response, "Authentication");
+                    // CookieUtils.remove(response, "refreshToken");
                     chain.doFilter(request, response);
                     return;
                 }

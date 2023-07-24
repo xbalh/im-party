@@ -22,6 +22,7 @@ public class MyAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setContentType("application/json;charset=UTF-8");
         //这里写你登录失败后的逻辑，可加验证码验证等
         String errorInfo = "";
+        int code = 500;
         if (exception instanceof BadCredentialsException ||
                 exception instanceof UsernameNotFoundException) {
             errorInfo = "账户名或者密码输入错误!";
@@ -29,8 +30,10 @@ public class MyAuthenticationEntryPoint implements AuthenticationEntryPoint {
             errorInfo = "账户被锁定，请联系管理员!";
         } else if (exception instanceof CredentialsExpiredException) {
             errorInfo = "密码过期，请联系管理员!";
+            code = 401;
         } else if (exception instanceof AccountExpiredException) {
             errorInfo = "账户过期，请联系管理员!";
+            code = 401;
         } else if (exception instanceof DisabledException) {
             errorInfo = "账户被禁用，请联系管理员!";
         } else if (exception instanceof JwtAuthenticationAbstractException) {
@@ -42,6 +45,6 @@ public class MyAuthenticationEntryPoint implements AuthenticationEntryPoint {
         }
         log.info("登录失败原因：" + errorInfo);
         //ajax请求认证方式
-        response.getWriter().write(BaseResult.fail(errorInfo).toJSONString());
+        response.getWriter().write(BaseResult.build(code, errorInfo).toJSONString());
     }
 }

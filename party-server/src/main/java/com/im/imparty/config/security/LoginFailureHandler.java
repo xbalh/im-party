@@ -37,10 +37,10 @@ public class LoginFailureHandler extends SimpleUrlAuthenticationFailureHandler {
             code = 200;
         } else if (exception instanceof CredentialsExpiredException) {
             errorInfo = "密码过期，请联系管理员!";
-            code = 200;
+            code = 401;
         } else if (exception instanceof AccountExpiredException) {
             errorInfo = "账户过期，请联系管理员!";
-            code = 200;
+            code = 401;
         } else if (exception instanceof DisabledException) {
             errorInfo = "账户被禁用，请联系管理员!";
             code = 200;
