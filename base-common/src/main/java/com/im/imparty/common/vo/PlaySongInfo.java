@@ -3,8 +3,10 @@ package com.im.imparty.common.vo;
 import com.alibaba.fastjson.JSONObject;
 import com.im.imparty.common.util.SongUtils;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 
+@EqualsAndHashCode
 @Data
 public class PlaySongInfo {
 
