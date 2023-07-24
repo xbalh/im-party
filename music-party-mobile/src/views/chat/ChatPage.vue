@@ -24,7 +24,7 @@
                 <template v-slot:activator="{ props }">
                   <v-list-item v-bind="props" :title="roomstyle"></v-list-item>
                 </template>
-                <v-list-item v-for="roomInfo in roomlist" :key="roomInfo.roomNo" :to="enterRoom(roomInfo)" exact>
+                <v-list-item v-for="roomInfo in roomlist" :key="roomInfo.roomNo" replace :to="enterRoom(roomInfo)" exact>
                   <v-list-item-title class="text-subtitle-2">{{ roomInfo.roomName }}</v-list-item-title>
                 </v-list-item>
               </v-list-group>
@@ -371,19 +371,6 @@ const closePlayListDetailPage = () => {
   isPlayListDetailPage.value = false
   hasMore.value = true
 }
-
-onBeforeRouteLeave((to, from, next) => {
-  //离开当前的组件，触发
-  console.log("离开了房间")
-  const { roomName } = to.query
-  window.$dialog?.show({
-    main: `你确定要离开当前房间【${roomName}】么`,
-    title: '提醒',
-    confirmText: '确定',
-    cancelText: '取消'
-  })
-
-});
 
 </script>
 

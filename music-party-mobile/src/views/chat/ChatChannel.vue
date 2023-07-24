@@ -50,7 +50,7 @@ import Bus from '@/utils/common/Bus';
 import { formatDate } from '@vueuse/core';
 import { random } from 'lodash-es';
 import { addMusic } from "@/service/api/room";
-import { onBeforeRouteUpdate } from 'vue-router' 
+import { onBeforeRouteUpdate } from 'vue-router'
 
 
 const route = useRoute()
@@ -62,6 +62,7 @@ const { userInfo } = storeToRefs(auth)
 const messagesRef = ref<HTMLDivElement>()
 const inputMessage = ref<HTMLDivElement>()
 const { wsUrl } = getServiceEnvConfig(import.meta.env);
+const leavedCurrentRoom = ref(false)
 const messages = ref<Array<ApiChatManagement.message>>([
   {
     id: '1',
@@ -234,22 +235,44 @@ const onDemandMusic = async (musicInfo: ApiMusic.playListMusicInfo) => {
 }
 
 Bus.on('on-demand-music', (musicInfo: ApiMusic.playListMusicInfo) => {
-  console.log("点歌了")
-  if (!joinedRoom.value) {
-    window.$snackBar?.error('请先进入一个房间~');
-  } else {
-    onDemandMusic(musicInfo)
+  if (!leavedCurrentRoom.value) {
+    console.log("点歌了: " + roomName)
+    if (!joinedRoom.value) {
+      window.$snackBar?.error('请先进入一个房间~');
+    } else {
+      onDemandMusic(musicInfo)
+    }
   }
 
 })
 
-onBeforeRouteUpdate((to, from, next)=>{
-  //TODO
-  if(from.name === 'apps_chat-channel'){
-    from.meta.keepAlive = false;
-  }
-  next()
-})
+// onBeforeRouteUpdate((to, from, next) => {
+//   //TODO
+//   if(from.name === 'apps_chat-channel'){
+//     from.meta.keepAlive = false;
+//   }
+//   next()
+// })
+
+onBeforeRouteUpdate((to, from, next) => {
+  //离开当前的组件，触发
+  console.log("离开了房间")
+  const { roomName: toRoomName } = to.query
+  const { roomName: fromRoomName } = from.query
+  const leaveRoomDialog = window.$dialog?.show({
+    main: fromRoomName ? `你确定要离开当前房间【${fromRoomName}】进入房间【${toRoomName}】么` : `你确定要进入房间【${toRoomName}】么`,
+    title: '提醒',
+    confirmText: '确定',
+    cancelText: '取消',
+    confirm: () => {
+      leavedCurrentRoom.value = true
+      Bus.emit('change-room', true)
+      next()
+      leaveRoomDialog?.close()
+    }
+  })
+
+});
 
 
 

@@ -130,10 +130,11 @@ Bus.on('change-song', (songInfo: Music.SongInfo) => {
 
 })
 
-Bus.on('change-room', (roomInfo: ApiRoomManagement.roomInfo)=>{
+Bus.on('change-room', (flag: boolean)=>{
   progress.value = 0
   currentSong.value = {}
   isPlay.value = false
+  player.value?.pause()
 })
 
 

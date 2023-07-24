@@ -209,7 +209,7 @@ const playOrPauseMusic = () => {
 }
 
 
-Bus.on('change-room', (roomInfo: ApiRoomManagement.roomInfo)=>{
+Bus.on('change-room', (flag: boolean)=>{
   playList.value = []
   currentProgress.value = 0
   isPlay.value = false

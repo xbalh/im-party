@@ -129,7 +129,8 @@ export const routeModel: Record<Auth.RoleType, AuthRoute.Route[]> = {
               meta: {
                 title: 'menu.chat-channel',
                 dynamicPath: '/apps/chat-channel/:id?',
-                hide: true
+                hide: true,
+                keepAlive: false
               }
             }
           ],
@@ -228,7 +229,8 @@ export const routeModel: Record<Auth.RoleType, AuthRoute.Route[]> = {
               meta: {
                 title: 'menu.chat-channel',
                 dynamicPath: '/apps/chat-channel/:id?',
-                hide: true
+                hide: true,
+                keepAlive: false
               }
             }
           ],
