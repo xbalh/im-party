@@ -24,6 +24,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class WebsocketSessionManager {
@@ -147,7 +148,8 @@ public class WebsocketSessionManager {
         this.playTimer = new PlayTimer(playSongInfo1.getTotalTime(), (o) -> {
             if (o) {
                 if (currentSongInfo != null) {
-                    songList.remove(currentSongInfo);
+                    songList.removeAll(songList.stream().filter(item -> currentSongInfo.getSongId().equals(item.getSongId())).collect(Collectors.toList()));
+                    // songList.remove(currentSongInfo);
                     musicPlayerRecordService.updateMusicPlayStatus(ImmutableList.of(currentSongInfo.getSongId()), this.roomId);
                     broadcastMsg(MsgJSON.songListChange(songList, roomId).toJSONString());
                 }
