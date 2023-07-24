@@ -162,7 +162,7 @@ public class WebsocketSessionManager {
                 JSONObject song1 = songs1.getJSONObject(0);
                 playSongInfo.setSongDetailInfo(song1);
                 broadcastMsg(MsgJSON.nextPlay(playSongInfo).toJSONString());
-                playTimer.play(0);
+                playTimer.playSong(playSongInfo.getTotalTime() / 1000);
 
             } else {
                 // broadcastMsg(MsgJSON.currentTime(getCurrentTime()).toJSONString());
@@ -233,6 +233,9 @@ public class WebsocketSessionManager {
                     break;
                 }
             }
+        }
+        if (playSongInfo == null) {
+            return null;
         }
         playSongInfo.setUrl(SongUtils.getUrlBySongId(playSongInfo.getSongId(), playSongInfo.getSongQuality()));
         return playSongInfo;
