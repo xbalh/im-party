@@ -16,6 +16,14 @@ public class MsgJSON {
         return res;
     }
 
+    public static JSONObject play(PlaySongInfo playSongInfo, Long nowTime) {
+        JSONObject res = new JSONObject();
+        res.put("method", "/music/playControl/play");
+        playSongInfo.setNowTime(nowTime);
+        res.put("data", playSongInfo);
+        return res;
+    }
+
     public static JSONObject userJoin(String userName, Integer roomId) {
         JSONObject res = new JSONObject();
         res.put("method", "/music/room/user-join/" + roomId);
