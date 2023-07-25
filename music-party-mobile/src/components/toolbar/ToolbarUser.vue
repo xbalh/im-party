@@ -16,7 +16,7 @@
       <v-list-item v-if="!isLogin">
         <v-list-item-title>{{ $t('usermenu.notSignin') }}</v-list-item-title>
       </v-list-item>
-      <v-list-item v-else v-for="(item, index) in menu" :key="index" :to="item.link" link>
+      <v-list-item v-else v-for="(item, index) in menu" :key="index" :to="item.link" link replace>
         <template v-slot:prepend>
           <v-icon size="small" :icon="item.icon"></v-icon>
         </template>
@@ -52,7 +52,7 @@ const openSetting = () => {
 
 const menu = reactive(
   [
-    { icon: 'mdi-account-box-outline', key: 'menu.profile', link: `/apps/manager-user/edit/${userInfo.value.userId}` },
+    { icon: 'mdi-account-box-outline', key: 'menu.profile', link: `/apps/manager-user/edit/${userInfo.value.userName}` },
     // {icon: 'mdi-format-list-checkbox', key: 'menu.todo', link: '/apps/todo'},
     // {icon: 'mdi-email-outline', key: 'menu.board', link: '/apps/board'},
     { icon: 'mdi-music', key: 'menu.chat', link: '/apps/chat-channel/' }

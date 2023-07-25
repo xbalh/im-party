@@ -254,6 +254,15 @@ Bus.on('music-play', (flag: boolean) => {
   isPlay.value = flag
 })
 
+watch(router.currentRoute, (newValue, oldValue) => {
+  console.log("新路由：" + newValue + "旧路由：" + oldValue)
+  if (newValue.name === 'apps_chat-channel') {
+    isShowFooter.value = true
+  } else {
+    isShowFooter.value = false
+  }
+});
+
 </script>
 
 <style scoped>
