@@ -18,4 +18,6 @@ public interface UserService extends IService<UserDomain> {
     void setMusicCookie(String userName, String cookie);
 
     String getMusicCookie(String userName);
+
+    void updateWyyBind(String userName, String wyyUserId);
 }

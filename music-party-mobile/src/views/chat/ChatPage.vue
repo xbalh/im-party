@@ -142,18 +142,17 @@
       </div>
     </div>
     <div v-else>
-
       <v-card>
         <v-card-title> 请先绑定网易云账号 </v-card-title>
         <v-card-item>
           <v-spacer></v-spacer>
-          <v-text-field v-model="searchInput" append-icon="mdi-magnify" label="通过用户名搜索网易云用户" single-line hide-details
-            @click:append="searchWyyUserHandle"></v-text-field>
+          <v-text-field v-model="searchInput" clearable append-icon="mdi-magnify" label="通过用户名搜索网易云用户" single-line
+            hide-details @click:append="searchWyyUserHandle"></v-text-field>
         </v-card-item>
         <v-card-item>
           <v-list>
-            <v-list-item v-for="item in searchWyyUserItems" lines="one" :title="item.nickname" :prepend-avatar="item.avatarUrl"
-              @click="bindUser(item)">
+            <v-list-item v-for="item in searchWyyUserItems" lines="one" :title="item.nickname"
+              :prepend-avatar="item.avatarUrl" @click="bindUser(item)">
             </v-list-item>
           </v-list>
         </v-card-item>
@@ -189,7 +188,8 @@ import { useRouter } from "vue-router";
 import { useRouterPush } from "@/composables";
 import { fetchRoomList } from "@/service/api/room";
 import { fetchPlayList, fetchPlayListAllMusic, searchWyyUser } from "@/service/api/music";
-import { groupByKey } from "@/utils";
+import { bindWyyUser } from "@/service/api/user";
+import { groupByKey, localStg } from "@/utils";
 import Bus from "@/utils/common/Bus";
 import { trim } from "lodash-es";
 
@@ -266,14 +266,21 @@ const searchWyyUserHandle = async () => {
   }
 }
 
-const bindUser = (userInfo) => {
+const bindUser = (wyyUserInfo) => {
   const bindDialog = window.$dialog?.show({
-    main: `确定要将用户【${userInfo.nickname}】绑定至当前账号么`,
+    main: `确定要将用户【${wyyUserInfo.nickname}】绑定至当前账号么`,
     title: '提醒',
     confirmText: '确定',
     cancelText: '取消',
-    confirm: () => {
+    confirm: async () => {
       console.log("确认绑定")
+      const resp = await bindWyyUser(wyyUserInfo.userId)
+      if (resp.data) {
+        window.$snackBar?.success('绑定成功！')
+        localStg.set('userInfo', resp.data)
+        userInfo.value = resp.data
+        fetchUserPlayList()
+      }
       bindDialog?.close()
     }
   })

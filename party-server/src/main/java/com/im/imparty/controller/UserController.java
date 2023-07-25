@@ -1,15 +1,15 @@
 package com.im.imparty.controller;
 
+import com.im.imparty.common.exception.CustomException;
 import com.im.imparty.user.dto.UserInfo;
 import com.im.imparty.user.dto.UserInfoDetail;
 import com.im.imparty.user.entity.UserDomain;
 import com.im.imparty.user.mapper.UserMapper;
 import com.im.imparty.user.service.UserService;
 import com.im.imparty.web.vo.BaseResult;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -42,6 +42,16 @@ public class UserController {
 //                add(new User("4"));
 //            }
 //        };
+    }
+
+    @PostMapping("/updateWyyBind")
+    public BaseResult<UserInfo> updateWyyBind(@RequestBody String wyyUserId) {
+        if(StringUtils.isBlank(wyyUserId)){
+            throw new CustomException("请选择一个要绑定的用户");
+        }
+        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+        userService.updateWyyBind(userName, wyyUserId);
+        return BaseResult.ok(userService.getUserInfo(userName));
     }
 
     // public BaseResult<String> getWebsocket

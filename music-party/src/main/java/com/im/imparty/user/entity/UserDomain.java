@@ -33,4 +33,7 @@ public class UserDomain extends BaseDomain<UserDomain> {
     @TableField("wyy_cookie")
     private String wyyCookie;
 
+    @TableField("wyy_user_id")
+    private String wyyUserId;
+
 }

@@ -7,7 +7,6 @@ import com.im.imparty.user.entity.UserDomain;
 import com.im.imparty.user.mapper.UserMapper;
 import com.im.imparty.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,7 +47,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDomain> impleme
     public String getMusicCookie(String userName) {
         List<UserDomain> entity = lambdaQuery().eq(UserDomain::getUserName, userName)
                 .select(UserDomain::getWyyCookie).list();
-        return entity == null || entity.isEmpty()? "" : entity.get(0).getWyyCookie();
+        return entity == null || entity.isEmpty() ? "" : entity.get(0).getWyyCookie();
+    }
+
+    @Override
+    public void updateWyyBind(String userName, String wyyUserId) {
+        lambdaUpdate().eq(UserDomain::getUserName, userName).eq(UserDomain::getValidSts, "A")
+                .set(UserDomain::getWyyUserId, wyyUserId).update();
     }
 
 }
