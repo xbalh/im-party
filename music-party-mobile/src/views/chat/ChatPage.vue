@@ -31,6 +31,30 @@
             </v-list>
           </v-list>
         </v-navigation-drawer>
+        <v-navigation-drawer v-model="usersDrawer" :permanent="lgAndUp" floating class="elevation-1 rounded flex-shrink-0"
+          :class="{ 'top-z-index': !lgAndUp }" width="240" touchless location="right">
+          <v-list v-if="!fetchOnlineLoading" dense>
+            <v-list-item-subtitle class="mx-2 my-2 overline ">
+              {{ $t('chat.online', { count: onlineUsers.length }) }}
+            </v-list-item-subtitle>
+            <v-list-item v-for="item in onlineUsers" :key="item.id">
+              <v-list-item-title class="text-body-2" :class="{ 'text-primary': item.id === userInfo.userId }">
+                <v-avatar size="40" class="elevation-1 grey lighten-3">
+                  <svg-icon :name="item.avatar"></svg-icon>
+                </v-avatar>
+                {{ item.name }}
+              </v-list-item-title>
+            </v-list-item>
+          </v-list>
+          <v-row v-else class="fill-height" align-content="center" justify="center">
+            <v-col class="text-subtitle-1 text-center" cols="12">
+              Fetching Online Users
+            </v-col>
+            <v-col cols="6">
+              <v-progress-linear color="primary" indeterminate rounded height="6"></v-progress-linear>
+            </v-col>
+          </v-row>
+        </v-navigation-drawer>
         <v-main>
           <div :class="{ 'pl-3': lgAndUp }" class="d-flex flex-grow-1 h-100 flex-column">
             <v-card class="flex-grow-1 h-100">
@@ -59,29 +83,6 @@
       </div>
 
     </v-layout>
-    <v-navigation-drawer v-model="usersDrawer" width="180" order="-1" location="right" touchless>
-      <v-list v-if="!fetchOnlineLoading" dense>
-        <v-list-item-subtitle class="mx-2 my-2 overline ">
-          {{ $t('chat.online', { count: onlineUsers.length }) }}
-        </v-list-item-subtitle>
-        <v-list-item v-for="item in onlineUsers" :key="item.id">
-          <v-list-item-title class="text-body-2" :class="{ 'text-primary': item.id === userInfo.userId }">
-            <v-avatar size="40" class="elevation-1 grey lighten-3">
-              <svg-icon :name="item.avatar"></svg-icon>
-            </v-avatar>
-            {{ item.name }}
-          </v-list-item-title>
-        </v-list-item>
-      </v-list>
-      <v-row v-else class="fill-height" align-content="center" justify="center">
-        <v-col class="text-subtitle-1 text-center" cols="12">
-          Fetching Online Users
-        </v-col>
-        <v-col cols="6">
-          <v-progress-linear color="primary" indeterminate rounded height="6"></v-progress-linear>
-        </v-col>
-      </v-row>
-    </v-navigation-drawer>
   </v-card>
   <v-card key="myself" class="h-100" v-show="currentTab === 'myself'">
     <div v-if="isUserBindWyy">
@@ -237,6 +238,9 @@ const { currentRoute } = useRouter()
 
 const usersDrawer = ref()
 const onlineUsers = ref<Array<ApiUserManagement.User>>([])
+Bus.on('onlineUsers-change', (users: ApiAuth.UserInfo[]) => {
+  // onlineUsers.value = users
+})
 
 const roomList = ref<Array<ApiRoomManagement.roomInfo>>([])
 

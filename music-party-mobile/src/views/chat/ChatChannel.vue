@@ -1,35 +1,38 @@
 <template>
   <div>
-    <!-- channel toolbar -->
-    <v-toolbar flat height="64" color="surface">
-      <v-app-bar-nav-icon class="hidden-lg-and-up" @click="$emit('toggle-menu')"></v-app-bar-nav-icon>
-      <v-toolbar-title>
-        {{ roomName }}
-      </v-toolbar-title>
-      <v-spacer></v-spacer>
-      <v-btn class="mx-1" icon @click.stop="$emit('toggle-usersDrawer')">
-        <v-icon>mdi-account-group-outline</v-icon>
-      </v-btn>
-    </v-toolbar>
-
-    <v-divider></v-divider>
-    <!-- channel messages -->
-    <div class="channel-page" :class="{ 'channel-page-bg': !current.dark }">
-      <div id="messages" ref="messagesRef" class="messages mx-2">
-        <v-slide-y-transition group tag="div">
-          <channel-message v-for="message in messages" :key="message.id" :message="message" class="my-4 d-flex" />
-        </v-slide-y-transition>
-      </div>
-
-      <div class="input-box pa-2">
-        <div class="d-flex position-relative align-center">
-          <v-text-field v-model="input" variant="outlined" density="comfortable" ref="inputMessage" autofocus
-            class="font-weight-bold position-relative align-center" :placeholder="`${$t('chat.message')}`" hide-details
-            @keyup.enter="sendMessage" @blur="changeBlur">
-          </v-text-field>
-          <v-btn flat rounded icon size="small" color="primary" class="mx-1" :disabled="!input" @click="sendMessage">
-            <v-icon size="small">mdi-send</v-icon>
-          </v-btn>
+    <div>
+      <!-- channel toolbar -->
+      <v-toolbar flat height="64" color="surface">
+        <v-app-bar-nav-icon class="hidden-lg-and-up" @click="$emit('toggle-menu')"></v-app-bar-nav-icon>
+        <v-toolbar-title>
+          {{ roomName }}
+        </v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-btn class="mx-1" icon @click.stop="$emit('toggle-usersDrawer')">
+          <v-icon>mdi-account-group-outline</v-icon>
+        </v-btn>
+      </v-toolbar>
+      <v-divider></v-divider>
+      <!-- channel messages -->
+      <div class="channel-page" :class="{ 'channel-page-bg': !current.dark }">
+        <v-overlay ref="myOverlay" persistent contained :model-value="!isJoinRoom" class="align-center justify-center">
+          请先进入一个房间
+        </v-overlay>
+        <div id="messages" ref="messagesRef" class="messages mx-2">
+          <v-slide-y-transition group tag="div">
+            <channel-message v-for="message in messages" :key="message.id" :message="message" class="my-4 d-flex" />
+          </v-slide-y-transition>
+        </div>
+        <div class="input-box pa-2">
+          <div class="d-flex position-relative align-center">
+            <v-text-field v-model="input" variant="outlined" density="comfortable" ref="inputMessage" autofocus
+              class="font-weight-bold position-relative align-center" :placeholder="`${$t('chat.message')}`" hide-details
+              @keyup.enter="sendMessage" @blur="changeBlur">
+            </v-text-field>
+            <v-btn flat rounded icon size="small" color="primary" class="mx-1" :disabled="!input" @click="sendMessage">
+              <v-icon size="small">mdi-send</v-icon>
+            </v-btn>
+          </div>
         </div>
       </div>
     </div>
@@ -91,11 +94,13 @@ const input = ref('')
 
 const demo = ref()
 
+const isJoinRoom = ref(false)
 onMounted(() => {
   if (roomNo) {
     window.$loadingOverly?.show()
     connectWS(roomNo as string)
     currentHeight.value = messagesRef.value!.scrollHeight
+    isJoinRoom.value = true
   }
   // demo.value = setInterval(async () => {
   //   const resp = await fetchMessage()
