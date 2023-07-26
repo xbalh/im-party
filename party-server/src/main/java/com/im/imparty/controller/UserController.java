@@ -1,12 +1,15 @@
 package com.im.imparty.controller;
 
 import com.im.imparty.common.exception.CustomException;
+import com.im.imparty.common.vo.PlaySongInfo;
+import com.im.imparty.server.WebSocketServer;
 import com.im.imparty.user.dto.UserInfo;
 import com.im.imparty.user.dto.UserInfoDetail;
 import com.im.imparty.user.entity.UserDomain;
 import com.im.imparty.user.mapper.UserMapper;
 import com.im.imparty.user.service.UserService;
 import com.im.imparty.web.vo.BaseResult;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -54,6 +57,11 @@ public class UserController {
         return BaseResult.ok(userService.getUserInfo(userName));
     }
 
-    // public BaseResult<String> getWebsocket
+    @ApiOperation("批量获取用户基本信息")
+    @PostMapping("/fetchUsersInfoBatch")
+    public BaseResult<List<UserInfo>> fetchUsersInfoBatch(@RequestBody List<String> userNames) {
+        List<UserInfo> userInfoList = userService.getUserInfoBatchByUserNames(userNames);
+        return BaseResult.ok(userInfoList);
+    }
 
 }

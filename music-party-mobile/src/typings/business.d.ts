@@ -5,7 +5,7 @@ declare namespace Auth {
     userId: string;
     userName: string;
     userRole: RoleType;
-    userAvatar?: string;
+    userAvatarUrl?: string;
     wyyUserId?: string;
     nickName?: string;
   }

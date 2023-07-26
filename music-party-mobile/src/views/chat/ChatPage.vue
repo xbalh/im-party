@@ -1,7 +1,7 @@
 <template>
   <v-card key="chat" class="h-100" v-show="currentTab === 'chat'">
     <v-layout full-height :class="{ 'position-static': !lgAndUp }">
-      <div class="d-flex flex-grow-1 flex-row">
+      <div class="d-flex flex-grow-1 flex-row w-100">
         <v-navigation-drawer v-model="channelDrawer" :permanent="lgAndUp" floating
           class="elevation-1 rounded flex-shrink-0" :class="{ 'top-z-index': !lgAndUp }" width="240" touchless>
           <div class="px-2 py-1">
@@ -37,18 +37,18 @@
             <v-list-item-subtitle class="mx-2 my-2 overline ">
               {{ $t('chat.online', { count: onlineUsers.length }) }}
             </v-list-item-subtitle>
-            <v-list-item v-for="item in onlineUsers" :key="item.id">
-              <v-list-item-title class="text-body-2" :class="{ 'text-primary': item.id === userInfo.userId }">
+            <v-list-item v-for="item in onlineUsers" :key="item.userName">
+              <v-list-item-title class="text-body-2" :class="{ 'text-primary': item.userName === userInfo.userName }">
                 <v-avatar size="40" class="elevation-1 grey lighten-3">
-                  <svg-icon :name="item.avatar"></svg-icon>
+                  <v-img :src="item.userAvatarUrl"></v-img>
                 </v-avatar>
-                {{ item.name }}
+                {{ item.nickName }}
               </v-list-item-title>
             </v-list-item>
           </v-list>
           <v-row v-else class="fill-height" align-content="center" justify="center">
             <v-col class="text-subtitle-1 text-center" cols="12">
-              Fetching Online Users
+              加载中...
             </v-col>
             <v-col cols="6">
               <v-progress-linear color="primary" indeterminate rounded height="6"></v-progress-linear>
@@ -56,8 +56,8 @@
           </v-row>
         </v-navigation-drawer>
         <v-main>
-          <div :class="{ 'pl-3': lgAndUp }" class="d-flex flex-grow-1 h-100 flex-column">
-            <v-card class="flex-grow-1 h-100">
+          <div :class="{ 'pl-3': lgAndUp }" class="d-flex flex-grow-1 h-100 flex-column w-100">
+            <v-card class="flex-grow-1 h-100 w-100">
               <router-view :key="currentRoute.fullPath" @toggle-users-drawer="usersDrawer = !usersDrawer"
                 @toggle-menu="channelDrawer = !channelDrawer"></router-view>
             </v-card>
@@ -68,14 +68,17 @@
           <v-card>
             <v-card-title class="title">{{ $t('room.createRoom') }}</v-card-title>
             <div class="pa-3">
-              <v-text-field ref="channel" v-model="newChannel" :label="$t('room.room')" maxlength="20" counter="20"
+              <v-text-field ref="channel" v-model="newRoomStyle" :label="$t('room.style')" maxlength="20" counter="20"
+                autofocus></v-text-field>
+              <v-text-field ref="channel" v-model="newRoomName" :label="$t('room.room')" maxlength="20" counter="20"
                 autofocus @keyup.enter="addChannel()"></v-text-field>
             </div>
             <v-card-actions class="pa-2">
               <v-spacer></v-spacer>
               <v-btn @click="showCreateDialog = false">{{ $t('common.cancel') }}</v-btn>
-              <v-btn :loading="isLoadingAdd" :disabled="newChannel.length === 0" color="success" @click="addChannel()">
-                {{ $t('common.add') }}
+              <v-btn :loading="isLoadingAdd" :disabled="newRoomStyle.length === 0 || newRoomName.length === 0"
+                color="success" @click="addChannel()">
+                {{ $t('common.confirm') }}
               </v-btn>
             </v-card-actions>
           </v-card>
@@ -189,7 +192,7 @@ import { useRouter } from "vue-router";
 import { useRouterPush } from "@/composables";
 import { fetchRoomList } from "@/service/api/room";
 import { fetchPlayList, fetchPlayListAllMusic, searchWyyUser } from "@/service/api/music";
-import { bindWyyUser } from "@/service/api/user";
+import { bindWyyUser, fetchUserInfoBatch } from "@/service/api/user";
 import { groupByKey, localStg } from "@/utils";
 import Bus from "@/utils/common/Bus";
 import { trim } from "lodash-es";
@@ -219,15 +222,16 @@ const topTabCurrent = ref('myPlayList')
 const channelDrawer = ref()
 const showCreateDialog = ref(false)
 const channels = ref(['general', 'production', 'qa', 'staging', 'random'])
-const newChannel = ref("")
+const newRoomStyle = ref("")
+const newRoomName = ref("")
 const { routerPush } = useRouterPush()
 const addChannel = () => {
   startLoading()
   setTimeout(() => {
-    channels.value.push(newChannel.value)
+    channels.value.push(newRoomName.value)
     showCreateDialog.value = false
-    routerPush(`/apps/chat-channel/${newChannel.value}`)
-    newChannel.value = ''
+    routerPush(`/apps/chat-channel/${newRoomName.value}`)
+    newRoomName.value = ''
     endLoading()
   }, 1000)
 }
@@ -237,9 +241,26 @@ const { userInfo } = storeToRefs(auth)
 const { currentRoute } = useRouter()
 
 const usersDrawer = ref()
-const onlineUsers = ref<Array<ApiUserManagement.User>>([])
-Bus.on('onlineUsers-change', (users: ApiAuth.UserInfo[]) => {
+const onlineUsers = ref<Array<ApiAuth.UserInfo>>([])
+Bus.on('onlineUsers-init', async (userNameList: string[]) => {
   // onlineUsers.value = users
+  const { data } = await fetchUserInfoBatch(userNameList);
+  if (data) {
+    onlineUsers.value = data
+  }
+})
+
+Bus.on('onlineUsers-add', async (userName: string) => {
+  const { data } = await fetchUserInfoBatch([userName]);
+  onlineUsers.value = [...onlineUsers.value, ...data!]
+})
+
+Bus.on('onlineUsers-leave', async (userName: string) => {
+  onlineUsers.value = onlineUsers.value?.filter(userInfo => userInfo.userName !== userName)
+})
+
+watch(onlineUsers, (newValue, oldValue) => {
+  Bus.emit('sync-onlineUsers-count', onlineUsers.value.length)
 })
 
 const roomList = ref<Array<ApiRoomManagement.roomInfo>>([])

@@ -35,6 +35,7 @@ export default {
     'online': '在线用户（{count}）',
     'createRoom': '创建房间',
     'room': '房间|房间',
+    'style': '主题',
     'message': '信息'
   },
   'email': {
@@ -204,8 +205,8 @@ export default {
     'pricingPage': '定价页面',
     'flowable': '流程管理',
     'flowable-design': '流程设计',
-    'form-list':'表单',
-    'form-design':'表单设计'
+    'form-list': '表单',
+    'form-design': '表单设计'
   },
   '$vuetify': {
     'badge': '徽章',

@@ -9,4 +9,9 @@ export function bindWyyUser(wyyUserId: string) {
   });
 }
 
+//批量获取用户信息
+export function fetchUserInfoBatch(userNames: string[]) {
+  return request.post<ApiAuth.UserInfo[]>("/users/fetchUsersInfoBatch", userNames);
+}
+
 

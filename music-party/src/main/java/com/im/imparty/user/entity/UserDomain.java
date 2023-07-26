@@ -36,4 +36,7 @@ public class UserDomain extends BaseDomain<UserDomain> {
     @TableField("wyy_user_id")
     private String wyyUserId;
 
+    @TableField("user_avatar_url")
+    private String userAvatarUrl;
+
 }
