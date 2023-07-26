@@ -34,30 +34,30 @@ public class PlayTimer {
             task.cancel();
             timer.purge();
         }
+        if (this.stopWatch == null) {
+            this.stopWatch = new TimeWatch();
+        }
+        this.stopWatch.init();
+        this.stopWatch.start();
         task = new PlayTask();
         timer.schedule(task, 5000, 1000);
     }
 
     public void play() {
         if (!stopWatch.isRunning()) {
-            stopWatch.start();
             initTimer();
         }
     }
 
     public void play(long startTime) {
         if (startTime <= totalTime) {
-            this.startTime = startTime;
-            this.stopWatch = new TimeWatch();
-            this.stopWatch.start();
             initTimer();
+            this.startTime = startTime;
         }
     }
 
     public void playSong(long totalTime) {
         initTimer();
-        this.stopWatch.init();
-        this.stopWatch.start();
         this.totalTime = totalTime;
     }
 

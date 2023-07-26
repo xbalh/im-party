@@ -22,6 +22,7 @@ import javax.websocket.Session;
 import java.security.Principal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -35,7 +36,7 @@ public class WebsocketSessionManager {
 
     private static AtomicInteger count = new AtomicInteger();
 
-    private static final CopyOnWriteArrayList<PlaySongInfo> songList = new CopyOnWriteArrayList();
+    private static final ConcurrentLinkedQueue<PlaySongInfo> songList = new ConcurrentLinkedQueue();
 
     private PlaySongInfo currentSongInfo = null;
 
@@ -73,7 +74,7 @@ public class WebsocketSessionManager {
         // count.incrementAndGet();
         websocketSession.sendMessage(MsgJSON.songListChange(songList, this.roomId).toJSONString());
         broadcastMsg(MsgJSON.userJoin(name, this.roomId).toJSONString());
-        if (currentSongInfo != null && playTimer.isRunning()) {
+        if (currentSongInfo != null && playTimer != null && playTimer.isRunning()) {
             websocketSession.sendMessage(MsgJSON.play(currentSongInfo, playTimer.getCurrentTime()).toJSONString());
         }
         return true;
@@ -130,7 +131,7 @@ public class WebsocketSessionManager {
         return Collections.emptyList();
     }
 
-    public PlayTimer init(List<PlaySongInfo> songList) {
+    public PlayTimer init(Collection<PlaySongInfo> songList) {
         initSongList(songList);
         PlaySongInfo playSongInfo1 = nextSong();
         if (playSongInfo1 == null) {
@@ -147,16 +148,19 @@ public class WebsocketSessionManager {
         MusicPlayerRecordService musicPlayerRecordService = SpringFactoryUtils.getBean(MusicPlayerRecordService.class);
         this.playTimer = new PlayTimer(playSongInfo1.getTotalTime(), (o) -> {
             if (o) {
+                PlaySongInfo playSongInfo = nextSong();
                 if (currentSongInfo != null) {
-                    songList.removeAll(songList.stream().filter(item -> currentSongInfo.getSongId().equals(item.getSongId())).collect(Collectors.toList()));
+                    List<PlaySongInfo> collect = songList.stream().filter(item -> !currentSongInfo.getSongId().equals(item.getSongId())).collect(Collectors.toList());
+                    songList.clear();
+                    songList.addAll(collect);
                     // songList.remove(currentSongInfo);
                     musicPlayerRecordService.updateMusicPlayStatus(ImmutableList.of(currentSongInfo.getSongId()), this.roomId);
                     broadcastMsg(MsgJSON.songListChange(songList, roomId).toJSONString());
                 }
-                PlaySongInfo playSongInfo = nextSong();
                 if (playSongInfo == null) {
                     currentSongInfo = null;
                     playTimer.over();
+                    log.info("房间号：{}，播放完毕！", roomId);
                     return null;
                 }
                 currentSongInfo = playSongInfo;
@@ -169,6 +173,7 @@ public class WebsocketSessionManager {
 
             } else {
                 log.info("房间号：{}，当前播放信息：{},播放时间：{}, 总共时间：{}", roomId, currentSongInfo.getSongName(), playTimer.getCurrentTime(), playTimer.getTotalTime());
+                log.info("房间号：{}， 播放列表: {}", roomId, songList.stream().map(PlaySongInfo::getSongName).collect(Collectors.joining("|")));
                 // broadcastMsg(MsgJSON.currentTime(getCurrentTime()).toJSONString());
             }
             return null;
@@ -186,7 +191,6 @@ public class WebsocketSessionManager {
     }
 
     public void play(String songId, Integer roomId) {
-        this.roomId = roomId;
         if (this.playTimer == null) {
             init(songList);
         }
@@ -194,6 +198,14 @@ public class WebsocketSessionManager {
                 () -> new ServiceException("歌曲不存在！")
         );
         playTimer.playSong(playSongInfo.getTotalTime());
+
+        JSONObject songDetail1 = SpringFactoryUtils.getBean(MusicApi.class).getSongDetail(ImmutableList.of(playSongInfo.getSongId()));
+        JSONArray songs1 = songDetail1.getJSONArray("songs");
+        JSONObject song1 = songs1.getJSONObject(0);
+        playSongInfo.setSongDetailInfo(song1);
+        playSongInfo.setUrl(SongUtils.getUrlBySongId(songId, playSongInfo.getSongQuality()));
+
+        broadcastMsg(MsgJSON.play(playSongInfo, 0L).toJSONString());
         this.currentSongInfo = playSongInfo;
     }
 
@@ -201,17 +213,20 @@ public class WebsocketSessionManager {
         return playTimer.getCurrentTime();
     }
 
-    public void initSongList(List<PlaySongInfo> dataList) {
+    public void initSongList(Collection<PlaySongInfo> dataList) {
+        if (dataList == songList) {
+            return;
+        }
         songList.clear();
         songList.addAll(dataList);
     }
 
     public void addSong(PlaySongInfo songInfo) {
         songList.add(songInfo);
-        songList.sort(Comparator.comparingInt(PlaySongInfo::getSort));
+        // ssongList.sort(Comparator.comparingInt(PlaySongInfo::getSort));
         broadcastMsg(MsgJSON.songListChange(songList, roomId).toJSONString());
         if (currentSongInfo == null) {
-            play(0, BeanUtil.copyToList(songList, PlaySongInfo.class), roomId);
+            play(songInfo.getSongId(), roomId);
         }
     }
 
@@ -224,7 +239,7 @@ public class WebsocketSessionManager {
         }
         PlaySongInfo playSongInfo = null;
         if (currentSongInfo == null) {
-            playSongInfo = songList.get(0);
+            playSongInfo = songList.element();
         }
         if (playSongInfo == null) {
             Iterator<PlaySongInfo> iterator = songList.iterator();
@@ -239,7 +254,11 @@ public class WebsocketSessionManager {
             }
         }
         if (playSongInfo == null) {
-            return null;
+            if (songList.size() > 1) {
+                playSongInfo = songList.element();
+            } else {
+                return null;
+            }
         }
         playSongInfo.setUrl(SongUtils.getUrlBySongId(playSongInfo.getSongId(), playSongInfo.getSongQuality()));
         return playSongInfo;

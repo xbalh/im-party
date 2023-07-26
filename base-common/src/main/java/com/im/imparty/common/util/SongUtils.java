@@ -4,9 +4,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.ImmutableList;
 import com.im.imparty.api.music.MusicApi;
 import com.im.imparty.common.enums.SongQualityEnum;
+import com.im.imparty.common.exception.ServiceException;
 import com.im.imparty.spring.util.SpringFactoryUtils;
 
 import java.util.LinkedHashMap;
+import java.util.Optional;
 
 public class SongUtils {
 

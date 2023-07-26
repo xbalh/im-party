@@ -1,5 +1,7 @@
 package com.im.imparty.controller;
 
+import com.im.imparty.common.exception.CustomException;
+import com.im.imparty.common.util.SongUtils;
 import com.im.imparty.common.vo.PlaySongInfo;
 import com.im.imparty.music.playerlist.entity.MusicPlayerRecordDomain;
 import com.im.imparty.music.playerlist.service.MusicPlayerRecordService;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Optional;
 
 @Api("房间控制")
 @RestController
@@ -50,6 +53,8 @@ public class MusicRoomController {
     @PostMapping("/addMusic/{roomId}")
     public BaseResult addMusic(@PathVariable("roomId") Integer roomId, @RequestParam("songId") String songId) {
         MusicPlayerRecordDomain data = musicPlayerRecordService.addMusic(roomId, songId, SecurityContextHolder.getContext().getAuthentication().getName());
+
+        Optional.ofNullable(SongUtils.getUrlBySongId(data.getSongId(), data.getSongQuality())).orElseThrow(() -> new CustomException("这首个没法听，换一首吧"));
 
         if (WebSocketServer.roomMap.get(roomId) != null) {
             PlaySongInfo songInfo = new PlaySongInfo();
