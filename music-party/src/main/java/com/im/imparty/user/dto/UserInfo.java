@@ -20,5 +20,7 @@ public class  UserInfo implements Serializable {
 
     private String wyyUserId;
 
+    private String userAvatarUrl;
+
 
 }

@@ -50,16 +50,16 @@ export function useRouterPush(inSetup = true) {
 
   function toLoginModule(module: EnumType.LoginModuleKey) {
     const { query } = route.value;
-    routerPush({ name: routeName('login'), params: { module }, query});
+    routerPush({ name: routeName('login'), params: { module }, query });
   }
 
   function toLoginRedirect() {
     const { query } = route.value;
-    if (query?.redirect) {
-      routerPush(query.redirect as string);
-    } else {
-      toHome();
-    }
+    // if (query?.redirect) {
+    //   routerPush(query.redirect as string);
+    // } else {
+    toHome();
+    // }
   }
 
   return {

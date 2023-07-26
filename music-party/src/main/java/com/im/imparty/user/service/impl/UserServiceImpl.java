@@ -1,5 +1,7 @@
 package com.im.imparty.user.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.im.imparty.user.dto.UserInfo;
 import com.im.imparty.user.dto.UserInfoDetail;
@@ -11,6 +13,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -54,6 +57,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDomain> impleme
     public void updateWyyBind(String userName, String wyyUserId) {
         lambdaUpdate().eq(UserDomain::getUserName, userName).eq(UserDomain::getValidSts, "A")
                 .set(UserDomain::getWyyUserId, wyyUserId).update();
+    }
+
+    @Override
+    public List<UserInfo> getUserInfoBatchByUserNames(List<String> userNames) {
+        if (CollectionUtil.isEmpty(userNames)) {
+            return new ArrayList<>();
+        }
+        List<UserDomain> userDomains = lambdaQuery()
+                .eq(UserDomain::getValidSts, "A")
+                .in(UserDomain::getUserName, userNames)
+                .list();
+
+        return BeanUtil.copyToList(userDomains, UserInfo.class);
     }
 
 }

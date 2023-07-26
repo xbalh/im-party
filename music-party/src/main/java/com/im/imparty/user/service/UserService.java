@@ -5,6 +5,8 @@ import com.im.imparty.user.dto.UserInfo;
 import com.im.imparty.user.dto.UserInfoDetail;
 import com.im.imparty.user.entity.UserDomain;
 
+import java.util.List;
+
 public interface UserService extends IService<UserDomain> {
     UserInfoDetail getUserDetail(String userName);
 
@@ -20,4 +22,6 @@ public interface UserService extends IService<UserDomain> {
     String getMusicCookie(String userName);
 
     void updateWyyBind(String userName, String wyyUserId);
+
+    List<UserInfo> getUserInfoBatchByUserNames(List<String> userNames);
 }

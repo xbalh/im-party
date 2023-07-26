@@ -2,15 +2,18 @@
   <div>
     <div>
       <!-- channel toolbar -->
-      <v-toolbar flat height="64" color="surface">
+      <v-toolbar flat floating height="64" color="surface" class="chatToolbar">
         <v-app-bar-nav-icon class="hidden-lg-and-up" @click="$emit('toggle-menu')"></v-app-bar-nav-icon>
-        <v-toolbar-title>
+        <v-toolbar-title class="chatToolbarTitle">
           {{ roomName }}
         </v-toolbar-title>
+        <span>({{ currentOnlineUserCount }}) </span>
         <v-spacer></v-spacer>
-        <v-btn class="mx-1" icon @click.stop="$emit('toggle-usersDrawer')">
-          <v-icon>mdi-account-group-outline</v-icon>
-        </v-btn>
+        <div>
+          <v-btn class="mx-1" icon @click.stop="$emit('toggle-usersDrawer')">
+            <v-icon>mdi-account-group-outline</v-icon>
+          </v-btn>
+        </div>
       </v-toolbar>
       <v-divider></v-divider>
       <!-- channel messages -->
@@ -66,18 +69,7 @@ const messagesRef = ref<HTMLDivElement>()
 const inputMessage = ref<HTMLDivElement>()
 const { wsUrl } = getServiceEnvConfig(import.meta.env);
 const leavedCurrentRoom = ref(false)
-const messages = ref<Array<ApiChatManagement.message>>([
-  {
-    id: '1',
-    text: "这句话是用来测试的",
-    timestamp: "2022-12-13 15:13:10",
-    user: {
-      avatar: 'avatar1',
-      id: '1',
-      name: 'test1'
-    }
-  }
-])
+const messages = ref<Array<ApiChatManagement.message>>([])
 defineEmits(['toggle-menu', 'toggle-usersDrawer'])
 
 const currentHeight = ref<Number>()
@@ -124,28 +116,41 @@ Bus.on('join-room-success', (flag: boolean) => {
 /**建立WS连接，并订阅 */
 const connectWS = (roomNo: string) => {
   ws.value = new Ws(wsUrl + `/musicParty/ws/${roomNo}`, localStg.get('token') as string)
-  ws.value.subscribe('/music/chat', chatHandle)
+  ws.value.subscribe(`/music/chat/${roomNo}`, chatHandle)
   ws.value.subscribe('/music/playControl/nextPlay', nextPlayHandle)
   ws.value.subscribe('/music/playControl/play', playHandle)
   ws.value.subscribe(`/music/room/user-join/${roomNo}`, userJoinHandle)
   ws.value.subscribe(`/music/room/user-leave/${roomNo}`, userLeaveHandle)
   ws.value.subscribe(`/music/room/playlist-change/${roomNo}`, playlistChangeHandle)
+  ws.value.subscribe(`/music/room/current-users/${roomNo}`, loadCurrentUsersHandle)
 }
 
 /* 用户加入房间处理 */
 const userJoinHandle = (userName: object) => {
   console.log("用户：" + String(userName) + "加入了")
+  Bus.emit('onlineUsers-add', userName)
+
 }
 
 /* 用户离开房间处理 */
 const userLeaveHandle = (userName: object) => {
   console.log("用户：" + String(userName) + "离开了")
+  Bus.emit('onlineUsers-leave', userName)
+}
+
+const loadCurrentUsersHandle = (userNameList: string[]) => {
+  Bus.emit('onlineUsers-init', userNameList)
 }
 
 /** 歌曲列表变动处理 */
 const playlistChangeHandle = (songList: Music.SongInfo[]) => {
   Bus.emit('playlist-change', songList);
 }
+
+const currentOnlineUserCount = ref(0)
+Bus.on('sync-onlineUsers-count', (count: number) => {
+  currentOnlineUserCount.value = count
+})
 
 /**聊天处理 */
 const chatHandle = (data: Chat.Msg) => {
@@ -213,12 +218,12 @@ const sendMessage = () => {
     timestamp: new Date().toLocaleString(),
     user: {
       id: userInfo.value.userId,
-      avatar: userInfo.value.userAvatar ?? '',
+      avatar: userInfo.value.userAvatarUrl ?? '',
       name: userInfo.value.userName
     }
   })
   const data = {
-    method: "/music/chat",
+    method: `/music/chat/${roomNo}`,
     data: {
       msg: input.value
     }
@@ -320,5 +325,9 @@ onBeforeRouteUpdate((to, from, next) => {
     position: absolute;
     bottom: 12px;
   }
+}
+
+.chatToolbar :deep(.v-toolbar-title) {
+  flex: 1 1 50% !important;
 }
 </style>

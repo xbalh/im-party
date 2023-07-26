@@ -73,6 +73,8 @@ public class WebsocketSessionManager {
         // count.incrementAndGet();
         websocketSession.sendMessage(MsgJSON.songListChange(songList, this.roomId).toJSONString());
         broadcastMsg(MsgJSON.userJoin(name, this.roomId).toJSONString());
+        List<String> currentUserNameList = new ArrayList<>(socketStore.keySet());
+        websocketSession.sendMessage(MsgJSON.currentUserList(currentUserNameList, this.roomId).toJSONString());
         if (currentSongInfo != null && playTimer.isRunning()) {
             websocketSession.sendMessage(MsgJSON.play(currentSongInfo, playTimer.getCurrentTime()).toJSONString());
         }

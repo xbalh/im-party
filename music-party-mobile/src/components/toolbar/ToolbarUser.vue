@@ -4,8 +4,8 @@
       <v-btn icon size="small" class="elevation-2" v-bind="props">
 
         <v-badge color="success" dot bordered>
-          <v-avatar size="40" :class="{ 'bg-grey': !userInfo.userAvatar }">
-            <svg-icon v-if="!!userInfo.userAvatar" :name="userInfo.userAvatar"></svg-icon>
+          <v-avatar size="40" :class="{ 'bg-grey': !userInfo.userAvatarUrl }">
+            <v-img v-if="!!userInfo.userAvatarUrl" :src="userInfo.userAvatarUrl"></v-img>
           </v-avatar>
         </v-badge>
       </v-btn>

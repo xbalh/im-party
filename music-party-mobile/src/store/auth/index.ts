@@ -81,6 +81,7 @@ export const useAuthStore = defineStore('auth-store', {
           userName: data.userName,
           wyyUserId: data.wyyUserId,
           nickName: data.nickName,
+          userAvatarUrl: data.userAvatarUrl,
           userRole: 'admin'
         };
 

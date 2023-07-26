@@ -211,7 +211,7 @@ const playOrPauseMusic = () => {
 }
 
 
-Bus.on('change-room', (flag: boolean)=>{
+Bus.on('change-room', (flag: boolean) => {
   playList.value = []
   currentProgress.value = 0
   isPlay.value = false

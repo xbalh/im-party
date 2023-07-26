@@ -66,7 +66,7 @@ const apis: MockMethod[] = [
         userId: '',
         userName: '',
         userRole: 'user',
-        userAvatar: 'avatar' + mock({
+        userAvatarUrl: 'avatar' + mock({
           "number|1-20": 2
         })['number']
 
