@@ -25,9 +25,9 @@ public class MusicPlayController {
      * @param session
      * @param msg
      */
-    @ActionMethod("/chat/{roomId}")
-    public void receiveChatMsg(WebsocketSessionImpl session, String msg, @PathVariable String roomId) throws IOException {
-        MsgData res = new MsgData("/music/chat/"+ roomId);
+    @ActionMethod("/chat")
+    public void receiveChatMsg(WebsocketSessionImpl session, String msg) throws IOException {
+        MsgData res = new MsgData("/music/chat");
         res.putData("from", session.getUserName());
         res.putData("msg", msg);
         res.putData("timestamp", System.currentTimeMillis());

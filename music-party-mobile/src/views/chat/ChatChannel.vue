@@ -116,7 +116,7 @@ Bus.on('join-room-success', (flag: boolean) => {
 /**建立WS连接，并订阅 */
 const connectWS = (roomNo: string) => {
   ws.value = new Ws(wsUrl + `/musicParty/ws/${roomNo}`, localStg.get('token') as string)
-  ws.value.subscribe(`/music/chat/${roomNo}`, chatHandle)
+  ws.value.subscribe(`/music/chat`, chatHandle)
   ws.value.subscribe('/music/playControl/nextPlay', nextPlayHandle)
   ws.value.subscribe('/music/playControl/play', playHandle)
   ws.value.subscribe(`/music/room/user-join/${roomNo}`, userJoinHandle)
@@ -223,7 +223,7 @@ const sendMessage = () => {
     }
   })
   const data = {
-    method: `/music/chat/${roomNo}`,
+    method: `/music/chat`,
     data: {
       msg: input.value
     }
