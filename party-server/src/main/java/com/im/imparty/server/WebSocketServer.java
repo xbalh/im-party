@@ -50,12 +50,8 @@ public class WebSocketServer implements ApplicationContextAware {
             websocketSessionManager.addUser(session, roomId);
             roomMap.put(roomId, websocketSessionManager);
         }//加入set中
-
         try {
-            WebsocketSessionManager sessionManager = roomMap.get(roomId);
-            WebsocketSessionImpl sessionBySession = sessionManager.getSessionBySession(session);
-            sessionBySession.sendMessage("conn_success");
-            log.info("有新窗口开始监听:" + sessionBySession.getUserName() + ",当前在线人数为:" + sessionManager.count());
+            log.info("房间号：{}, 人数{}", roomId, roomMap.get(roomId).count());
         } catch (Exception e) {
             log.error("websocket IO Exception");
         }
@@ -70,9 +66,7 @@ public class WebSocketServer implements ApplicationContextAware {
         WebsocketSessionManager sessionManager = roomMap.get(roomId);
         sessionManager.close(session);
         //断开连接情况下，更新主板占用情况为释放
-        log.info("释放的userName为："+userName);
-        //这里写你 释放的时候，要处理的业务
-        log.info("有一连接关闭！当前在线人数为" + sessionManager.count());
+        log.info("房间号：{}, 释放的userName为：{}, 人数{}", roomId, userName, roomMap.get(roomId).count());
 
     }
 
@@ -83,7 +77,7 @@ public class WebSocketServer implements ApplicationContextAware {
     @OnMessage
     public void onMessage(String message, Session session) {
         String userName = SessionUtils.getUserName(session);
-        log.info("收到来自窗口" + userName + "的信息:" + message);
+        log.info("房间号：{}, 收到来自:{} 的信息:{}", roomId, userName, message);
         //群发消息
         try {
             WebsocketSessionManager sessionManager = roomMap.get(roomId);

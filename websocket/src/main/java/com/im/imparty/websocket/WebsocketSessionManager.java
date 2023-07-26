@@ -30,13 +30,13 @@ import java.util.stream.Collectors;
 @Slf4j
 public class WebsocketSessionManager {
 
-    private static ConcurrentHashMap<String, WebsocketSessionImpl> socketStore = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, WebsocketSessionImpl> socketStore = new ConcurrentHashMap<>();
 
-    private static ConcurrentHashMap<String, ConcurrentHashMap<String, WebsocketSessionImpl>> socketStoreByRole = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, ConcurrentHashMap<String, WebsocketSessionImpl>> socketStoreByRole = new ConcurrentHashMap<>();
 
     private static AtomicInteger count = new AtomicInteger();
 
-    private static final ConcurrentLinkedQueue<PlaySongInfo> songList = new ConcurrentLinkedQueue();
+    private final ConcurrentLinkedQueue<PlaySongInfo> songList = new ConcurrentLinkedQueue();
 
     private PlaySongInfo currentSongInfo = null;
 
@@ -97,7 +97,7 @@ public class WebsocketSessionManager {
                 }
             }
             sessionImpl.close();
-            count.decrementAndGet();
+            // count.decrementAndGet();
             broadcastMsg(MsgJSON.userLeave(userName, roomId).toJSONString());
             return true;
         }
