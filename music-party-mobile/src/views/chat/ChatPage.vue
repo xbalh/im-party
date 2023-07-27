@@ -74,7 +74,7 @@
                 autofocus @keyup.enter="addChannel()"></v-text-field>
             </div>
             <v-card-actions class="pa-2">
-              <v-spacer></v-spacer>
+              <v-spacer></v-spacer> 
               <v-btn @click="showCreateDialog = false">{{ $t('common.cancel') }}</v-btn>
               <v-btn :loading="isLoadingAdd" :disabled="newRoomStyle.length === 0 || newRoomName.length === 0"
                 color="success" @click="addChannel()">

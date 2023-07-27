@@ -2,17 +2,22 @@ package com.im.imparty.user.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.im.imparty.music.service.MusicSongService;
 import com.im.imparty.user.dto.UserInfo;
 import com.im.imparty.user.dto.UserInfoDetail;
 import com.im.imparty.user.entity.UserDomain;
 import com.im.imparty.user.mapper.UserMapper;
 import com.im.imparty.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +25,8 @@ import java.util.List;
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, UserDomain> implements UserService {
 
+    @Resource
+    private MusicSongService musicSongService;
 
     @Cacheable(cacheNames = "userInfo", key = "#userName")
     @Override
@@ -36,6 +43,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDomain> impleme
         userInfo.setUserName(detail.getUsername());
         userInfo.setNickName(detail.getNickName());
         userInfo.setWyyUserId(detail.getWyyUserId());
+        userInfo.setUserAvatarUrl(detail.getUserAvatarUrl());
         return userInfo;
     }
 
@@ -55,8 +63,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDomain> impleme
 
     @Override
     public void updateWyyBind(String userName, String wyyUserId) {
-        lambdaUpdate().eq(UserDomain::getUserName, userName).eq(UserDomain::getValidSts, "A")
-                .set(UserDomain::getWyyUserId, wyyUserId).update();
+        UserInfo userInfo = getUserInfo(userName);
+        LambdaUpdateChainWrapper<UserDomain> chainWrapper = lambdaUpdate().eq(UserDomain::getUserName, userName).eq(UserDomain::getValidSts, "A")
+                .set(UserDomain::getWyyUserId, wyyUserId);
+        if(StringUtils.isBlank(userInfo.getUserAvatarUrl())){
+            JSONObject userDetailInfo = musicSongService.getUserDetailInfo(wyyUserId);
+            if(userDetailInfo.containsKey("avatarUrl") && StringUtils.isNotBlank((String)userDetailInfo.get("avatarUrl"))){
+                chainWrapper.set(UserDomain::getUserAvatarUrl, (String)userDetailInfo.get("avatarUrl"));
+            }
+        }
+        chainWrapper.update();
     }
 
     @Override

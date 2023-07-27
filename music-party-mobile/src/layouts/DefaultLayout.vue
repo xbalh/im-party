@@ -9,6 +9,17 @@
       <div class="overline text-grey">{{ version }}</div>
     </div>
 
+
+    <div class="mx-auto text-center">
+      <v-avatar color="grey">
+        <v-img :src="userInfo.userAvatarUrl"></v-img>
+      </v-avatar>
+      <h3>{{ userInfo.nickName }}</h3>
+      <p class="text-caption mt-1">
+        {{ userInfo.userName }}
+      </p>
+    </div>
+
     <!-- Navigation menu -->
     <div class="py-1">
       <main-menu :menu="menus" />
@@ -146,6 +157,8 @@ import { computed } from 'vue'
 import { useAppInfo, useRouterPush } from "@/composables";
 import Bus from "../utils/common/Bus";
 import { useResizeObserver } from "@vueuse/core";
+const auth = useAuthStore();
+const { userInfo } = storeToRefs(auth)
 
 const theme = useThemeStore()
 const drawer = ref()

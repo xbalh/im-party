@@ -20,7 +20,8 @@ public interface UserMapper extends BaseMapper<UserDomain> {
             "select u.username userName, u.password password, " +
                     "u.valid_sts validSts, u.salt, u.salt_expires_time saltExpiresTime, " +
                     "u.nick_name nickName, " +
-                    "u.wyy_user_id wyyUserId " +
+                    "u.wyy_user_id wyyUserId, " +
+                    "u.user_avatar_url " +
                     "from user u " +
                     "where u.username = #{userName}"
     )
