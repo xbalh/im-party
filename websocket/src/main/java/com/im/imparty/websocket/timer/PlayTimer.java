@@ -81,6 +81,9 @@ public class PlayTimer {
     }
 
     public long getCurrentTime() {
+        if(stopWatch == null){
+            return -1;
+        }
         return startTime + stopWatch.getTotalTime();
     }
 

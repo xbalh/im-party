@@ -1,11 +1,13 @@
 import { useEventListener } from '@vueuse/core';
-import {useThemeStore} from "@/store";
+import {useThemeStore, useUserSettingStore} from "@/store";
 
 
 export function useGlobalEvents() {
-  const appConifg= useThemeStore();
+  const appConfig= useThemeStore();
+  const userConfig= useUserSettingStore();
 
   useEventListener(window, 'beforeunload', () => {
-    appConifg.cacheThemeSettings();
+    appConfig.cacheThemeSettings();
+    userConfig.cacheUserSettings();
   });
 }

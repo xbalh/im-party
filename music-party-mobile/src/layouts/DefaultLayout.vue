@@ -113,19 +113,27 @@
                   <v-icon size="x-large">mdi-playlist-play</v-icon>
                 </v-btn>
               </template>
-              <v-slide-y-transition key="playList" group tag="div">
-                <v-list v-model="playList" width="350" class="playlist" max-height="400">
-                  <v-list-subheader>当前歌曲列表({{ playList ? playList.length : 0 }})</v-list-subheader>
-                  <v-list-item v-for="(songInfo, index) in playList" :key="songInfo.songId" lines="two"
-                    :title="`${songInfo.songName} - ${songInfo.singer}`" :subtitle="`点歌人：${songInfo.from}`">
-                    <template v-slot:prepend>
-                      <span>{{ index + 1 }}</span>
-                    </template>
-                  </v-list-item>
-                </v-list>
-              </v-slide-y-transition>
+              <v-card>
+                <v-slide-y-transition key="playList" group tag="div">
+                  <v-list v-model="playList" width="350" class="playlist" max-height="400">
+                    <v-list-subheader>当前歌曲列表({{ playList ? playList.length : 0 }})</v-list-subheader>
+                    <v-list-item v-if="playList?.length === 0">
+                      <span>当前歌曲列表为空，快去点歌吧！</span>
+                    </v-list-item>
+                    <v-list-item v-for="(songInfo, index) in playList" :key="songInfo.songId" lines="two"
+                      :title="`${songInfo.songName} - ${songInfo.singer}`" :subtitle="`点歌人：${songInfo.from}`"
+                      :class="index === 0 ? 'hightlight_grey' : ''">
+                      <template v-slot:prepend>
+                        <span>{{ index + 1 }}</span>
+                      </template>
+                      <template v-slot:append v-if="index === 0">
+                        <v-icon icon="mdi-signal-cellular-3" color="red"></v-icon>
+                      </template>
+                    </v-list-item>
+                  </v-list>
+                </v-slide-y-transition>
+              </v-card>
             </v-menu>
-
           </div>
         </div>
         <v-divider />
@@ -157,6 +165,7 @@ import { computed } from 'vue'
 import { useAppInfo, useRouterPush } from "@/composables";
 import Bus from "../utils/common/Bus";
 import { useResizeObserver } from "@vueuse/core";
+import { useRoute } from 'vue-router'
 const auth = useAuthStore();
 const { userInfo } = storeToRefs(auth)
 
@@ -401,5 +410,9 @@ watch(router.currentRoute, (newValue, oldValue) => {
 .animate__animated.animate__slideInUp,
 .animate__animated.animate__slideOutDown {
   --animate-duration: 0.3s;
+}
+
+.hightlight_grey {
+  background-color: rgb(230, 230, 230);
 }
 </style>

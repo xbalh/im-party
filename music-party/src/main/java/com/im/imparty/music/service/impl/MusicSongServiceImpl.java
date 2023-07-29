@@ -49,9 +49,7 @@ public class MusicSongServiceImpl implements MusicSongService {
     @Override
     public JSONObject getUserDetailInfo(String userId) {
         JSONObject search = musicApi.getUserDetailInfo(userId);
-        JSONArray result = search.getJSONArray("songs");
-
-        return null;
+        return search;
     }
 
 }

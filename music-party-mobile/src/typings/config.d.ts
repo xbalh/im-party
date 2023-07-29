@@ -2,6 +2,7 @@ interface Config {
   theme: ThemeConfig.Config,
   locales: any
   currency: CurrencyConfig.Config,
+  userConfig: UserConfig.Config
 }
 
 declare namespace CurrencyConfig {
@@ -53,6 +54,15 @@ declare namespace ThemeConfig {
 
     // light theme colors
     light: import('vuetify').ThemeDefinition,
+  }
+}
+
+declare namespace UserConfig {
+  interface Config {
+
+    //进入房间后是否自动播放
+    autoPlay: boolean,
+
   }
 }
 

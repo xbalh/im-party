@@ -74,7 +74,7 @@
                 autofocus @keyup.enter="addChannel()"></v-text-field>
             </div>
             <v-card-actions class="pa-2">
-              <v-spacer></v-spacer> 
+              <v-spacer></v-spacer>
               <v-btn @click="showCreateDialog = false">{{ $t('common.cancel') }}</v-btn>
               <v-btn :loading="isLoadingAdd" :disabled="newRoomStyle.length === 0 || newRoomName.length === 0"
                 color="success" @click="addChannel()">
@@ -244,19 +244,28 @@ const usersDrawer = ref()
 const onlineUsers = ref<Array<ApiAuth.UserInfo>>([])
 Bus.on('onlineUsers-init', async (userNameList: string[]) => {
   // onlineUsers.value = users
+  const onlineUserNameList = onlineUsers.value.map(user => user.userName)
+  userNameList = userNameList.filter(username => !onlineUserNameList.includes(username))
   const { data } = await fetchUserInfoBatch(userNameList);
   if (data) {
-    onlineUsers.value = data
+    const onlineUserNameList = onlineUsers.value.map(user => user.userName)
+    onlineUsers.value = [...onlineUsers.value, ...data.filter(item => !onlineUserNameList.includes(item.userName))]
   }
 })
 
 Bus.on('onlineUsers-add', async (userName: string) => {
+  if (onlineUsers.value.find(user => user.userName === userName)) return
   const { data } = await fetchUserInfoBatch([userName]);
+  if (onlineUsers.value.find(user => user.userName === userName)) return
   onlineUsers.value = [...onlineUsers.value, ...data!]
 })
 
-Bus.on('onlineUsers-leave', async (userName: string) => {
+Bus.on('onlineUsers-leave', (userName: string) => {
   onlineUsers.value = onlineUsers.value?.filter(userInfo => userInfo.userName !== userName)
+})
+
+Bus.on('change-room', (flag: boolean) => {
+  onlineUsers.value = []
 })
 
 watch(onlineUsers, (newValue, oldValue) => {

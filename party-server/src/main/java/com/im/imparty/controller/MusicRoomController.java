@@ -6,6 +6,8 @@ import com.im.imparty.common.vo.PlaySongInfo;
 import com.im.imparty.music.playerlist.entity.MusicPlayerRecordDomain;
 import com.im.imparty.music.playerlist.service.MusicPlayerRecordService;
 import com.im.imparty.server.WebSocketServer;
+import com.im.imparty.user.dto.UserInfo;
+import com.im.imparty.user.service.UserService;
 import com.im.imparty.web.vo.BaseResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -26,6 +28,9 @@ public class MusicRoomController {
 
     @Resource
     private MusicPlayerRecordService playerRecordService;
+
+    @Resource
+    private UserService userService;
 
     @ApiOperation("播放")
     @GetMapping("/play")
@@ -64,7 +69,8 @@ public class MusicRoomController {
             songInfo.setSinger(data.getSinger());
             songInfo.setSort(data.getSort());
             songInfo.setTotalTime(data.getTotalTime());
-            songInfo.setFrom(data.getCrtUsr());
+            UserInfo userInfo = userService.getUserInfo(data.getCrtUsr());
+            songInfo.setFrom(userInfo.getNickName() + "(" + userInfo.getUserName() + ")");
             WebSocketServer.roomMap.get(roomId).addSong(songInfo);
         }
         return BaseResult.ok();

@@ -19,7 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -66,10 +68,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDomain> impleme
         UserInfo userInfo = getUserInfo(userName);
         LambdaUpdateChainWrapper<UserDomain> chainWrapper = lambdaUpdate().eq(UserDomain::getUserName, userName).eq(UserDomain::getValidSts, "A")
                 .set(UserDomain::getWyyUserId, wyyUserId);
-        if(StringUtils.isBlank(userInfo.getUserAvatarUrl())){
+        if (StringUtils.isBlank(userInfo.getUserAvatarUrl())) {
             JSONObject userDetailInfo = musicSongService.getUserDetailInfo(wyyUserId);
-            if(userDetailInfo.containsKey("avatarUrl") && StringUtils.isNotBlank((String)userDetailInfo.get("avatarUrl"))){
-                chainWrapper.set(UserDomain::getUserAvatarUrl, (String)userDetailInfo.get("avatarUrl"));
+            if (userDetailInfo.containsKey("profile")) {
+                Map profile = (Map) userDetailInfo.get("profile");
+                chainWrapper.set(UserDomain::getUserAvatarUrl, (String) profile.get("avatarUrl"));
             }
         }
         chainWrapper.update();
