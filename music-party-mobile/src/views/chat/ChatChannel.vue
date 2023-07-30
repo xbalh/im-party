@@ -65,7 +65,7 @@ const auth = useAuthStore();
 const { userInfo } = storeToRefs(auth)
 const messagesRef = ref<HTMLDivElement>()
 const inputMessage = ref<HTMLDivElement>()
-const { wsUrl } = getServiceEnvConfig(import.meta.env);
+const { wsUrl, wsUrlPattern } = getServiceEnvConfig(import.meta.env);
 const leavedCurrentRoom = ref(false)
 const messages = ref<Array<ApiChatManagement.message>>([])
 defineEmits(['toggle-menu', 'toggle-usersDrawer'])
@@ -113,7 +113,7 @@ Bus.on('join-room-success', (flag: boolean) => {
 
 /**建立WS连接，并订阅 */
 const connectWS = (roomNo: string) => {
-  ws.value = new Ws(wsUrl + `/musicParty/ws/${roomNo}`, localStg.get('token') as string, roomNo)
+  ws.value = new Ws(wsUrl + wsUrlPattern + `/musicParty/ws/${roomNo}`, localStg.get('token') as string, roomNo)
   ws.value.subscribe(`/music/chat`, chatHandle)
   ws.value.subscribe('/music/playControl/nextPlay', nextPlayHandle)
   ws.value.subscribe('/music/playControl/play', playHandle)

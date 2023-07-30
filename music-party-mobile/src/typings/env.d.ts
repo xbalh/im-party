@@ -2,10 +2,11 @@ type ServiceEnvType = 'dev' | 'test' | 'prod';
 
 interface ServiceEnvConfig {
   url: string;
-  urlPattern: '/api';
+  urlPattern: string;
   secondUrl: string;
   secondUrlPattern: '/second-url-pattern';
   wsUrl: string;
+  wsUrlPattern: string;
 }
 
 interface ImportMetaEnv {

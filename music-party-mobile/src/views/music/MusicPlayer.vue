@@ -146,6 +146,7 @@ Bus.on('change-room', (flag: boolean) => {
   currentSong.value = {}
   isPlay.value = false
   player.value?.pause()
+  manualPause.value = false
 })
 
 

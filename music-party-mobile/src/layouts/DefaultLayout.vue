@@ -165,7 +165,6 @@ import { computed } from 'vue'
 import { useAppInfo, useRouterPush } from "@/composables";
 import Bus from "../utils/common/Bus";
 import { useResizeObserver } from "@vueuse/core";
-import { useRoute } from 'vue-router'
 const auth = useAuthStore();
 const { userInfo } = storeToRefs(auth)
 
@@ -243,6 +242,9 @@ Bus.on('change-room', (flag: boolean) => {
 const playList = ref<Music.SongInfo[]>()
 Bus.on('playlist-change', (songList: Music.SongInfo[]) => {
   playList.value = songList
+  if (!songList || songList.length === 0) {
+    currentPlayMusicInfo.value = {}
+  }
 })
 
 const avatar = ref<import('vuetify/components').VAvatar>()

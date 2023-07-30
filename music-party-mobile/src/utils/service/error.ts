@@ -29,6 +29,7 @@ export function handleAxiosError(axiosError: AxiosError) {
       // 网路错误
       !window.navigator.onLine || axiosError.message === 'Network Error',
       () => {
+        console.error(`当前网络状态: ${window.navigator.onLine}, ${axiosError}`)
         Object.assign(error, { code: NETWORK_ERROR_CODE, msg: NETWORK_ERROR_MSG });
       }
     ],
@@ -70,6 +71,7 @@ export function handleResponseError(response: AxiosResponse) {
 
   if (!window.navigator.onLine) {
     // 网路错误
+    console.error(`当前网络状态: ${window.navigator.onLine}`)
     Object.assign(error, { code: NETWORK_ERROR_CODE, msg: NETWORK_ERROR_MSG });
   } else {
     // 请求成功的状态码非200的错误
