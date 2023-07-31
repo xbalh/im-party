@@ -30,7 +30,7 @@
           <div class="d-flex position-relative align-center">
             <v-text-field v-model="input" variant="outlined" density="comfortable" ref="inputMessage" autofocus
               class="font-weight-bold position-relative align-center" :placeholder="`${$t('chat.message')}`" hide-details
-              @keyup.enter="sendMessage" @blur="changeBlur">
+              @keyup.enter="sendMessage" @blur="changeBlur" :readonly="!isJoinRoom" :disabled="!isJoinRoom">
             </v-text-field>
             <v-btn flat rounded icon size="small" color="primary" class="mx-1" :disabled="!input" @click="sendMessage">
               <v-icon size="small">mdi-send</v-icon>
@@ -209,6 +209,11 @@ onUnmounted(() => {
 
 const changeBlur = () => {
   window.scroll(0, 0);//失焦后强制让页面归位
+  let scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+  if (scrollTop > 0) {
+    document.documentElement.scrollTop = 0
+    document.body.scrollTop = 0;
+  }
 }
 
 const sendMessage = () => {
