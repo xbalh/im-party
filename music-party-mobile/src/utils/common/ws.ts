@@ -1,5 +1,6 @@
 import Bus from "./Bus"
 import EventCenter from "./eventCenter"
+import { localStg } from '@/utils';
 
 type CbType = (data: object) => any
 
@@ -22,10 +23,13 @@ class Ws {
   // 消息管理中心
   eventCenter = new EventCenter()
 
-  constructor(url: string, protocols: string | string[], isReconnection = true) {
+  roomId: string
+
+  constructor(url: string, protocols: string | string[], roomId: string, isReconnection = true) {
     this.url = url
     this.protocols = protocols
     this.ws = this.createWs() as WebSocket
+    this.roomId = roomId
     this.isCustomClose = !isReconnection
   }
 
@@ -51,6 +55,7 @@ class Ws {
     this.ws.onopen = () => {
       window.$loadingOverly?.hide()
       Bus.emit('join-room-success', true)
+      localStg.set('currentRoom', parseInt(this.roomId))
       console.log(this.ws, 'onopen')
       // 发送成功连接之前所发送失败的消息
       this.errorStack.forEach(message => {
@@ -78,6 +83,7 @@ class Ws {
     this.ws.onclose = () => {
       console.log('onclose')
       Bus.emit('join-room-success', false)
+      localStg.remove('currentRoom')
       // 用户手动关闭的不重连
       if (this.isCustomClose) return
 

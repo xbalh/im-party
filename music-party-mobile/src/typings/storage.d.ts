@@ -10,5 +10,7 @@ declare namespace StorageInterface {
     refreshToken: string;
     userInfo: Auth.UserInfo;
     themeSettings: ThemeConfig.Config;
+    userSettings: UserConfig.Config;
+    currentRoom: number;
   }
 }

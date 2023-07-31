@@ -1,13 +1,13 @@
 <template>
   <div class="d-flex flex-grow-1" :class="{ 'flex-row-reverse': isOwnMessage }">
     <v-avatar size="40" class="elevation-1 grey lighten-3">
-      <svg-icon :name="message.user.avatar"></svg-icon>
+      <v-img :src="message.user?.avatar"></v-img>
     </v-avatar>
     
     <div class="mx-2">
       <v-tooltip location="bottom">
         <template v-slot:activator="{ props }">
-          <div >{{ message.user.name }}</div>
+          <div >{{ message.user?.name || message.from }}</div>
           <v-card class="pa-1" :color="isOwnMessage ? 'primary-darken-1' : undefined" v-bind="props">
             <div class="font-weight-bold text-break">
               {{ message.text }}
@@ -38,7 +38,7 @@ const props = defineProps({
 
 
 const isOwnMessage = computed(() => {
-  return userInfo.userId === props.message.user.id
+  return userInfo.userName === props.message.from
 })
 
 </script>

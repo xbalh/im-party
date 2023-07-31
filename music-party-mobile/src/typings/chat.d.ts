@@ -4,6 +4,7 @@ declare namespace Chat {
     from: string;
     msg: string;
     timestamp: number;
+    userInfo?: ApiAuth.UserInfo
   }
 }
 

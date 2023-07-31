@@ -29,17 +29,19 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import Bus from '@/utils/common/Bus';
+import { getCurrentTime } from '@/service/api/room';
+import { localStg } from '~/src/utils';
 
-const musicList = ref()
 const display = ref(false)
 const disablePlay = ref(true)
+const neverPlay = ref(true)
+const manualPause = ref(false)
 const player = ref<HTMLAudioElement>()
 const currentSong = ref<Music.SongInfo>()
 const progress = ref(0)
 const currentProgress = ref('--')
 const totalProgress = ref('--')
-//TODO 从本地存储获取设置：是否自动开始播放
-const isAutoPlay = ref(true)
+const userConfig = useUserSettingStore()
 Bus.on('openMusicPage', (flag: boolean) => {
   display.value = flag
 })
@@ -79,6 +81,7 @@ const timeupdate = () => {
         if (progress.value === 100) {
           currentSong.value = {}
           Bus.emit('clear-currentMusicInfo', true)
+          Bus.emit('music-process-update', 0)
         }
       }, 1000)
     }
@@ -93,15 +96,22 @@ const musicTimeformat = (value: number) => {
   return `${minute}:${second}`
 }
 
-Bus.on('request-music-play', (flag: boolean) => {
+Bus.on('request-music-play', async (flag: boolean) => {
   if (flag) {
-    if (disablePlay || !player || !player.value!.src) {
+    if (disablePlay.value || Boolean(!player) || Boolean(!player.value?.getAttribute('src'))) {
       return
     }
+    const roomId = localStg.get('currentRoom')
+    if (!roomId) return
+    const { data: currentTime } = await getCurrentTime(roomId)
+    if (currentTime === -1) return
+    player.value!.currentTime = currentTime ? currentTime / 1000 : 0
     player.value!.play()
     Bus.emit('music-play', true)
     isPlay.value = true
+    manualPause.value = false
   } else {
+    manualPause.value = true
     player.value!.pause()
     Bus.emit('music-play', false)
     isPlay.value = false
@@ -117,24 +127,26 @@ Bus.on('change-song', (songInfo: Music.SongInfo) => {
   currentSong.value = songInfo
   const currentPlayer = player.value!
   currentPlayer.setAttribute('src', songInfo.url!)
-  if (isAutoPlay) {
-    currentPlayer.currentTime = songInfo.type === 'next-play'? 0 : songInfo.nowTime! / 1000
+  disablePlay.value = false
+  if (manualPause.value) return
+  if (userConfig.autoPlay) {
+    currentPlayer.currentTime = songInfo.type === 'next-play' ? 0 : songInfo.nowTime! / 1000
     currentPlayer.play()
     isPlay.value = true
     Bus.emit('music-play', true)
+    neverPlay.value = false
   } else if (isPlay.value) {
     currentPlayer.play()
     Bus.emit('music-play', true)
   }
-
-
 })
 
-Bus.on('change-room', (flag: boolean)=>{
+Bus.on('change-room', (flag: boolean) => {
   progress.value = 0
   currentSong.value = {}
   isPlay.value = false
   player.value?.pause()
+  manualPause.value = false
 })
 
 

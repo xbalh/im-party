@@ -23,7 +23,7 @@
         </v-overlay>
         <div id="messages" ref="messagesRef" class="messages mx-2">
           <v-slide-y-transition group tag="div">
-            <channel-message v-for="message in messages" :key="message.id" :message="message" class="my-4 d-flex" />
+            <channel-message v-for="(message, index) in messages" :key="index" :message="message" class="my-4 d-flex" />
           </v-slide-y-transition>
         </div>
         <div class="input-box pa-2">
@@ -47,14 +47,12 @@ import ChannelMessage from './ChannelMessage.vue'
 import { ref } from "vue";
 import { useTheme } from 'vuetify'
 import { useAuthStore } from "@/store";
-import { createId } from "seemly";
 import { useRoute } from 'vue-router'
 import Ws from '@/utils/common/ws';
 import { getServiceEnvConfig } from '~/.env-config';
 import { localStg } from '@/utils';
 import Bus from '@/utils/common/Bus';
 import { formatDate } from '@vueuse/core';
-import { random } from 'lodash-es';
 import { addMusic } from "@/service/api/room";
 import { onBeforeRouteUpdate } from 'vue-router'
 
@@ -67,7 +65,7 @@ const auth = useAuthStore();
 const { userInfo } = storeToRefs(auth)
 const messagesRef = ref<HTMLDivElement>()
 const inputMessage = ref<HTMLDivElement>()
-const { wsUrl } = getServiceEnvConfig(import.meta.env);
+const { wsUrl, wsUrlPattern } = getServiceEnvConfig(import.meta.env);
 const leavedCurrentRoom = ref(false)
 const messages = ref<Array<ApiChatManagement.message>>([])
 defineEmits(['toggle-menu', 'toggle-usersDrawer'])
@@ -115,7 +113,7 @@ Bus.on('join-room-success', (flag: boolean) => {
 
 /**建立WS连接，并订阅 */
 const connectWS = (roomNo: string) => {
-  ws.value = new Ws(wsUrl + `/musicParty/ws/${roomNo}`, localStg.get('token') as string)
+  ws.value = new Ws(wsUrl + wsUrlPattern + `/musicParty/ws/${roomNo}`, localStg.get('token') as string, roomNo)
   ws.value.subscribe(`/music/chat`, chatHandle)
   ws.value.subscribe('/music/playControl/nextPlay', nextPlayHandle)
   ws.value.subscribe('/music/playControl/play', playHandle)
@@ -156,13 +154,15 @@ Bus.on('sync-onlineUsers-count', (count: number) => {
 const chatHandle = (data: Chat.Msg) => {
   if (data.from === userInfo.value.userName) return
   let msg: ApiChatManagement.message = {
-    id: String(random(1, 9999, false)),
+    from: data.from,
     text: data.msg,
-    timestamp: formatDate(new Date(data.timestamp), 'YYYY-MM-DD hh:mm:ss'),
-    user: {
-      avatar: 'avatar1',
-      id: String(random(1, 9999, false)),
-      name: data.from
+    timestamp: formatDate(new Date(data.timestamp), 'YYYY-MM-DD hh:mm:ss')
+  }
+  if (data.userInfo) {
+    msg.user = {
+      avatar: data.userInfo.userAvatarUrl,
+      name: data.userInfo.userName,
+      nickName: data.userInfo.nickName
     }
   }
   const isBottom = checkScrollIsToBottom()
@@ -213,11 +213,11 @@ const changeBlur = () => {
 
 const sendMessage = () => {
   messages.value.push({
-    id: createId(),
+    from: userInfo.value.userName,
     text: input.value,
     timestamp: new Date().toLocaleString(),
     user: {
-      id: userInfo.value.userId,
+      nickName: userInfo.value.nickName,
       avatar: userInfo.value.userAvatarUrl ?? '',
       name: userInfo.value.userName
     }

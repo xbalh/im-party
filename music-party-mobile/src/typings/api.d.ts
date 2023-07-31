@@ -62,14 +62,14 @@ declare namespace ApiUserManagement {
 
 declare namespace ApiChatManagement {
   interface message {
-    id: string,
+    from: string,
     text: string,
     timestamp: string,
     image?: string,
-    user: {
-      avatar: string,
-      id: string,
-      name: string
+    user?: {
+      avatar?: string,
+      name?: string,
+      nickName?: string
     }
   }
 }

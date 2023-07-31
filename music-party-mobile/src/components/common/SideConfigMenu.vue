@@ -6,72 +6,87 @@
 
     <v-navigation-drawer v-model="openSetting" location="right" floating temporary order="-10" width="310" touchless>
       <div class="d-flex align-center pa-2">
-        <div class="title">Settings</div>
+        <div class="title">设置</div>
         <v-spacer></v-spacer>
         <v-btn flat icon @click="openSetting = false">
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </div>
+      <v-tabs v-model="topTabCurrent" fixed-tabs color="primary">
+        <v-tab value="general">常规</v-tab>
+        <v-tab value="appearance">外观</v-tab>
+      </v-tabs>
+      <v-window v-model="topTabCurrent">
+        <v-window-item value="appearance">
+          <v-divider></v-divider>
+          <div class="pa-2">
+            <div class="font-weight-bold my-1">跟随系统主题</div>
+            <v-switch v-model="themeConfig.followOs" color="primary"></v-switch>
+            <div class="font-weight-bold my-1">全局主题</div>
+            <v-btn-toggle v-model="themeConfig.globalTheme" color="primary" mandatory variant="outlined" class="mb-2">
+              <v-btn value="light">白色主题</v-btn>
+              <v-btn value="dark">深色主题</v-btn>
+            </v-btn-toggle>
 
-      <v-divider></v-divider>
+            <div class="font-weight-bold my-1">Toolbar Theme</div>
+            <v-btn-toggle v-model="themeConfig.toolbarTheme" color="primary" mandatory variant="outlined" class="mb-2">
+              <v-btn value="global">Global</v-btn>
+              <v-btn value="light">Light</v-btn>
+              <v-btn value="dark">Dark</v-btn>
+            </v-btn-toggle>
 
-      <div class="pa-2">
-        <div class="font-weight-bold my-1">Follow Os Theme</div>
-        <v-switch v-model="themeConfig.followOs" color="primary"></v-switch>
-        <div class="font-weight-bold my-1">Global Theme</div>
-        <v-btn-toggle v-model="themeConfig.globalTheme" color="primary" mandatory variant="outlined" class="mb-2">
-          <v-btn value="light">Light</v-btn>
-          <v-btn value="dark">Dark</v-btn>
-        </v-btn-toggle>
+            <div class="font-weight-bold my-1">Toolbar Style</div>
+            <v-btn-toggle v-model="themeConfig.isToolbarDetached" color="primary" mandatory variant="outlined"
+              class="mb-2">
+              <v-btn :value="false">Full</v-btn>
+              <v-btn :value="true">Solo</v-btn>
+            </v-btn-toggle>
 
-        <div class="font-weight-bold my-1">Toolbar Theme</div>
-        <v-btn-toggle v-model="themeConfig.toolbarTheme" color="primary" mandatory variant="outlined" class="mb-2">
-          <v-btn value="global">Global</v-btn>
-          <v-btn value="light">Light</v-btn>
-          <v-btn value="dark">Dark</v-btn>
-        </v-btn-toggle>
+            <div class="font-weight-bold my-1">Content Layout</div>
+            <v-btn-toggle v-model="themeConfig.isContentBoxed" color="primary" mandatory variant="outlined" class="mb-2">
+              <v-btn :value="false">Fluid</v-btn>
+              <v-btn :value="true">Boxed</v-btn>
+            </v-btn-toggle>
 
-        <div class="font-weight-bold my-1">Toolbar Style</div>
-        <v-btn-toggle v-model="themeConfig.isToolbarDetached" color="primary" mandatory variant="outlined" class="mb-2">
-          <v-btn :value="false">Full</v-btn>
-          <v-btn :value="true">Solo</v-btn>
-        </v-btn-toggle>
+            <div class="font-weight-bold my-1">Menu Theme</div>
+            <v-btn-toggle v-model="themeConfig.menuTheme" color="primary" mandatory variant="outlined" class="mb-2">
+              <v-btn value="global">Global</v-btn>
+              <v-btn value="light">Light</v-btn>
+              <v-btn value="dark">Dark</v-btn>
+            </v-btn-toggle>
 
-        <div class="font-weight-bold my-1">Content Layout</div>
-        <v-btn-toggle v-model="themeConfig.isContentBoxed" color="primary" mandatory variant="outlined" class="mb-2">
-          <v-btn :value="false">Fluid</v-btn>
-          <v-btn :value="true">Boxed</v-btn>
-        </v-btn-toggle>
+            <div class="font-weight-bold my-1">Primary Color</div>
 
-        <div class="font-weight-bold my-1">Menu Theme</div>
-        <v-btn-toggle v-model="themeConfig.menuTheme" color="primary" mandatory variant="outlined" class="mb-2">
-          <v-btn value="global">Global</v-btn>
-          <v-btn value="light">Light</v-btn>
-          <v-btn value="dark">Dark</v-btn>
-        </v-btn-toggle>
+            <v-color-picker v-model="themeConfig.primary" mode="hexa" :swatches="swatches" show-swatches></v-color-picker>
+          </div>
 
-        <div class="font-weight-bold my-1">Primary Color</div>
-
-        <v-color-picker v-model="themeConfig.primary" mode="hexa" :swatches="swatches" show-swatches></v-color-picker>
-      </div>
-
-      <v-divider></v-divider>
+          <v-divider></v-divider>
+        </v-window-item>
+        <v-window-item value="general">
+          <v-divider></v-divider>
+          <div class="pa-2">
+            <div class="font-weight-bold my-1">进入房间后是否自动播放</div>
+            <v-switch v-model="userConfig.autoPlay" color="primary"></v-switch>
+          </div>
+        </v-window-item>
+      </v-window>
     </v-navigation-drawer>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ComponentPublicInstance } from "vue";
-import { useThemeStore } from "@/store";
+import { useThemeStore, useUserSettingStore } from "@/store";
 import Bus from "@/utils/common/Bus";
 
-
+const topTabCurrent = ref('general')
 const openSetting = ref(false)
 Bus.on('openSetting', (flag: boolean) => {
   openSetting.value = flag
 })
 //使用父组件传递过来的值
 const themeConfig = useThemeStore()
+const userConfig = useUserSettingStore()
 // const right = ref(false)
 let timeout: NodeJS.Timeout
 const swatches = reactive([['#0096c7', '#31944f'],

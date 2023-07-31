@@ -31,4 +31,7 @@ public interface MusicApi {
 
     @GetMapping("/playlist/track/all")
     JSONObject getPlayListAllMusic(@RequestParam("id") String id, @RequestParam("limit") Integer limit, @RequestParam("offset") Integer offset);
+
+    @GetMapping("/user/detail")
+    JSONObject getUserDetailInfo(@RequestParam("uid") String uid);
 }

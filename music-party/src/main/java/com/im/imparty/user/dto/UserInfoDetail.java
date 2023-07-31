@@ -28,6 +28,8 @@ public class UserInfoDetail implements Serializable, UserDetails {
 
     private String wyyUserId;
 
+    private String userAvatarUrl;
+
     private List<RoleInfo> roleList;
 
     private Collection<GrantedAuthority> authorities;
