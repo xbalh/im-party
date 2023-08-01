@@ -5,9 +5,9 @@
       <v-toolbar flat floating height="64" color="surface" class="chatToolbar">
         <v-app-bar-nav-icon class="hidden-lg-and-up" @click="$emit('toggle-menu')"></v-app-bar-nav-icon>
         <v-toolbar-title class="chatToolbarTitle">
-          {{ roomName }}
+          {{ isJoinRoom ? roomName : '' }}
         </v-toolbar-title>
-        <span>({{ currentOnlineUserCount }}) </span>
+        <span>{{ isJoinRoom ? `(${currentOnlineUserCount})` : '' }} </span>
         <v-spacer></v-spacer>
         <div>
           <v-btn class="mx-1" icon @click.stop="$emit('toggle-usersDrawer')">
@@ -85,12 +85,14 @@ const input = ref('')
 const demo = ref()
 
 const isJoinRoom = ref(false)
+
 onMounted(() => {
   if (roomNo) {
     window.$loadingOverly?.show()
     connectWS(roomNo as string)
     currentHeight.value = messagesRef.value!.scrollHeight
     isJoinRoom.value = true
+    Bus.emit('join-room', true)
   }
   // demo.value = setInterval(async () => {
   //   const resp = await fetchMessage()
@@ -274,6 +276,7 @@ onBeforeRouteUpdate((to, from, next) => {
   console.log("离开了房间")
   const { roomName: toRoomName } = to.query
   const { roomName: fromRoomName } = from.query
+  if (!toRoomName) return
   const leaveRoomDialog = window.$dialog?.show({
     main: fromRoomName ? `你确定要离开当前房间【${fromRoomName}】进入房间【${toRoomName}】么` : `你确定要进入房间【${toRoomName}】么`,
     title: '提醒',
@@ -288,6 +291,15 @@ onBeforeRouteUpdate((to, from, next) => {
   })
 
 });
+
+Bus.on('leave-room', (flag: boolean) => {
+  leavedCurrentRoom.value = true
+  isJoinRoom.value = false
+  currentOnlineUserCount.value = 0
+  ws.value?.close()
+  Bus.emit('change-room', true)
+  window.$loadingOverly?.hide()
+})
 
 
 

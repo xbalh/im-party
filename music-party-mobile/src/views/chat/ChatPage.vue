@@ -19,6 +19,12 @@
               </v-btn>
             </div>
 
+            <div class="mx-2 mb-2" v-if="isJoinRoom">
+              <v-btn variant="outlined" block @click="openLeaveRoomDialog" color="red">
+                离开房间
+              </v-btn>
+            </div>
+
             <v-list v-model:opened="open">
               <v-list-group v-for="(roomlist, roomstyle) in roomMap" :key="roomstyle" :value="roomstyle">
                 <template v-slot:activator="{ props }">
@@ -198,7 +204,7 @@ import Bus from "@/utils/common/Bus";
 import { trim } from "lodash-es";
 
 const { loading: isLoadingAdd, startLoading, endLoading } = useLoading()
-
+const isJoinRoom = ref(false)
 const isMusicPage = ref(false)
 Bus.on('toMusicPage', (flag: boolean) => {
   isMusicPage.value = flag
@@ -445,6 +451,27 @@ const closePlayListDetailPage = () => {
   currentOffSet.value = 0
   isPlayListDetailPage.value = false
   hasMore.value = true
+}
+
+Bus.on('join-room', (flag: boolean) => {
+  isJoinRoom.value = true
+})
+
+const openLeaveRoomDialog = () => {
+  const leaveDialog = window.$dialog?.show({
+    title: '离开',
+    main: '确定要离开当前房间吗?',
+    confirmText: '确定',
+    confirm: () => {
+      window.$loadingOverly?.show()
+      isJoinRoom.value = false
+      Bus.emit('leave-room', true)
+      // router.removeRoute(router.currentRoute.value.name!)
+      router.replace({ name: 'apps_chat-channel', query: {} })
+      leaveDialog?.close()
+    }
+
+  })
 }
 
 </script>
