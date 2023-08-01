@@ -10,6 +10,7 @@ export default defineConfig(configEnv => {
   const srcPath = getSrcPath();
 
   return {
+    base: './',
     plugins: setupVitePlugins(viteEnv),
     define: { 'process.env': {} },
     resolve: {
@@ -30,7 +31,7 @@ export default defineConfig(configEnv => {
     server: {
       port: 3322,
       open: true,
-      // host: '0.0.0.0',
+      host: '0.0.0.0',
       proxy: {
         '/api': {
           /* 目标代理服务器地址 */
@@ -52,20 +53,20 @@ export default defineConfig(configEnv => {
       },
     },
 
-      // devServer: {
-      //   port: 3322,
-      //   open: true,
-      //   proxy: {
-      //     '/api': {
-      //       target: 'http://124.221.34.38:8081',
-      //       changeOrigin: true,
-      //       pathRewrite: {
-      //         '^/api': ''
-      //       }
-      //     }
-      //   }
-      // },
-      build: {
+    // devServer: {
+    //   port: 3322,
+    //   open: true,
+    //   proxy: {
+    //     '/api': {
+    //       target: 'http://124.221.34.38:8081',
+    //       changeOrigin: true,
+    //       pathRewrite: {
+    //         '^/api': ''
+    //       }
+    //     }
+    //   }
+    // },
+    build: {
       reportCompressedSize: false,
       sourcemap: false,
       commonjsOptions: {
