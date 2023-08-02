@@ -1,0 +1,1 @@
+docker run -d -p 3344:8081 --add-host=host.docker.internal:host-gateway --name=imparty imparty /bin/sh
