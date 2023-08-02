@@ -61,8 +61,9 @@ const route = useRoute()
 const { roomNo, roomName } = route.query
 const ws = ref<Ws>()
 const { current } = useTheme()
-const auth = useAuthStore();
-const { userInfo } = storeToRefs(auth)
+// const auth = useAuthStore();
+const { userInfo } = useAuthStore();
+// const { userInfo } = storeToRefs(auth)
 const messagesRef = ref<HTMLDivElement>()
 const inputMessage = ref<HTMLDivElement>()
 const { wsUrl, wsUrlPattern } = getServiceEnvConfig(import.meta.env);
@@ -154,7 +155,7 @@ Bus.on('sync-onlineUsers-count', (count: number) => {
 
 /**聊天处理 */
 const chatHandle = (data: Chat.Msg) => {
-  if (data.from === userInfo.value.userName) return
+  if (data.from === userInfo.userName) return
   let msg: ApiChatManagement.message = {
     from: data.from,
     text: data.msg,
@@ -220,13 +221,13 @@ const changeBlur = () => {
 
 const sendMessage = () => {
   messages.value.push({
-    from: userInfo.value.userName,
+    from: userInfo.userName,
     text: input.value,
     timestamp: new Date().toLocaleString(),
     user: {
-      nickName: userInfo.value.nickName,
-      avatar: userInfo.value.userAvatarUrl ?? '',
-      name: userInfo.value.userName
+      nickName: userInfo.nickName,
+      avatar: userInfo.userAvatarUrl ?? '',
+      name: userInfo.userName
     }
   })
   const data = {
@@ -242,7 +243,7 @@ const sendMessage = () => {
 }
 
 const onDemandMusic = async (musicInfo: ApiMusic.playListMusicInfo) => {
-  if (!musicInfo || !musicInfo.id) return
+  if (!musicInfo || !musicInfo.id || !roomNo || Number.isNaN(roomNo)) return
   const resp = await addMusic(parseInt(roomNo as string), String(musicInfo.id));
   if (resp.error?.code) {
     window.$snackBar?.error(resp.error.msg)
@@ -255,7 +256,7 @@ Bus.on('on-demand-music', (musicInfo: ApiMusic.playListMusicInfo) => {
   if (!leavedCurrentRoom.value) {
     console.log("点歌了: " + roomName)
     if (!joinedRoom.value) {
-      window.$snackBar?.error('请先进入一个房间~');
+      window.$snackBar?.error('请先进入一个房间~', { location: 'center center' });
     } else {
       onDemandMusic(musicInfo)
     }

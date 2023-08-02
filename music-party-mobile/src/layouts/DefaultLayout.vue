@@ -167,8 +167,8 @@ import { computed } from 'vue'
 import { useAppInfo, useRouterPush } from "@/composables";
 import Bus from "@/utils/common/Bus";
 import { useResizeObserver } from "@vueuse/core";
-const auth = useAuthStore();
-const { userInfo } = storeToRefs(auth)
+import { useAuthStore } from "@/store";
+const { userInfo } = useAuthStore();
 const searchResult = ref()
 const theme = useThemeStore()
 const drawer = ref()

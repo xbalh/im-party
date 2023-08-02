@@ -88,6 +88,8 @@ import { bindWyyUser, updateUserInfo } from "@/service/api/user";
 import { useLoadingProgressLine } from "@/components/provider";
 import { trim } from "lodash-es";
 import { localStg } from "@/utils";
+import { useAuthStore } from "@/store";
+const { userInfo } = useAuthStore();
 
 const user = ref<Auth.UserInfo>()
 const currentWyyUserInfo = ref()
@@ -109,11 +111,15 @@ const bindUser = (wyyUserInfo) => {
     cancelText: '取消',
     confirm: async () => {
       console.log("确认绑定")
-      const resp = await bindWyyUser(wyyUserInfo.userId)
-      if (resp.data) {
+      const { data } = await bindWyyUser(wyyUserInfo.userId)
+      if (data) {
         window.$snackBar?.success('绑定成功！')
-        localStg.set('userInfo', resp.data)
-        router.go(0)
+        localStg.set('userInfo', data)
+        user.value = data
+        userInfo.userAvatarUrl = data.userAvatarUrl
+        userInfo.wyyUserId = data.wyyUserId
+        // router.go(0)
+        // location.reload()
       }
       bindDialog?.close()
     }
@@ -141,7 +147,9 @@ const submit = async () => {
     if (newUserInfo) {
       window.$snackBar?.success("修改成功", { location: 'bottom center' })
       localStg.set('userInfo', newUserInfo)
-      router.go(0)
+      userInfo.nickName = newUserInfo.nickName
+      // user.value = newUserInfo
+      // location.reload()
     }
   }
 

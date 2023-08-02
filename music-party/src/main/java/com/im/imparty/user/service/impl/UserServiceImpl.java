@@ -64,7 +64,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDomain> impleme
 
     @Override
     public void updateWyyBind(String userName, String wyyUserId) {
-        UserInfo userInfo = getUserInfo(userName);
         LambdaUpdateChainWrapper<UserDomain> chainWrapper = lambdaUpdate().eq(UserDomain::getUserName, userName).eq(UserDomain::getValidSts, "A")
                 .set(UserDomain::getWyyUserId, wyyUserId);
         JSONObject userDetailInfo = musicSongService.getUserDetailInfo(wyyUserId);
