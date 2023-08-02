@@ -274,6 +274,7 @@ Bus.on('on-demand-music', (musicInfo: ApiMusic.playListMusicInfo) => {
 onBeforeRouteUpdate((to, from, next) => {
   //离开当前的组件，触发
   console.log("离开了房间")
+  if (to.path !== '/apps/chat-channel') next()
   const { roomName: toRoomName } = to.query
   const { roomName: fromRoomName } = from.query
   if (!toRoomName) return

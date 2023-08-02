@@ -52,10 +52,10 @@ const openSetting = () => {
 
 const menu = reactive(
   [
-    { icon: 'mdi-account-box-outline', key: 'menu.profile', link: `/apps/manager-user/edit/${userInfo.value.userName}` },
+    { icon: 'mdi-account-box-outline', key: 'menu.profile', name: 'apps_manager-user_edit', link: `/apps/manager-user/edit/${userInfo.value.userName}` },
     // {icon: 'mdi-format-list-checkbox', key: 'menu.todo', link: '/apps/todo'},
     // {icon: 'mdi-email-outline', key: 'menu.board', link: '/apps/board'},
-    { icon: 'mdi-music', key: 'menu.chat', link: '/apps/chat-channel/' }
+    { icon: 'mdi-music', key: 'menu.chat', name: 'apps_chat-channel', link: '/apps/chat-channel/:id' }
   ]
 )
 

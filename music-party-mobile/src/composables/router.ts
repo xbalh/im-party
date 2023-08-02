@@ -24,6 +24,15 @@ export function useRouterPush(inSetup = true) {
     }
   }
 
+  function routerReplace(to: RouteLocationRaw, newTab = false) {
+    if (newTab) {
+      const routerData = router.resolve(to);
+      window.open(routerData.href, '_blank');
+    } else {
+      router.replace(to);
+    }
+  }
+
   /** 返回上一级路由 */
   function routerBack() {
     router.go(-1);
@@ -65,6 +74,7 @@ export function useRouterPush(inSetup = true) {
   return {
     routerPush,
     routerBack,
+    routerReplace,
     toHome,
     toLogin,
     toLoginModule,

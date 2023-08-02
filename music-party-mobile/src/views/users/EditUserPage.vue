@@ -16,18 +16,28 @@
       <span class="ma-1">Administrator</span>
     </div>
 
-    <div class="mb-4">
+    <!-- <div class="mb-4">
       <div class="d-flex">
         <span class="font-weight-bold">修改昵称</span>
         <v-text-field v-model="user.nickName" clearable></v-text-field>
       </div>
       <div class="d-flex">
-        <!-- <span class="font-weight-bold">ID</span>
+        <span class="font-weight-bold">ID</span>
         <span class="mx-1">
           <copy-label :text="user.id + ''" />
-        </span> -->
+        </span>
       </div>
-    </div>
+    </div> -->
+
+
+    <form>
+      <v-text-field v-model="state?.nickName"  :counter="15"
+        label="昵称" required @input="v$.nickName.$touch" @blur="v$.nickName.$touch"></v-text-field>
+
+      <v-btn class="me-4" @click="v$.$validate">
+        保存
+      </v-btn>
+    </form>
 
 
     <!-- <v-tabs v-model="tab" :show-arrows="false" background-color="transparent" color="primary">
@@ -48,16 +58,23 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { fetchUserInfo } from '@/service/api/auth'
-import { useRouter } from 'vue-router'
 import { useLoadingProgressLine } from "@/components/provider";
+import { useVuelidate } from '@vuelidate/core'
+import { required } from '@vuelidate/validators'
 
-let user = ref<ApiAuth.UserInfo | null>(null)
+const user = ref()
 
-const tab = ref()
-const { currentRoute } = useRouter()
-const userName = currentRoute.value.params['id'] as string
+const state = reactive({
+  ...user.value,
+})
 
 const { show, hide } = useLoadingProgressLine()
+
+const rules = {
+  nickName: { required }
+}
+
+const v$ = useVuelidate(rules, state)
 
 async function getData() {
   show()
@@ -68,6 +85,9 @@ async function getData() {
   }
 }
 
-getData()
+onMounted(() => {
+  getData()
+})
+
 
 </script>

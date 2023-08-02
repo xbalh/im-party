@@ -230,7 +230,7 @@ const showCreateDialog = ref(false)
 const channels = ref(['general', 'production', 'qa', 'staging', 'random'])
 const newRoomStyle = ref("")
 const newRoomName = ref("")
-const { routerPush } = useRouterPush()
+const { routerPush, toHome } = useRouterPush()
 const addChannel = () => {
   startLoading()
   setTimeout(() => {
@@ -467,7 +467,8 @@ const openLeaveRoomDialog = () => {
       isJoinRoom.value = false
       Bus.emit('leave-room', true)
       // router.removeRoute(router.currentRoute.value.name!)
-      router.replace({ name: 'apps_chat-channel', query: {} })
+      // router.replace({ name: 'apps_chat-channel', query: {} })
+      toHome()
       leaveDialog?.close()
     }
 

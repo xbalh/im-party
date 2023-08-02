@@ -86,4 +86,14 @@ public class MusicRoomController {
         return BaseResult.ok();
     }
 
+//    @ApiOperation("切歌")
+//    @PostMapping("/addRoom")
+//    public BaseResult skipMusic(@PathVariable("roomId") Integer roomId, @RequestParam("songIds") List<String> songIds) {
+////        .updateMusicPlayStatus(songIds, roomId);
+//        if (WebSocketServer.roomMap.get(roomId) != null) {
+//            WebSocketServer.roomMap.get(roomId).skipSong(songIds);
+//        }
+//        return BaseResult.ok();
+//    }
+
 }
