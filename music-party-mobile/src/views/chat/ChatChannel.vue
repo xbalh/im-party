@@ -248,7 +248,7 @@ const onDemandMusic = async (musicInfo: ApiMusic.playListMusicInfo) => {
     window.$snackBar?.error(resp.error.msg)
     return
   }
-  window.$snackBar?.success('点歌成功')
+  window.$snackBar?.success('点歌成功', { location: 'top center' })
 }
 
 Bus.on('on-demand-music', (musicInfo: ApiMusic.playListMusicInfo) => {

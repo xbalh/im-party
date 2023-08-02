@@ -64,4 +64,11 @@ public class UserController {
         return BaseResult.ok(userInfoList);
     }
 
+    @PostMapping("/updateUserInfo")
+    public BaseResult<UserInfo> updateUserInfo(@RequestBody UserDomain userDomain) {
+        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+        userService.updateUserInfo(userDomain, userName);
+        return BaseResult.ok(userService.getUserInfo(userName));
+    }
+
 }

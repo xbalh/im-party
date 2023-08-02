@@ -165,7 +165,7 @@
 import LoadingProgressProvider from "@/components/provider/LoadingProgressLine";
 import { computed } from 'vue'
 import { useAppInfo, useRouterPush } from "@/composables";
-import Bus from "../utils/common/Bus";
+import Bus from "@/utils/common/Bus";
 import { useResizeObserver } from "@vueuse/core";
 const auth = useAuthStore();
 const { userInfo } = storeToRefs(auth)
@@ -209,7 +209,7 @@ watch(navCurrent, (newValue, oldValue) => {
 
 const isPlay = ref(false)
 
-const isShowFooter = ref(true)
+const isShowFooter = ref(false)
 const hideFooter = () => {
   isShowFooter.value = false
   Bus.emit('rightCircleBtnShow', true)
@@ -263,9 +263,14 @@ useResizeObserver(avatarDiv, (entries) => {
 
 
 onMounted(() => {
-  const height = avatarDiv.value!.offsetHeight
-  avatarDiv.value!.style.cssText += `;width: ${height}px;`
-  avatarSize.value = height - 15
+  if (router.currentRoute.value.name === 'apps_chat-channel') {
+    isShowFooter.value = true
+  }
+  const height = avatarDiv.value?.offsetHeight
+  if (height) {
+    avatarDiv.value!.style.cssText += `;width: ${height}px;`
+    avatarSize.value = height - 15
+  }
 })
 
 Bus.on('change-song', (songInfo: Music.SongInfo) => {

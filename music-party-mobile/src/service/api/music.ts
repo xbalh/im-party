@@ -36,3 +36,13 @@ export function fetchPlayListAllMusic(id: string, limit: number, offset: number)
     }
   });
 }
+
+
+//搜索网易云用户
+export function fetchWyyUserInfo(wyyUserId: string) {
+  return request.get<any>("/music/user/info", {
+    params: {
+      wyyUserId: wyyUserId
+    }
+  });
+}
