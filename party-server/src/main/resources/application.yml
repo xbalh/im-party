@@ -1,28 +1,3 @@
-server:
-  port: 8081
 spring:
   profiles:
     active: ${profile.active:dev}
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${databaseUrl}:3306/imparty?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&useSSL=true
-    username: ${databaseUser:root} #-DdatabaseUser=xxx -DdatabasePassword=xxx
-    password: ${databasePassword}
-  cache:
-    type: ehcache
-    ehcache:
-      config: classpath:/ehcache.xml
-  mvc:
-    view:
-      suffix: .html
-      static-path-pattern: /**
-      resources:
-        static-locations: classpath:/templates/,classpath:/static/
-mybatis-plus:
-  global-config:
-    db-config:
-      id-type: ASSIGN_ID # mybatisPlus id生成策略雪花算法
-  type-handlers-package: com.im.imparty.handler
-
-NeteaseCloudMusicApi:
-  url: http://${neteaseCloudMusicApiUrl}:3000
