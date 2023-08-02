@@ -2,7 +2,7 @@ server:
   port: 8081
 spring:
   profiles:
-    active: prod
+    active: ${profile.active:dev}
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${databaseUrl}:3306/imparty?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&useSSL=true

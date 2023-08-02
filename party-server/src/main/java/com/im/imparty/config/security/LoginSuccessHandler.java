@@ -53,9 +53,9 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
         String tokenJwt = JwtTokenUtils.encryptTokenJwt(info, userDetail.getUsername(), randomStr);
         LoginInfoVO loginInfoVO = new LoginInfoVO(tokenJwt, JwtTokenUtils.encryptRefreshTokenJwt(info, userDetail.getUsername(), randomStr));
         // response.setHeader("Authentication", String.format("Bearer %s", tokenJwt));
-        // response.setHeader("refreshToken", loginInfoVO.getRefreshToken());
-        // response.addCookie(new Cookie("Authentication", tokenJwt));
-        // response.addCookie(new Cookie("refreshToken", loginInfoVO.getRefreshToken()));
+        //response.setHeader("refreshToken", loginInfoVO.getRefreshToken());
+        response.addCookie(new Cookie("Authorization", tokenJwt));
+        response.addCookie(new Cookie("refreshToken", loginInfoVO.getRefreshToken()));
         response.getWriter().write(BaseResult.ok(authentication.getName() + "登陆成功").data(loginInfoVO).toJSONString());
     }
 }
