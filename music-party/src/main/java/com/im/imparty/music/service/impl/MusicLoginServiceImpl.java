@@ -138,7 +138,7 @@ public class MusicLoginServiceImpl implements MusicLoginService, ApplicationCont
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        qrKeySet.add("root");
+        qrKeySet.add("admin");
         new Timer().schedule(new TimerTask(){
 
             @Override

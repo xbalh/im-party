@@ -54,25 +54,27 @@
         <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
         <!-- <audio controls ></audio> -->
         <v-spacer class="d-none d-lg-block" />
-        <v-autocomplete :placeholder="$t('menu.search')" prepend-inner-icon="mdi-magnify" hide-details
-          :items="routeStore.searchMenus" item-title="meta.title" item-value="path" clearable
-          @update:modelValue="searchSelect" variant="filled" density="comfortable" class="v-text-field-rounded"
-          single-line>
+        <v-autocomplete placeholder="搜索歌曲" prepend-inner-icon="mdi-magnify" hide-details :items="searchResult"
+          item-title="meta.title" item-value="path" clearable @update:modelValue="searchSelect" variant="filled"
+          density="comfortable" class="v-text-field-rounded" single-line>
         </v-autocomplete>
         <v-spacer class="d-none" />
-        <toolbar-language />
+        <!-- <toolbar-language /> -->
         <div class="mr-1">
           <toolbar-notifications />
         </div>
-        <toolbar-user />
+        <div class="mr-1">
+          <toolbar-user />
+        </div>
+
       </div>
     </v-card>
   </v-app-bar>
 
-  <v-main>
+  <v-main style="height: 100% !important;">
     <loading-progress-provider>
       <v-container :fluid="!theme.isContentBoxed" class="h-100 position-relative">
-        <router-view v-slot="{ Component }">
+        <router-view v-slot="{ Component }" :key="$route.fullPath">
           <v-fade-transition mode="out-in">
             <component :is="Component" />
           </v-fade-transition>
@@ -163,11 +165,11 @@
 import LoadingProgressProvider from "@/components/provider/LoadingProgressLine";
 import { computed } from 'vue'
 import { useAppInfo, useRouterPush } from "@/composables";
-import Bus from "../utils/common/Bus";
+import Bus from "@/utils/common/Bus";
 import { useResizeObserver } from "@vueuse/core";
-const auth = useAuthStore();
-const { userInfo } = storeToRefs(auth)
-
+import { useAuthStore } from "@/store";
+const { userInfo } = useAuthStore();
+const searchResult = ref()
 const theme = useThemeStore()
 const drawer = ref()
 const routeStore = useRouteStore();
@@ -207,7 +209,7 @@ watch(navCurrent, (newValue, oldValue) => {
 
 const isPlay = ref(false)
 
-const isShowFooter = ref(true)
+const isShowFooter = ref(false)
 const hideFooter = () => {
   isShowFooter.value = false
   Bus.emit('rightCircleBtnShow', true)
@@ -261,9 +263,14 @@ useResizeObserver(avatarDiv, (entries) => {
 
 
 onMounted(() => {
-  const height = avatarDiv.value!.offsetHeight
-  avatarDiv.value!.style.cssText += `;width: ${height}px;`
-  avatarSize.value = height - 15
+  if (router.currentRoute.value.name === 'apps_chat-channel') {
+    isShowFooter.value = true
+  }
+  const height = avatarDiv.value?.offsetHeight
+  if (height) {
+    avatarDiv.value!.style.cssText += `;width: ${height}px;`
+    avatarSize.value = height - 15
+  }
 })
 
 Bus.on('change-song', (songInfo: Music.SongInfo) => {

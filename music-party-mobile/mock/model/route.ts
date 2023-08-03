@@ -1,29 +1,6 @@
 export const routeModel: Record<Auth.RoleType, AuthRoute.Route[]> = {
   admin: [
     {
-      name: 'dashboard',
-      path: '/dashboard',
-      component: 'basic',
-      children: [
-        {
-          name: 'dashboard_analytics',
-          path: '/dashboard/analytics',
-          component: 'self',
-          meta: {
-            icon: 'mdi-view-dashboard-outline',
-            title: 'menu.dashboard',
-            requiresAuth: true
-          }
-        }
-      ],
-      meta: {
-        title: 'menu.dashboard',
-        icon: 'mdi-view-dashboard-outline',
-        order: 1,
-        requiresAuth: true
-      }
-    },
-    {
       name: 'apps',
       path: '/apps',
       component: 'basic',
@@ -34,22 +11,14 @@ export const routeModel: Record<Auth.RoleType, AuthRoute.Route[]> = {
           component: 'blank',
           children: [
             {
-              name: 'apps_manager-user_list',
-              path: '/apps/manager-user/list',
-              component: 'self',
-              meta: {
-                title: 'menu.usersList',
-                requiresAuth: true
-              }
-            },
-            {
               name: 'apps_manager-user_edit',
               path: '/apps/manager-user/edit',
               component: 'self',
               meta: {
                 title: 'menu.usersEdit',
                 dynamicPath: '/apps/manager-user/edit/:id?',
-                requiresAuth: true
+                requiresAuth: true,
+                keepAlive: false
               }
             }
           ],
@@ -129,7 +98,7 @@ export const routeModel: Record<Auth.RoleType, AuthRoute.Route[]> = {
               meta: {
                 title: 'menu.chat-channel',
                 dynamicPath: '/apps/chat-channel/:id?',
-                hide: true,
+                // hide: true,
                 keepAlive: false
               }
             }
@@ -229,7 +198,7 @@ export const routeModel: Record<Auth.RoleType, AuthRoute.Route[]> = {
               meta: {
                 title: 'menu.chat-channel',
                 dynamicPath: '/apps/chat-channel/:id?',
-                hide: true,
+                // hide: true,
                 keepAlive: false
               }
             }
@@ -253,7 +222,8 @@ export const routeModel: Record<Auth.RoleType, AuthRoute.Route[]> = {
               meta: {
                 title: 'menu.usersEdit',
                 dynamicPath: '/apps/manager-user/edit/:id?',
-                requiresAuth: true
+                requiresAuth: true,
+                keepAlive: false
               }
             }
           ],

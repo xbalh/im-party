@@ -24,4 +24,6 @@ public interface UserService extends IService<UserDomain> {
     void updateWyyBind(String userName, String wyyUserId);
 
     List<UserInfo> getUserInfoBatchByUserNames(List<String> userNames);
+
+    void updateUserInfo(UserDomain userDomain, String userName);
 }

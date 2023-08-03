@@ -1,6 +1,7 @@
 package com.im.imparty.controller;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.im.imparty.music.service.MusicSongService;
 import com.im.imparty.web.vo.BaseResult;
 import io.swagger.annotations.Api;
@@ -30,6 +31,12 @@ public class MusicUserController {
                                                      @RequestParam("limit") Integer limit,
                                                      @RequestParam("offset") Integer offset) {
         return BaseResult.ok("", musicSongService.getPlayListAllMusic(id, limit, offset));
+    }
+
+    @GetMapping("/music/user/info")
+    @ApiOperation("获取用户信息")
+    public BaseResult<JSONObject> getMusicUserInfo(@RequestParam("wyyUserId") String wyyUserId) {
+        return BaseResult.ok("", musicSongService.getUserDetailInfo(wyyUserId));
     }
 
 }

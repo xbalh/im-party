@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -65,15 +64,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDomain> impleme
 
     @Override
     public void updateWyyBind(String userName, String wyyUserId) {
-        UserInfo userInfo = getUserInfo(userName);
         LambdaUpdateChainWrapper<UserDomain> chainWrapper = lambdaUpdate().eq(UserDomain::getUserName, userName).eq(UserDomain::getValidSts, "A")
                 .set(UserDomain::getWyyUserId, wyyUserId);
-        if (StringUtils.isBlank(userInfo.getUserAvatarUrl())) {
-            JSONObject userDetailInfo = musicSongService.getUserDetailInfo(wyyUserId);
-            if (userDetailInfo.containsKey("profile")) {
-                Map profile = (Map) userDetailInfo.get("profile");
-                chainWrapper.set(UserDomain::getUserAvatarUrl, (String) profile.get("avatarUrl"));
-            }
+        JSONObject userDetailInfo = musicSongService.getUserDetailInfo(wyyUserId);
+        if (userDetailInfo.containsKey("profile")) {
+            Map profile = (Map) userDetailInfo.get("profile");
+            chainWrapper.set(UserDomain::getUserAvatarUrl, (String) profile.get("avatarUrl"));
         }
         chainWrapper.update();
     }
@@ -89,6 +85,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDomain> impleme
                 .list();
 
         return BeanUtil.copyToList(userDomains, UserInfo.class);
+    }
+
+    @Override
+    public void updateUserInfo(UserDomain userDomain, String userName) {
+        UserDomain currentInfo = lambdaQuery()
+                .eq(UserDomain::getValidSts, "A")
+                .eq(UserDomain::getUserName, userName)
+                .one();
+        if (StringUtils.isNotBlank(userDomain.getNickName())) {
+            currentInfo.setNickName(userDomain.getNickName());
+        }
+        baseMapper.updateById(currentInfo);
     }
 
 }

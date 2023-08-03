@@ -230,7 +230,7 @@ const showCreateDialog = ref(false)
 const channels = ref(['general', 'production', 'qa', 'staging', 'random'])
 const newRoomStyle = ref("")
 const newRoomName = ref("")
-const { routerPush } = useRouterPush()
+const { routerPush, toHome } = useRouterPush()
 const addChannel = () => {
   startLoading()
   setTimeout(() => {
@@ -242,8 +242,9 @@ const addChannel = () => {
   }, 1000)
 }
 const { lgAndUp } = useDisplay()
-const auth = useAuthStore();
-const { userInfo } = storeToRefs(auth)
+// const auth = useAuthStore();
+const { userInfo } = useAuthStore();
+// const { userInfo } = storeToRefs(auth)
 const { currentRoute } = useRouter()
 
 const usersDrawer = ref()
@@ -318,7 +319,8 @@ const bindUser = (wyyUserInfo) => {
       if (resp.data) {
         window.$snackBar?.success('绑定成功！')
         localStg.set('userInfo', resp.data)
-        userInfo.value = resp.data
+        userInfo.userAvatarUrl = resp.data.userAvatarUrl
+        userInfo.wyyUserId = resp.data.wyyUserId
         fetchUserPlayList()
       }
       bindDialog?.close()
@@ -350,9 +352,9 @@ const fetchRooms = async () => {
 }
 
 const fetchUserPlayList = async () => {
-  if (!userInfo.value.wyyUserId) return
+  if (!userInfo.wyyUserId) return
   window.$loadingOverly?.show()
-  const resp = await fetchPlayList(userInfo.value.wyyUserId);
+  const resp = await fetchPlayList(userInfo.wyyUserId);
   window.$loadingOverly?.hide()
   if (resp.data) {
     //通过subscribed区分是我的歌单还是收藏歌单
@@ -467,7 +469,8 @@ const openLeaveRoomDialog = () => {
       isJoinRoom.value = false
       Bus.emit('leave-room', true)
       // router.removeRoute(router.currentRoute.value.name!)
-      router.replace({ name: 'apps_chat-channel', query: {} })
+      // router.replace({ name: 'apps_chat-channel', query: {} })
+      toHome()
       leaveDialog?.close()
     }
 

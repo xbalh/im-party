@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app style="height: 100%;">
     <vuetify-provider>
       <router-view />
       <right-circle-button />

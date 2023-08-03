@@ -14,4 +14,9 @@ export function fetchUserInfoBatch(userNames: string[]) {
   return request.post<ApiAuth.UserInfo[]>("/users/fetchUsersInfoBatch", userNames);
 }
 
+//批量获取用户信息
+export function updateUserInfo(updateUserInfo: Auth.UserInfo) {
+  return request.post<ApiAuth.UserInfo>("/users/updateUserInfo", updateUserInfo);
+}
+
 
