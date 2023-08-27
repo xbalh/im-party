@@ -24,13 +24,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
         return bean;
     }
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOriginPatterns("*")
-                .allowedHeaders("*")
-                .allowCredentials(true)
-                .allowedMethods("*")
-                .maxAge(3600);
-    }
+//    @Override
+//    public void addCorsMappings(CorsRegistry registry) {
+//        registry.addMapping("/**")
+//                .allowedOriginPatterns("*")
+//                .allowedHeaders("*")
+//                .allowCredentials(true)
+//                .allowedMethods("*")
+//                .maxAge(3600);
+//    }
 }
