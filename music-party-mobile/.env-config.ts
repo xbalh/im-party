@@ -4,11 +4,11 @@ type ServiceEnv = Record<ServiceEnvType, ServiceEnvConfig>;
 /** 不同请求服务的环境配置 */
 const serviceEnv: ServiceEnv = {
   dev: {
-    url: 'http://124.221.34.38:8081',
+    url: 'http://localhost:8081',
     urlPattern: '/api',
-    secondUrl: 'http://124.221.34.38:8081',
+    secondUrl: 'http://localhost:8081',
     secondUrlPattern: '/second-url-pattern',
-    wsUrl: 'ws://124.221.34.38:8081',
+    wsUrl: 'ws://localhost:8081',
     wsUrlPattern: ''
   },
   test: {
@@ -20,11 +20,11 @@ const serviceEnv: ServiceEnv = {
     wsUrlPattern: '/musicParty'
   },
   prod: {
-    url: 'http://124.221.34.38:8082',
+    url: 'http://182.92.203.142:3344',
     urlPattern: '/api',
-    secondUrl: 'http://124.221.34.38:8082',
+    secondUrl: 'http://182.92.203.142:3344',
     secondUrlPattern: '/second-url-pattern',
-    wsUrl: 'ws://124.221.34.38:8081',
+    wsUrl: 'ws://182.92.203.142:3344',
     wsUrlPattern: ''
   }
 };
